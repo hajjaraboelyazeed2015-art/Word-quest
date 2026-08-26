@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Quest — Classroom English Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#1B2A49; --sky2:#243B6B; --sun:#FFC93C; --coral:#FF6B6B; --mint:#4ECDC4; --paper:#FFF8E7; --ink:#1B2A49; --grass:#7BD389;
+  --ok:#7BD389; --okd:#3F9E55; --bad:#FF6B6B; --badd:#C64848;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:radial-gradient(circle at 20% 10%,#2E4A8A 0,var(--sky) 45%,#12203A 100%);color:#fff;min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.display{font-family:'Fredoka',sans-serif}
+button{font-family:inherit;cursor:pointer;border:none}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+/* gate + watermark */
+.gate{position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 30% 20%,#2E4A8A,#12203A);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
+.gate .glogo{width:90px;height:90px;border-radius:26px;background:var(--sun);display:grid;place-items:center;font-size:52px;box-shadow:0 8px 0 #D9A518}
+.gate h2{font-family:'Fredoka';font-size:40px;color:var(--sun)}
+.gate .gc{font-weight:800;opacity:.85}
+.gate input{padding:14px 18px;border-radius:14px;border:3px solid var(--sun);font-family:'Fredoka';font-size:22px;text-align:center;width:min(300px,80vw);background:#fff;color:#1B2A49}
+.gate .err{color:var(--coral);font-weight:800;min-height:22px;font-size:16px}
+.gate .cred{position:absolute;bottom:20px;font-weight:800;opacity:.8}
+.wm{position:fixed;bottom:6px;right:10px;z-index:3;font-size:11px;font-weight:800;color:rgba(255,255,255,.45);pointer-events:none;letter-spacing:.5px}
+.dead{position:fixed;inset:0;background:#12203A;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center;font-family:'Nunito';z-index:99999}
+.dead h1{font-family:'Fredoka';color:var(--coral);font-size:38px}
+.dead p{max-width:520px;font-size:17px;line-height:1.5;opacity:.9}
+/* on-screen keyboard */
+.osk{position:fixed;left:0;right:0;bottom:0;z-index:100000;background:#1B2A49;padding:8px 8px calc(8px + env(safe-area-inset-bottom));display:none;box-shadow:0 -6px 20px rgba(0,0,0,.4)}
+.oskrow{display:flex;gap:6px;justify-content:center;margin:5px 0}
+.osk-k{flex:1 1 0;max-width:64px;height:52px;border-radius:10px;background:#fff;color:#1B2A49;font-family:'Fredoka';font-size:20px;border:none;box-shadow:0 3px 0 #C9C2B2}
+.osk-k:active{transform:translateY(2px);box-shadow:0 1px 0 #C9C2B2}
+.osk-k.wide{flex:1.4 1 0;background:#4ECDC4;box-shadow:0 3px 0 #2E9C94;font-size:18px}
+.osk-k.space{flex:5 1 0;max-width:none;background:#FFC93C;box-shadow:0 3px 0 #D9A518}
+.osklaunch{position:fixed;left:14px;bottom:14px;z-index:100000;width:56px;height:56px;border-radius:50%;background:var(--sun);color:#1B2A49;font-size:26px;border:none;box-shadow:0 5px 0 #D9A518;display:none;align-items:center;justify-content:center}
+/* stars */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.stars i{position:absolute;width:3px;height:3px;background:#fff;border-radius:50%;opacity:.7;animation:tw 3s infinite alternate}
+@keyframes tw{to{opacity:.15}}
+/* header */
+header{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:52px;height:52px;border-radius:16px;background:var(--sun);display:grid;place-items:center;font-size:30px;box-shadow:0 6px 0 #D9A518}
+.brand h1{font-size:30px;letter-spacing:.5px}
+.brand small{display:block;font-size:12px;opacity:.75;font-family:'Nunito';font-weight:700}
+.ghost{background:rgba(255,255,255,.12);color:#fff;padding:10px 16px;border-radius:12px;font-weight:800;font-size:14px;transition:.2s}
+.ghost:hover{background:rgba(255,255,255,.22)}
+/* scoreboard */
+.scoreboard{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.team{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:999px;background:rgba(255,255,255,.08);border:3px solid transparent;transition:.25s;cursor:pointer}
+.team.turn{border-color:var(--sun);box-shadow:0 0 0 6px rgba(255,201,60,.18);transform:scale(1.05)}
+.team .dot{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-family:'Fredoka';font-size:20px;color:#1B2A49}
+.team .dot{color:#1B2A49}.team .pts{font-family:'Fredoka';font-size:30px;line-height:1}
+.team .lbl{font-size:11px;opacity:.7;font-weight:800;text-transform:uppercase}
+.vs{font-family:'Fredoka';opacity:.5}
+/* grade screen */
+.hero{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 20px 60px}
+.hero h2{font-size:clamp(38px,7vw,74px);line-height:1;color:var(--sun);text-shadow:0 6px 0 rgba(0,0,0,.25)}
+.hero p{margin-top:12px;font-size:19px;opacity:.85;max-width:560px}
+.grades{display:flex;gap:22px;margin-top:44px;flex-wrap:wrap;justify-content:center}
+.gcard{width:200px;padding:28px 18px 22px;border-radius:26px;background:var(--paper);color:var(--ink);text-align:center;transition:.25s;box-shadow:0 10px 0 rgba(0,0,0,.25);position:relative}
+.gcard:hover{transform:translateY(-8px) rotate(-1.5deg)}
+.gcard .num{font-family:'Fredoka';font-size:72px;line-height:1;color:var(--coral)}
+.gcard:nth-child(2) .num{color:#3D8BFF}.gcard:nth-child(3) .num{color:#2AB39B}
+.gcard .t{font-weight:800;font-size:18px;margin-top:4px}
+.gcard .s{font-size:13px;opacity:.65;margin-top:6px}
+.credit{position:relative;z-index:1;text-align:center;padding:16px;font-size:14px;opacity:.85}
+.credit b{color:var(--sun)}
+/* map */
+.map-wrap{position:relative;z-index:1;flex:1;padding:10px 28px 30px}
+.map-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.chip{background:var(--sun);color:var(--ink);padding:8px 16px;border-radius:999px;font-weight:800;font-family:'Fredoka';font-size:18px}
+.trail{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;max-width:1150px;margin:0 auto}
+.station{position:relative;background:var(--paper);color:var(--ink);border-radius:24px;padding:22px 16px 18px;text-align:center;transition:.25s;box-shadow:0 8px 0 rgba(0,0,0,.28);cursor:pointer;overflow:hidden}
+.station:hover{transform:translateY(-6px)}
+.station .ic{font-size:46px;line-height:1}
+.station .nm{font-family:'Fredoka';font-size:20px;margin-top:10px;font-weight:600}
+.station .ds{font-size:12px;opacity:.65;margin-top:4px;min-height:32px}
+.station .badge{position:absolute;top:10px;left:12px;font-family:'Fredoka';font-size:13px;background:var(--sky);color:#fff;padding:3px 9px;border-radius:999px}
+.station.done::after{content:'✔';position:absolute;top:8px;right:10px;background:var(--ok);color:#fff;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800}
+/* game */
+.game-wrap{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 20px 40px}
+.gtitle{display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap;justify-content:center}
+.gtitle h2{font-size:34px}
+.turnbar{font-size:16px;font-weight:800;padding:8px 18px;border-radius:999px;margin-bottom:16px}
+.turnbar{color:#1B2A49;margin-bottom:8px}
+.whorow{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;justify-content:center;font-size:13px;font-weight:800;opacity:.9}
+.whorow .tc{padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.15);color:#fff;font-weight:800;font-size:13px;border:2px solid transparent}
+.whorow .tc.on{background:var(--sun);color:var(--ink)}
+.fb .chance{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;font-weight:800;font-size:15px;margin-top:6px}
+.board{width:min(960px,100%);background:var(--paper);color:var(--ink);border-radius:30px;padding:32px 30px;box-shadow:0 14px 0 rgba(0,0,0,.28);min-height:380px;display:flex;flex-direction:column;align-items:center;gap:20px;position:relative}
+.q{font-family:'Fredoka';font-size:clamp(24px,3.4vw,38px);text-align:center;line-height:1.25}
+.hint{font-size:64px;line-height:1}
+.sub{font-size:16px;opacity:.7;text-align:center;font-weight:700}
+.tiles{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.tile{background:#fff;border:3px solid var(--sky);color:var(--ink);font-family:'Fredoka';font-size:30px;min-width:64px;height:64px;padding:0 16px;border-radius:16px;box-shadow:0 5px 0 var(--sky);transition:.15s;display:grid;place-items:center}
+.tile:hover{transform:translateY(-3px)}
+.tile.used{opacity:.25;pointer-events:none;transform:none}
+.tile.word{font-size:24px}
+.answer{min-height:76px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;padding:10px 16px;border:3px dashed #B9B0A0;border-radius:18px;width:100%}
+.answer .tile{background:var(--sun);border-color:#D9A518;box-shadow:0 5px 0 #D9A518}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%}
+.opt{background:#fff;border:3px solid var(--sky);color:var(--ink);font-size:24px;font-weight:800;padding:18px;border-radius:18px;box-shadow:0 5px 0 var(--sky);transition:.15s;text-align:left}
+.opt:hover{transform:translateY(-3px)}
+.opt.right{background:var(--ok);border-color:var(--okd);box-shadow:0 5px 0 var(--okd)}
+.opt.wrong{background:var(--bad);border-color:var(--badd);box-shadow:0 5px 0 var(--badd);animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{padding:14px 28px;border-radius:16px;font-family:'Fredoka';font-size:22px;color:var(--ink);background:var(--sun);box-shadow:0 6px 0 #D9A518;transition:.15s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #D9A518}
+.btn.mint{background:var(--mint);box-shadow:0 6px 0 #2E9C94}.btn.mint:active{box-shadow:0 2px 0 #2E9C94}
+.btn.grey{background:#E5DECF;box-shadow:0 6px 0 #B9B0A0}.btn.grey:active{box-shadow:0 2px 0 #B9B0A0}
+.btn:disabled{opacity:.45;pointer-events:none}
+/* match */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:16px 60px;width:100%}
+.mcol{display:flex;flex-direction:column;gap:12px}
+.mitem{background:#fff;border:3px solid var(--sky);border-radius:16px;padding:14px;font-size:22px;font-weight:800;box-shadow:0 5px 0 var(--sky);transition:.15s;color:var(--ink);text-align:center}
+.mitem.sel{background:var(--sun);border-color:#D9A518;box-shadow:0 5px 0 #D9A518}
+.mitem.paired{background:var(--ok);border-color:var(--okd);box-shadow:0 5px 0 var(--okd);pointer-events:none}
+.mitem.bad{background:var(--bad);animation:shake .4s}
+/* memory */
+.memgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:620px}
+.card{aspect-ratio:1;perspective:800px;cursor:pointer}
+.card .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.card.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:16px;display:grid;place-items:center;backface-visibility:hidden;font-family:'Fredoka';font-size:22px;text-align:center;padding:6px}
+.face.front{background:var(--sky);color:var(--sun);font-size:36px}
+.face.back{background:#fff;border:3px solid var(--sky);color:var(--ink);transform:rotateY(180deg)}
+.card.matched .face.back{background:var(--ok);border-color:var(--okd);color:#fff}
+/* hangman */
+.hang{font-family:'Fredoka';font-size:44px;letter-spacing:12px}
+.lives{font-size:28px}
+.kb{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:700px}
+.kb button{width:46px;height:46px;border-radius:10px;font-family:'Fredoka';font-size:20px;background:#fff;border:2px solid var(--sky);color:var(--ink)}
+.kb button:disabled{opacity:.25}
+/* feedback */
+.fb{position:absolute;inset:0;border-radius:30px;display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:rgba(255,248,231,.96);z-index:5;text-align:center;padding:20px}
+.fb.show{display:flex;animation:pop .35s}
+.fb.good{background:color-mix(in srgb,var(--ok) 28%,#FFF8E7)}.fb.badfb{background:color-mix(in srgb,var(--bad) 28%,#FFF8E7)}
+.board.flash-ok{box-shadow:0 0 0 8px var(--ok),0 14px 0 rgba(0,0,0,.28)}.board.flash-bad{box-shadow:0 0 0 8px var(--bad),0 14px 0 rgba(0,0,0,.28)}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+.fb .big{font-size:80px;line-height:1}
+.fb h3{font-size:40px}
+.fb p{font-size:20px;font-weight:700;opacity:.8}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--sun);color:var(--ink);padding:12px 22px;border-radius:12px;font-weight:800;z-index:20;display:none}
+.progress{display:flex;gap:6px}
+.progress i{width:14px;height:14px;border-radius:50%;background:#D9D2C2}
+.progress i.on{background:var(--sun)}.progress i.ok{background:var(--ok)}
+/* result */
+.result{text-align:center}
+.result h2{font-size:56px;color:var(--sun)}
+.result .final{display:flex;gap:24px;justify-content:center;margin:30px 0;flex-wrap:wrap}
+.result .f{padding:26px 40px;border-radius:24px;background:var(--paper);color:var(--ink);min-width:200px}
+.result .f .rank{font-family:'Fredoka';font-size:22px;opacity:.6}.result .f .n{font-family:'Fredoka';font-size:70px;line-height:1}
+.result .f.win{outline:6px solid var(--sun);transform:scale(1.08)}
+.conf{position:fixed;top:-10px;width:10px;height:16px;z-index:30;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+/* settings */
+.sgrid{display:grid;gap:14px;padding:22px 26px;overflow:auto}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;border:2px solid #E5DECF;border-radius:14px;padding:12px 16px;flex-wrap:wrap}
+.srow .l{font-weight:800}.srow .l small{display:block;font-weight:700;opacity:.6;font-size:12px}
+.srow .c{display:flex;align-items:center;gap:10px}
+.sw{width:54px;height:30px;border-radius:999px;background:#D9D2C2;position:relative;cursor:pointer;transition:.2s;border:none}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--ok)}.sw.on::after{left:27px}
+input[type=range]{width:140px;accent-color:var(--sky)}
+input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:8px;padding:2px;background:#fff}
+.cstat{font-weight:800;font-size:13px}.cstat.ok{color:#2E9C94}.cstat.bad{color:#C64848}
+.sel{padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:800;font-size:14px;background:#fff;color:var(--ink)}
+.srow input[type=text]{padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:800;width:130px}
+.shead{font-family:'Fredoka';font-size:18px;margin-top:6px;opacity:.8}
+/* picker */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:18px 22px;overflow:auto}
+.pick{aspect-ratio:1;border-radius:14px;overflow:hidden;background:#fff;border:3px solid #E5DECF;display:grid;place-items:center;transition:.15s}
+.pick:hover{border-color:var(--sky);transform:scale(1.04)}
+.pick img{width:100%;height:100%;object-fit:cover}
+.pick.em{font-size:56px}
+.findbtn{margin-top:6px;width:100%}
+/* timer */
+.timer{width:100%;height:14px;background:#E5DECF;border-radius:999px;overflow:hidden;position:relative}
+.timer i{display:block;height:100%;background:var(--mint);width:100%;transition:width 1s linear}
+.timer.low i{background:var(--bad)}
+.timer.up{background:transparent;height:0;margin-top:14px}.timer.up .tnum{left:0;right:auto;top:-22px;color:var(--sky)}
+.tnum{position:absolute;right:-2px;top:-30px;font-family:'Fredoka';font-size:22px}
+.twrap{width:100%;position:relative;margin-top:14px}
+/* wheel */
+.wheelrow{display:flex;gap:30px;align-items:center;justify-content:center;width:100%;flex-wrap:wrap}
+.wheelbox{position:relative;width:min(340px,80vw)}
+.wheelbox canvas{width:100%;height:auto;filter:drop-shadow(0 8px 0 rgba(0,0,0,.2))}
+.pointer{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:42px;color:var(--sky);z-index:2;text-shadow:0 2px 0 #fff}
+.envs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;flex:1;min-width:260px;max-width:420px}
+.env{position:relative;background:var(--c);border-radius:12px;height:86px;display:flex;align-items:flex-end;justify-content:center;padding:8px;box-shadow:0 5px 0 rgba(0,0,0,.2);transition:.3s;overflow:hidden}
+.env .flap{position:absolute;top:0;left:0;right:0;height:46%;background:rgba(255,255,255,.35);clip-path:polygon(0 0,100% 0,50% 100%)}
+.env .etype{background:#fff;color:var(--ink);font-family:'Fredoka';font-size:14px;padding:5px 10px;border-radius:999px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.env.hit{transform:scale(1.1) rotate(-3deg);box-shadow:0 0 0 5px #fff,0 0 0 9px var(--c),0 10px 20px rgba(0,0,0,.3);z-index:2}
+.env.used{filter:grayscale(1);opacity:.4}
+.landed{background:var(--sky);color:var(--sun);font-family:'Fredoka';font-size:18px;padding:8px 16px;border-radius:999px;align-self:flex-start}
+/* treasure */
+.thead{display:flex;justify-content:space-between;align-items:center;width:100%;gap:10px;flex-wrap:wrap}
+.tclock{font-family:'Fredoka';font-size:30px;color:var(--sky)}.tclock.low{color:var(--bad);animation:shake .5s infinite}
+.path{width:100%}.path svg{width:100%;height:auto}
+#kid{transition:x .8s ease,y .8s ease}
+/* season */
+.totals{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:10px 0 26px}
+.tot{background:var(--paper);color:var(--ink);border-radius:20px;padding:18px 26px;min-width:170px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.25);border-top:10px solid var(--c)}
+.tot .n{font-family:'Fredoka';font-size:54px;line-height:1}.tot .lbl{font-weight:800}.tot small{opacity:.6;font-weight:700}
+.stable{width:100%;max-width:1000px;margin:0 auto;border-collapse:separate;border-spacing:0 8px}
+.stable th{text-align:left;font-size:12px;text-transform:uppercase;opacity:.7;padding:0 14px}
+.stable td{background:rgba(255,255,255,.1);padding:12px 14px;font-weight:700}
+.stable tr td:first-child{border-radius:12px 0 0 12px}.stable tr td:last-child{border-radius:0 12px 12px 0}
+.stable .del{background:var(--coral);color:#fff;border-radius:8px;padding:5px 10px;font-weight:800}
+.empty{text-align:center;opacity:.75;padding:40px;font-size:18px}
+/* archives */
+.arccard{background:#fff;border:2px solid #E5DECF;border-radius:14px;padding:14px 16px}
+.arctop{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.arclabel{font-family:'Fredoka';font-size:22px}
+.arcchamp{font-weight:800}
+/* compare */
+.cmpbox{background:var(--paper);color:var(--ink);border-radius:20px;padding:18px 22px;max-width:640px;margin:0 auto 24px;box-shadow:0 8px 0 rgba(0,0,0,.25)}
+.cmprow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.cmprow label{font-weight:800}
+.cmptable{width:100%;border-collapse:collapse}
+.cmptable th,.cmptable td{padding:8px 10px;border-bottom:1px solid #E5DECF;text-align:center;font-weight:700}
+.cmptable td:first-child,.cmptable th:first-child{text-align:left;opacity:.7}
+/* teacher panel */
+.modal{position:fixed;inset:0;background:rgba(10,18,40,.7);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.panel{background:var(--paper);color:var(--ink);width:min(1000px,100%);max-height:92vh;border-radius:26px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.phead{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;background:var(--sky);color:#fff;flex-wrap:wrap;gap:10px}
+.phead h3{font-size:24px}
+.pbody{display:grid;grid-template-columns:230px 1fr;flex:1;overflow:hidden}
+.pnav{background:#F1EAD8;padding:14px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.pnav .gt{display:flex;gap:6px;margin-bottom:10px}
+.pnav .gt button{flex:1;padding:8px;border-radius:10px;font-family:'Fredoka';font-size:18px;background:#fff;color:var(--ink);border:2px solid #D9D2C2}
+.pnav .gt button.on{background:var(--sun);border-color:#D9A518}
+.pnav .gm{text-align:left;padding:9px 12px;border-radius:10px;background:transparent;color:var(--ink);font-weight:800;font-size:14px}
+.pnav .gm.on{background:var(--sky);color:#fff}
+.pmain{padding:20px 24px;overflow:auto}
+.form{background:#fff;border:2px solid #E5DECF;border-radius:16px;padding:16px;display:grid;gap:10px;margin-bottom:18px}
+.form label{font-size:12px;font-weight:800;text-transform:uppercase;opacity:.65}
+.form input,.form select,.form textarea{width:100%;padding:10px 12px;border:2px solid #D9D2C2;border-radius:10px;font-family:inherit;font-size:16px;font-weight:700;color:var(--ink)}
+.form input:focus{outline:none;border-color:var(--sky)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.drop{border:2px dashed #B9B0A0;border-radius:12px;padding:12px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;min-height:60px}
+.drop img{height:48px;border-radius:8px}
+.drop.hit{border-color:var(--sky);background:#F1EAD8}
+.items{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:12px;background:#fff;border:2px solid #E5DECF;border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px}
+.item img{height:36px;border-radius:6px}
+.item .tx{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .del{background:var(--coral);color:#fff;border-radius:8px;padding:6px 10px;font-weight:800}
+.sm{padding:9px 14px;border-radius:10px;font-weight:800;font-size:14px;background:var(--sky);color:#fff}
+.sm.alt{background:#fff;color:var(--ink);border:2px solid var(--sky)}
+.hint img{height:150px;border-radius:14px;box-shadow:0 6px 0 rgba(0,0,0,.15)}
+.mitem img,.face img{height:56px;border-radius:8px}
+.pnote{font-size:13px;opacity:.7;margin-bottom:12px}
+@media(max-width:800px){.pbody{grid-template-columns:1fr}.pnav{flex-direction:row;flex-wrap:wrap}.pnav .gt{width:100%}.row4{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.trail{grid-template-columns:repeat(2,1fr)}.opts{grid-template-columns:1fr}.match{gap:12px 16px}.brand h1{font-size:22px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <div class="glogo">🧭</div>
+  <h2>Word Quest</h2>
+  <div class="gc" id="gcmsg">Press Enter or tap to open</div>
+  <input type="password" id="gpass" placeholder="Password" onkeydown="if(event.key==='Enter'){event.preventDefault();tryUnlock()}">
+  <div class="err" id="gerr"></div>
+  <button class="btn" id="openBtn" onclick="tryUnlock()">▶ Open the games</button>
+  <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
+  <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v12</div>
+</div>
+<div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
+<div class="stars" id="stars"></div>
+<div class="toast" id="toast"></div>
+
+<!-- HEADER (shared) -->
+<header>
+  <div class="brand">
+    <div class="logo">🧭</div>
+    <div><h1>Word Quest</h1><small class="wm-credit">Prepared by Miss Hagar Shaaban</small></div>
+  </div>
+  <div class="scoreboard" id="scoreboard"></div>
+  <div style="display:flex;gap:8px">
+    <button class="ghost" style="background:var(--sun);color:var(--ink)" onclick="openPanel()">⚙️ Edit content</button>
+    <button class="ghost" onclick="toggleMusic()" id="musBtn">🎵 Music off</button>
+    <button class="ghost" onclick="openTeams()">👥 Teams</button>
+    <button class="ghost" onclick="go('season')">📊 Season</button>
+    <button class="ghost" onclick="openSettings()">🎛️ Settings</button>
+    <button class="ghost" onclick="resetScores()">↺ Reset scores</button>
+    <button class="ghost" onclick="go('grade')">🏠 Home</button>
+    <button class="ghost" onclick="lockNow()">🔒 Lock</button>
+  </div>
+</header>
+
+<!-- GRADE SCREEN -->
+<section class="screen active" id="scr-grade">
+  <div class="hero">
+    <h2>Choose your grade</h2>
+    <p>Pick a grade to unlock 10 games made for that level. Two teams, one champion!</p>
+    <div class="grades">
+      <button class="gcard" onclick="pickGrade(4)"><div class="num">4</div><div class="t">Grade 4</div><div class="s">Simple words · short sentences</div></button>
+      <button class="gcard" onclick="pickGrade(5)"><div class="num">5</div><div class="t">Grade 5</div><div class="s">Longer words · past tense</div></button>
+      <button class="gcard" onclick="pickGrade(6)"><div class="num">6</div><div class="t">Grade 6</div><div class="s">Vocabulary · grammar challenges</div></button>
+    </div>
+  </div>
+  <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
+</section>
+
+<!-- MAP SCREEN -->
+<section class="screen" id="scr-map">
+  <div class="map-wrap">
+    <div class="map-head">
+      <span class="chip" id="gradeChip">Grade 4</span>
+      <h2 style="font-size:30px">Pick a game station</h2>
+      <button class="ghost" onclick="go('grade')">← Change grade</button>
+    </div>
+    <div class="trail" id="trail"></div>
+  </div>
+  <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
+</section>
+
+<!-- GAME SCREEN -->
+<section class="screen" id="scr-game">
+  <div class="game-wrap">
+    <div class="gtitle"><span id="gIcon" style="font-size:40px"></span><h2 id="gName"></h2></div>
+    <div class="turnbar" id="turnbar"></div>
+    <div class="whorow" id="whorow"></div>
+    <div class="board" id="board"></div>
+    <div style="display:flex;gap:12px;margin-top:18px;align-items:center;flex-wrap:wrap;justify-content:center">
+      <div class="progress" id="prog"></div>
+      <button class="ghost" onclick="go('map')">← Back to map</button>
+    </div>
+  </div>
+  <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
+</section>
+
+<!-- RESULT SCREEN -->
+<section class="screen" id="scr-result">
+  <div class="hero result">
+    <h2 id="winTitle">🏆 Team A wins!</h2>
+    <div class="final" id="final"></div>
+    <div id="alltime"></div>
+    <div class="actions"><button class="btn mint" onclick="saveSession()">💾 Save session result</button><button class="btn" onclick="go('map')">Play more games</button><button class="btn grey" onclick="resetScores();go('grade')">New match</button></div>
+  </div>
+  <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
+</section>
+
+<!-- SEASON SCREEN -->
+<section class="screen" id="scr-season">
+  <div class="map-wrap">
+    <div class="map-head"><span class="chip">📊 Season</span><h2 style="font-size:30px">Scores for the whole school year</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="exportSeason()">📤 Export CSV</button><button class="ghost" onclick="closeYear()">🏁 Close &amp; archive year</button><button class="ghost" onclick="openArchives()">📚 Archives</button><button class="ghost" onclick="clearSeason()">🗑️ Clear season</button><button class="ghost" onclick="go('map')">← Back</button></div></div>
+    <div id="seasonBody"></div>
+  </div>
+  <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
+</section>
+
+<!-- ARCHIVES MODAL -->
+<div class="modal" id="amodal">
+  <div class="panel" style="width:min(760px,100%)">
+    <div class="phead"><h3>📚 Past school years</h3><button class="ghost" onclick="closeArchives()">✔ Done</button></div>
+    <div class="sgrid" id="abody"></div>
+  </div>
+</div>
+
+<!-- TEAMS MODAL -->
+<div class="modal" id="tmodal">
+  <div class="panel" style="width:min(560px,100%)">
+    <div class="phead"><h3>👥 Teams</h3><button class="ghost" onclick="closeTeams()">✔ Done</button></div>
+    <div class="sgrid" id="tgrid"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="modal" id="smodal">
+  <div class="panel" style="width:min(640px,100%)">
+    <div class="phead"><h3>🎛️ Settings</h3><div style="display:flex;gap:8px"><button class="ghost" onclick="resetSettings()">↺ Defaults</button><button class="ghost" onclick="closeSettings()">✖ Close</button></div></div>
+    <div class="sgrid" id="sgrid"></div>
+  </div>
+</div>
+
+<!-- PICTURE PICKER -->
+<div class="modal" id="pmodal" style="z-index:60">
+  <div class="panel" style="width:min(720px,100%)">
+    <div class="phead"><h3 id="ptitle">Pictures</h3><button class="ghost" onclick="closePicker()">✖ Close</button></div>
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+</div>
+
+<!-- TEACHER PANEL -->
+<div class="modal" id="modal">
+  <div class="panel">
+    <div class="phead">
+      <h3>⚙️ Edit game content</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="ghost" onclick="exportData()">📤 Export file</button>
+        <button class="ghost" onclick="$('#imp').click()">📥 Import file</button>
+        <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(this)">
+        <button class="ghost" onclick="resetContent()">↺ Restore defaults</button>
+        <button class="ghost" onclick="closePanel()">✖ Close</button>
+      </div>
+    </div>
+    <div class="pbody">
+      <div class="pnav" id="pnav"></div>
+      <div class="pmain" id="pmain"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== CONTENT ===================== */
+const DEFAULT = {
+4:{
+ spell:[{"w":"apple","h":"🍎"},{"w":"tiger","h":"🐯"},{"w":"house","h":"🏠"},{"w":"water","h":"💧"},{"w":"happy","h":"😊"},{"w":"elephant","h":"🐘"},{"w":"umbrella","h":"☂️"},{"w":"birthday","h":"🎂"},{"w":"kitchen","h":"🍳"},{"w":"giraffe","h":"🦒"},{"w":"sandwich","h":"🥪"},{"w":"butterfly","h":"🦋"},{"w":"bicycle","h":"🚲"},{"w":"rainbow","h":"🌈"},{"w":"pencil","h":"✏️"},{"w":"garden","h":"🌷"},{"w":"orange","h":"🍊"},{"w":"rabbit","h":"🐰"},{"w":"flower","h":"🌸"},{"w":"cookie","h":"🍪"},{"w":"balloon","h":"🎈"},{"w":"chicken","h":"🐔"}],
+ sentence:["I like to play football","My cat is black and white","We go to school by bus","She has a red bag","The sun is very hot","My grandmother lives in a village","We have breakfast at seven o'clock","The children are swimming in the pool","I do not like carrots","There are three tigers in the zoo","She is wearing a blue dress","My father reads the newspaper","The dog is sleeping under the tree","We play games in the park","My mother cooks delicious food","I brush my teeth every morning","The birds are singing loudly","He rides his bike to school","We watch cartoons on Friday","My best friend is very kind","The baby is laughing happily","I want an ice cream please"],
+ match:[[["dog","🐶"],["fish","🐟"],["book","📖"],["car","🚗"]],[["sun","☀️"],["rain","🌧️"],["tree","🌳"],["star","⭐"]],[["pizza","🍕"],["milk","🥛"],["bread","🍞"],["egg","🥚"]],[["dentist","🦷"],["farmer","🚜"],["pilot","✈️"],["chef","👨‍🍳"]],[["thirsty","🥤"],["sleepy","😴"],["cold","🥶"],["scared","😨"]],[["beach","🏖️"],["forest","🌲"],["desert","🏜️"],["island","🏝️"]],[["spring","🌸"],["summer","☀️"],["autumn","🍂"],["winter","❄️"]],[["cat","🐱"],["cow","🐮"],["duck","🦆"],["bee","🐝"]],[["hand","✋"],["eye","👁️"],["ear","👂"],["nose","👃"]],[["red","🔴"],["blue","🔵"],["green","🟢"],["yellow","🟡"]],[["ball","⚽"],["kite","🪁"],["drum","🥁"],["gift","🎁"]],[["apple","🍎"],["banana","🍌"],["grapes","🍇"],["lemon","🍋"]],[["boat","⛵"],["train","🚆"],["plane","✈️"],["bus","🚌"]],[["king","🤴"],["queen","👸"],["baby","👶"],["family","👨‍👩‍👧"]],[["snake","🐍"],["frog","🐸"],["turtle","🐢"],["spider","🕷️"]],[["hat","🎩"],["shirt","👕"],["shoes","👟"],["socks","🧦"]],[["moon","🌙"],["cloud","☁️"],["snow","❄️"],["fire","🔥"]],[["lion","🦁"],["monkey","🐵"],["bear","🐻"],["fox","🦊"]],[["cake","🎂"],["candy","🍬"],["juice","🧃"],["soup","🍲"]],[["clock","⏰"],["key","🔑"],["lamp","💡"],["phone","📱"]]],
+ quiz:[{"q":"Which word is a colour?","o":["run","blue","table","jump"],"a":1},{"q":"How many days are in a week?","o":["five","six","seven","ten"],"a":2},{"q":"What is the opposite of \"big\"?","o":["tall","small","fat","long"],"a":1},{"q":"Choose the correct sentence.","o":["She go to school.","She goes to school.","She going school.","She gos to school."],"a":1},{"q":"Which animal can fly?","o":["cow","bird","fish","dog"],"a":1},{"q":"Which word is an adjective?","o":["jump","quickly","tiny","table"],"a":2},{"q":"How many minutes are in an hour?","o":["thirty","fifty","sixty","one hundred"],"a":2},{"q":"What is the opposite of \"hot\"?","o":["warm","cold","dry","fast"],"a":1},{"q":"Which animal lives in the sea?","o":["camel","dolphin","goat","parrot"],"a":1},{"q":"\"I ___ my teeth every morning.\"","o":["brush","brushes","brushing","brushed"],"a":0},{"q":"Which is a fruit?","o":["carrot","potato","banana","onion"],"a":2},{"q":"What do we use to see?","o":["ears","eyes","nose","hands"],"a":1},{"q":"Which word means \"not happy\"?","o":["glad","sad","kind","tall"],"a":1},{"q":"Choose the correct plural.","o":["two cat","two cats","two cates","two catts"],"a":1},{"q":"Which day comes after Monday?","o":["Sunday","Friday","Tuesday","Saturday"],"a":2},{"q":"\"There ___ two books on the desk.\"","o":["is","am","are","be"],"a":2},{"q":"Which is a wild animal?","o":["dog","cat","lion","cow"],"a":2},{"q":"What is the opposite of \"day\"?","o":["morning","night","noon","week"],"a":1},{"q":"Which word starts with a vowel?","o":["book","apple","tree","dog"],"a":1},{"q":"What season is very hot?","o":["winter","summer","autumn","spring"],"a":1},{"q":"\"My sister ___ a doctor.\"","o":["am","is","are","be"],"a":1},{"q":"Which one can you drink?","o":["bread","water","apple","chair"],"a":1}],
+ riddle:[{"q":"I am yellow. I live in the sky. I am hot. What am I?","o":["moon","sun","star","cloud"],"a":1},{"q":"I have four legs and I say \"meow\". What am I?","o":["dog","cat","cow","duck"],"a":1},{"q":"You use me to write. I can be blue or black. What am I?","o":["pen","cup","ball","shoe"],"a":0},{"q":"I am white and cold. Children play with me in winter. What am I?","o":["sand","snow","rain","milk"],"a":1},{"q":"I am round. You kick me but I never cry. What am I?","o":["a stone","a ball","a wheel","an egg"],"a":1},{"q":"I have many teeth but I cannot eat. I make your hair tidy. What am I?","o":["a fork","a brush","a comb","a shark"],"a":2},{"q":"I have a neck but no head. I hold your water. What am I?","o":["a bottle","a giraffe","a cup","a shirt"],"a":0},{"q":"I fall in winter but I am not rain. I am white and soft. What am I?","o":["a feather","a cloud","snow","a leaf"],"a":2},{"q":"I have wings but I am not a bird. I carry people in the sky. What am I?","o":["a kite","a plane","a bat","a dragon"],"a":1},{"q":"I am tall and green. Birds build their homes on me. What am I?","o":["a house","a tree","a hill","a wall"],"a":1},{"q":"I give you light at night. You blow me out on your cake. What am I?","o":["a lamp","a candle","the sun","a star"],"a":1},{"q":"I have a tail and I bark. I am your best friend. What am I?","o":["a cat","a dog","a fox","a wolf"],"a":1},{"q":"I am cold and sweet. You eat me in summer. What am I?","o":["soup","ice cream","tea","bread"],"a":1},{"q":"I have hands but I cannot clap. I tell you the time. What am I?","o":["a clock","a glove","a doll","a ring"],"a":0},{"q":"I am long and yellow. Monkeys love to eat me. What am I?","o":["an apple","a banana","a lemon","corn"],"a":1},{"q":"I live in water and I have no legs. I can swim. What am I?","o":["a bird","a fish","a cat","a frog"],"a":1},{"q":"I am in the sky at night. I twinkle. What am I?","o":["the sun","a star","a cloud","the wind"],"a":1},{"q":"You open me to go outside. What am I?","o":["a window","a door","a box","a book"],"a":1},{"q":"I have four wheels and I take you to places. What am I?","o":["a car","a boat","a plane","a kite"],"a":0},{"q":"I am soft. You put your head on me to sleep. What am I?","o":["a chair","a pillow","a table","a shoe"],"a":1},{"q":"I am the colour of grass and leaves. What am I?","o":["red","blue","green","black"],"a":2},{"q":"I have leaves but I am not a tree. You read me. What am I?","o":["a book","a plant","a flower","a box"],"a":0}],
+ gap:[{"s":"I ___ a student.","o":["am","is","are"],"a":0},{"s":"They ___ playing in the park.","o":["is","am","are"],"a":2},{"s":"This is ___ apple.","o":["a","an","the"],"a":1},{"s":"We ___ TV every night.","o":["watch","watches","watching"],"a":0},{"s":"The cat is ___ the table.","o":["on","in","at"],"a":0},{"s":"My sister ___ football every Saturday.","o":["play","plays","playing"],"a":1},{"s":"Look! The birds ___ flying.","o":["is","am","are"],"a":2},{"s":"I want ___ orange and a banana.","o":["a","an","the"],"a":1},{"s":"We ___ TV yesterday evening.","o":["watch","watched","watching"],"a":1},{"s":"How ___ apples are there?","o":["much","many","a lot"],"a":1},{"s":"She ___ got a new bike.","o":["have","has","having"],"a":1},{"s":"There ___ a dog in the garden.","o":["is","are","am"],"a":0},{"s":"I go to school ___ Monday.","o":["in","on","at"],"a":1},{"s":"He ___ like spinach.","o":["don't","doesn't","isn't"],"a":1},{"s":"The books are ___ the bag.","o":["in","on","at"],"a":0},{"s":"My mum ___ cooking dinner now.","o":["is","are","am"],"a":0},{"s":"We have ___ eggs in the fridge.","o":["a","an","some"],"a":2},{"s":"Can you ___ me, please?","o":["helps","help","helping"],"a":1},{"s":"It is ___ elephant.","o":["a","an","the"],"a":1},{"s":"I ___ happy today.","o":["am","is","are"],"a":0},{"s":"The children ___ at school now.","o":["is","am","are"],"a":2},{"s":"She sits ___ her friend.","o":["next to","in","of"],"a":0}],
+ odd:[{"o":["apple","banana","carrot","orange"],"a":2,"why":"carrot is a vegetable"},{"o":["red","green","blue","cat"],"a":3,"why":"cat is an animal"},{"o":["Monday","Friday","June","Sunday"],"a":2,"why":"June is a month"},{"o":["chair","table","bed","bus"],"a":3,"why":"bus is not furniture"},{"o":["carrot","onion","potato","cherry"],"a":3,"why":"cherry is a fruit"},{"o":["purple","orange","grey","giraffe"],"a":3,"why":"giraffe is an animal"},{"o":["Tuesday","Thursday","August","Saturday"],"a":2,"why":"August is a month"},{"o":["sofa","wardrobe","carpet","lorry"],"a":3,"why":"lorry is a vehicle"},{"o":["whale","shark","dolphin","eagle"],"a":3,"why":"eagle lives in the sky"},{"o":["dog","cat","rabbit","rose"],"a":3,"why":"rose is a flower"},{"o":["one","three","seven","blue"],"a":3,"why":"blue is a colour"},{"o":["mother","father","teacher","sister"],"a":2,"why":"teacher is not family"},{"o":["run","jump","swim","milk"],"a":3,"why":"milk is not an action"},{"o":["nose","ear","eye","hat"],"a":3,"why":"hat is not a body part"},{"o":["train","bus","car","chair"],"a":3,"why":"chair is not transport"},{"o":["cow","goat","sheep","tiger"],"a":3,"why":"tiger is a wild animal"},{"o":["ball","doll","kite","spoon"],"a":3,"why":"spoon is not a toy"},{"o":["tea","juice","water","bread"],"a":3,"why":"bread is not a drink"},{"o":["happy","sad","angry","tall"],"a":3,"why":"tall is not a feeling"},{"o":["spring","summer","winter","Monday"],"a":3,"why":"Monday is a day"},{"o":["shirt","dress","shoes","cup"],"a":3,"why":"cup is not clothing"},{"o":["apple","pear","peach","carrot"],"a":3,"why":"carrot is a vegetable"}],
+ tf:[{"s":"A week has seven days.","a":true},{"s":"Cats can fly.","a":false},{"s":"We use our eyes to see.","a":true},{"s":"Ice is hot.","a":false},{"s":"Bananas are yellow.","a":true},{"s":"A year has twelve months.","a":true},{"s":"Penguins can fly.","a":false},{"s":"\"Beautiful\" is an adjective.","a":true},{"s":"We use \"an\" before \"dog\".","a":false},{"s":"Fish live in water.","a":true},{"s":"The sun rises in the morning.","a":true},{"s":"Cows can climb trees.","a":false},{"s":"We sleep at night.","a":true},{"s":"Snow is warm.","a":false},{"s":"A triangle has three sides.","a":true},{"s":"Elephants are very small.","a":false},{"s":"We hear with our ears.","a":true},{"s":"Milk is a colour.","a":false},{"s":"Spiders have eight legs.","a":true},{"s":"A car can swim in the sea.","a":false},{"s":"Apples grow on trees.","a":true},{"s":"Monday comes before Tuesday.","a":true}],
+ memory:[[["cat","🐱"],["dog","🐶"],["fish","🐟"],["bird","🐦"]],[["apple","🍎"],["cake","🍰"],["milk","🥛"],["egg","🥚"]],[["kitten","🐱"],["puppy","🐶"],["chick","🐤"],["calf","🐮"]],[["strawberry","🍓"],["pineapple","🍍"],["watermelon","🍉"],["grapes","🍇"]],[["nurse","🏥"],["teacher","🏫"],["chef","🍳"],["astronaut","🚀"]],[["sun","☀️"],["moon","🌙"],["star","⭐"],["cloud","☁️"]],[["car","🚗"],["boat","⛵"],["plane","✈️"],["bike","🚲"]],[["red","🔴"],["blue","🔵"],["green","🟢"],["yellow","🟡"]],[["ball","⚽"],["kite","🪁"],["drum","🥁"],["gift","🎁"]],[["lion","🦁"],["tiger","🐯"],["bear","🐻"],["fox","🦊"]],[["hand","✋"],["eye","👁️"],["ear","👂"],["nose","👃"]],[["hat","🎩"],["shirt","👕"],["shoes","👟"],["socks","🧦"]],[["tree","🌳"],["flower","🌸"],["leaf","🍃"],["rose","🌹"]],[["clock","⏰"],["key","🔑"],["lamp","💡"],["phone","📱"]],[["pizza","🍕"],["burger","🍔"],["bread","🍞"],["cheese","🧀"]],[["frog","🐸"],["snake","🐍"],["turtle","🐢"],["bee","🐝"]],[["rain","🌧️"],["snow","❄️"],["fire","🔥"],["wind","🌬️"]],[["king","🤴"],["queen","👸"],["baby","👶"],["boy","👦"]],[["book","📖"],["pen","🖊️"],["ruler","📏"],["bag","🎒"]],[["cow","🐮"],["duck","🦆"],["owl","🦉"],["pig","🐷"]]],
+ hang:[{"w":"school","h":"A place where you learn"},{"w":"orange","h":"A fruit and a colour"},{"w":"teacher","h":"This person helps you learn"},{"w":"garden","h":"Flowers grow here"},{"w":"hospital","h":"Doctors and nurses work here"},{"w":"pumpkin","h":"A big orange vegetable"},{"w":"dictionary","h":"A book full of words and meanings"},{"w":"playground","h":"Children play here at school"},{"w":"crocodile","h":"A green animal with sharp teeth"},{"w":"rainbow","h":"Colours in the sky after rain"},{"w":"butterfly","h":"A pretty insect with big wings"},{"w":"kitchen","h":"We cook food in this room"},{"w":"elephant","h":"A huge grey animal with a trunk"},{"w":"umbrella","h":"It keeps you dry in the rain"},{"w":"birthday","h":"The day you were born"},{"w":"chocolate","h":"A sweet brown treat"},{"w":"football","h":"A game you play with your feet"},{"w":"mountain","h":"Very high land"},{"w":"penguin","h":"A black and white bird that cannot fly"},{"w":"sandwich","h":"Food between two slices of bread"},{"w":"bicycle","h":"It has two wheels and you ride it"},{"w":"giraffe","h":"A tall animal with a long neck"}]
+},
+5:{
+ spell:[{"w":"elephant","h":"🐘"},{"w":"kitchen","h":"🍳"},{"w":"library","h":"📚"},{"w":"weather","h":"🌦️"},{"w":"balloon","h":"🎈"},{"w":"temperature","h":"🌡️"},{"w":"vegetables","h":"🥦"},{"w":"neighbour","h":"🏘️"},{"w":"championship","h":"🏆"},{"w":"invitation","h":"💌"},{"w":"chocolate","h":"🍫"},{"w":"volunteer","h":"🙋"},{"w":"passenger","h":"🚌"},{"w":"adventure","h":"🗺️"},{"w":"mountain","h":"⛰️"},{"w":"hospital","h":"🏥"},{"w":"calendar","h":"📅"},{"w":"dangerous","h":"⚠️"},{"w":"furniture","h":"🛋️"},{"w":"breakfast","h":"🍳"},{"w":"telephone","h":"📞"},{"w":"dinosaur","h":"🦕"}],
+ sentence:["Yesterday we visited my grandmother","The children are playing in the garden","He always brushes his teeth before bed","I did not finish my homework last night","My father drives to work every morning","Last summer we travelled to the Red Sea","The students were reading quietly in class","My cousin has never eaten sushi before","If you do not hurry we will miss the bus","She always finishes her homework before dinner","We were watching a film when the lights went out","My brother is taller than me","They have lived in this city for ten years","I would like a glass of cold water","The teacher asked us to open our books","We should always be kind to animals","He was tired because he woke up early","There aren't any apples left in the bowl","My mother is cooking dinner in the kitchen","We are going to the museum next weekend","She sings more beautifully than her sister","The weather was sunny during our trip"],
+ match:[[["doctor","🏥"],["farmer","🚜"],["pilot","✈️"],["chef","👨‍🍳"]],[["hungry","🍽️"],["tired","😴"],["cold","🥶"],["scared","😨"]],[["sunny","☀️"],["windy","🌬️"],["snowy","❄️"],["cloudy","☁️"]],[["generous","likes to give"],["patient","can wait calmly"],["confident","believes in himself"],["curious","wants to find out"]],[["thermometer","measures heat"],["compass","shows directions"],["telescope","sees far planets"],["microscope","sees tiny things"]],[["drought","no rain for long"],["flood","too much water"],["earthquake","the ground shakes"],["storm","strong wind and rain"]],[["whisper","speak very quietly"],["giggle","laugh softly"],["stare","look for a long time"],["yawn","open your mouth when tired"]],[["enormous","very big"],["ancient","very old"],["furious","very angry"],["exhausted","very tired"]],[["dentist","teeth"],["baker","bread"],["gardener","plants"],["mechanic","cars"]],[["begin","start"],["end","finish"],["reply","answer"],["fix","repair"]],[["happy","sad"],["big","small"],["fast","slow"],["hot","cold"]],[["go","went"],["eat","ate"],["see","saw"],["run","ran"]],[["kitchen","cooking"],["bedroom","sleeping"],["bathroom","washing"],["garage","the car"]],[["knife","cutting"],["broom","sweeping"],["needle","sewing"],["hammer","hitting nails"]],[["Egypt","Cairo"],["France","Paris"],["Japan","Tokyo"],["Italy","Rome"]],[["cow","milk"],["bee","honey"],["hen","eggs"],["sheep","wool"]],[["desert","dry and sandy"],["ocean","deep and salty"],["jungle","hot and green"],["mountain","high and rocky"]],[["author","writes books"],["painter","makes pictures"],["singer","sings songs"],["dancer","dances"]],[["brave","not afraid"],["honest","tells the truth"],["polite","has good manners"],["lazy","does not want to work"]],[["Monday","first day of school"],["December","last month"],["morning","start of the day"],["midnight","twelve at night"]]],
+ quiz:[{"q":"What is the past tense of \"go\"?","o":["goed","went","gone","goes"],"a":1},{"q":"Which word is an adjective?","o":["quickly","beautiful","run","table"],"a":1},{"q":"Choose the correct sentence.","o":["I didn't went home.","I didn't go home.","I don't went home.","I not go home."],"a":1},{"q":"Which is a plural noun?","o":["child","children","childs","childrens"],"a":1},{"q":"\"She is taller ___ me.\"","o":["then","that","than","from"],"a":2},{"q":"Which sentence is in the past continuous?","o":["I played tennis.","I was playing tennis.","I play tennis.","I have played tennis."],"a":1},{"q":"What is the comparative form of \"happy\"?","o":["happyer","more happy","happier","happiest"],"a":2},{"q":"Choose the correct sentence.","o":["She don't like milk.","She doesn't likes milk.","She doesn't like milk.","She not like milk."],"a":2},{"q":"Which is an irregular plural?","o":["books","feet","cars","dogs"],"a":1},{"q":"\"You ___ eat in the library.\" (not allowed)","o":["mustn't","don't have to","shouldn't have","couldn't"],"a":0},{"q":"Which word is an adverb of frequency?","o":["quickly","sometimes","yesterday","carefully"],"a":1},{"q":"What is the past tense of \"buy\"?","o":["buyed","bought","buys","buying"],"a":1},{"q":"Which word is a synonym of \"big\"?","o":["tiny","huge","thin","short"],"a":1},{"q":"Choose the correct question.","o":["Where you are going?","Where are you going?","Where going you?","You are going where?"],"a":1},{"q":"\"There ___ many books on the shelf.\"","o":["is","are","am","be"],"a":1},{"q":"What is the opposite of \"arrive\"?","o":["reach","leave","stay","come"],"a":1},{"q":"Which is a comparative adjective?","o":["good","best","better","well"],"a":2},{"q":"\"He ___ his homework yesterday.\"","o":["do","does","did","done"],"a":2},{"q":"Which word is a verb?","o":["happy","quickly","jump","table"],"a":2},{"q":"\"I have ___ finished my lunch.\"","o":["yet","already","never mind","soon"],"a":1},{"q":"Choose the correct sentence.","o":["We was late.","We were late.","We been late.","We is late."],"a":1},{"q":"What is the plural of \"leaf\"?","o":["leafs","leaves","leafes","leaf"],"a":1}],
+ riddle:[{"q":"I have hands but no arms. I have a face but no eyes. What am I?","o":["a mirror","a clock","a doll","a book"],"a":1},{"q":"I get wetter the more I dry. What am I?","o":["a towel","a river","a fish","an umbrella"],"a":0},{"q":"I have keys but no locks. I have space but no room. What am I?","o":["a piano","a house","a keyboard","a map"],"a":2},{"q":"The more you take, the more you leave behind. What am I?","o":["money","footsteps","time","food"],"a":1},{"q":"I am always in front of you but you can never see me. What am I?","o":["the future","your nose","the wind","a shadow"],"a":0},{"q":"What has one eye but cannot see?","o":["a cyclone","a needle","a potato","a coin"],"a":1},{"q":"I have a thumb and four fingers but I am not alive. What am I?","o":["a glove","a hand","a foot","a sock"],"a":0},{"q":"What has a bed but never sleeps, and runs but never walks?","o":["a clock","a river","a car","a horse"],"a":1},{"q":"I am full of holes but I still hold water. What am I?","o":["a bucket","a sponge","a cup","a bag"],"a":1},{"q":"The more of me you take, the more you leave behind. Wait — what am I really? I follow you in the sun. What am I?","o":["a friend","a shadow","a dog","the wind"],"a":1},{"q":"I have branches but no leaves, no trunk and no fruit. What am I?","o":["a tree","a bank","a river","a road"],"a":1},{"q":"What goes up but never comes down?","o":["a ball","your age","the rain","a lift"],"a":1},{"q":"I have teeth but cannot bite. I keep your hair neat. What am I?","o":["a saw","a comb","a shark","a zip"],"a":1},{"q":"What can you catch but never throw?","o":["a ball","a cold","a fish","a bird"],"a":1},{"q":"I fly without wings and cry without eyes. What am I?","o":["a bird","a cloud","a plane","a kite"],"a":1},{"q":"What has a neck but no head?","o":["a giraffe","a bottle","a person","a snake"],"a":1},{"q":"I shine at night and disappear by day. I am not the moon. What am I?","o":["the sun","a star","a lamp","a torch"],"a":1},{"q":"What has many pages but is not a tree?","o":["a leaf","a book","a door","a wall"],"a":1},{"q":"I am tall when young and short when old. What am I?","o":["a tree","a candle","a person","a mountain"],"a":1},{"q":"What building has the most stories?","o":["a castle","a library","a hospital","a school"],"a":1},{"q":"I have a face and two hands but no legs. What am I?","o":["a doll","a clock","a robot","a statue"],"a":1},{"q":"What kind of coat is best put on wet?","o":["a raincoat","a paint coat","a fur coat","a jacket"],"a":1}],
+ gap:[{"s":"She ___ to the market yesterday.","o":["go","goes","went"],"a":2},{"s":"There ___ many books on the shelf.","o":["is","are","am"],"a":1},{"s":"I have ___ money in my pocket.","o":["some","any","many"],"a":0},{"s":"He is ___ than his brother.","o":["old","older","oldest"],"a":1},{"s":"We ___ watching a film now.","o":["is","am","are"],"a":2},{"s":"While I ___ dinner, the phone rang.","o":["cook","cooked","was cooking"],"a":2},{"s":"There isn't ___ milk left in the fridge.","o":["some","any","many"],"a":1},{"s":"This mountain is the ___ in Egypt.","o":["high","higher","highest"],"a":2},{"s":"You ___ wear a seatbelt in the car.","o":["must","can","might"],"a":0},{"s":"I ___ my keys, so I can't open the door.","o":["lose","have lost","am losing"],"a":1},{"s":"She sings ___ than her sister.","o":["beautiful","more beautifully","most beautifully"],"a":1},{"s":"They ___ football when it started to rain.","o":["play","were playing","plays"],"a":1},{"s":"How ___ sugar do you want?","o":["many","much","some"],"a":1},{"s":"He has lived here ___ 2015.","o":["for","since","ago"],"a":1},{"s":"This is ___ interesting book I have read.","o":["most","the most","more"],"a":1},{"s":"I ___ never seen a whale before.","o":["has","have","had"],"a":1},{"s":"If it rains, we ___ stay at home.","o":["will","would","were"],"a":0},{"s":"She is good ___ playing the piano.","o":["in","at","on"],"a":1},{"s":"There were ___ people at the party.","o":["much","a lot of","any"],"a":1},{"s":"We ___ to visit the zoo last week.","o":["go","went","gone"],"a":1},{"s":"He speaks English ___ than me.","o":["good","well","better"],"a":2},{"s":"I bought ___ apples and some bananas.","o":["a","an","some"],"a":2}],
+ odd:[{"o":["walked","jumped","played","eat"],"a":3,"why":"eat is not in the past tense"},{"o":["happy","sad","angry","teacher"],"a":3,"why":"teacher is not a feeling"},{"o":["lion","tiger","leopard","sheep"],"a":3,"why":"sheep is not a wild cat"},{"o":["bicycle","train","airplane","pencil"],"a":3,"why":"pencil is not transport"},{"o":["wrote","swam","drank","drink"],"a":3,"why":"drink is present tense"},{"o":["furious","delighted","anxious","kitchen"],"a":3,"why":"kitchen is not a feeling"},{"o":["cheetah","leopard","jaguar","zebra"],"a":3,"why":"zebra is not a big cat"},{"o":["helicopter","submarine","yacht","trumpet"],"a":3,"why":"trumpet is an instrument"},{"o":["always","never","often","tomorrow"],"a":3,"why":"tomorrow is not an adverb of frequency"},{"o":["apple","grape","cabbage","banana"],"a":2,"why":"cabbage is a vegetable"},{"o":["run","running","swim","jump"],"a":1,"why":"running is not a base verb"},{"o":["quickly","slowly","loudly","quiet"],"a":3,"why":"quiet is an adjective, not an adverb"},{"o":["doctor","nurse","dentist","hospital"],"a":3,"why":"hospital is a place, not a job"},{"o":["Nile","Amazon","Sahara","Thames"],"a":2,"why":"Sahara is a desert, not a river"},{"o":["copper","gold","silver","wooden"],"a":3,"why":"wooden is not a metal"},{"o":["mother","uncle","cousin","friend"],"a":3,"why":"friend is not family"},{"o":["swim","dive","float","burn"],"a":3,"why":"burn is not done in water"},{"o":["June","April","Monday","March"],"a":2,"why":"Monday is a day, not a month"},{"o":["violin","guitar","drum","brush"],"a":3,"why":"brush is not an instrument"},{"o":["taller","bigger","fastest","smaller"],"a":2,"why":"fastest is superlative, others comparative"},{"o":["spoon","fork","plate","towel"],"a":3,"why":"towel is not used for eating"},{"o":["north","south","east","under"],"a":3,"why":"under is not a direction on a compass"}],
+ tf:[{"s":"\"Ran\" is the past tense of \"run\".","a":true},{"s":"An adjective describes a verb.","a":false},{"s":"\"Children\" is a plural noun.","a":true},{"s":"We use \"an\" before words that start with a consonant.","a":false},{"s":"\"Quickly\" is an adverb.","a":true},{"s":"\"Brought\" is the past tense of \"bring\".","a":true},{"s":"An adverb usually describes a noun.","a":false},{"s":"\"Geese\" is the plural of \"goose\".","a":true},{"s":"We use \"much\" with countable nouns.","a":false},{"s":"\"Have to\" means something is necessary.","a":true},{"s":"The comparative of \"good\" is \"gooder\".","a":false},{"s":"\"Since\" is used with a point in time.","a":true},{"s":"A verb is an action word.","a":true},{"s":"The plural of \"man\" is \"mans\".","a":false},{"s":"\"Beautifully\" is an adverb.","a":true},{"s":"We use \"were\" with the word \"I\".","a":false},{"s":"\"Enormous\" means very small.","a":false},{"s":"The past of \"see\" is \"saw\".","a":true},{"s":"\"Their\", \"there\" and \"they're\" sound the same.","a":true},{"s":"A question ends with a full stop.","a":false},{"s":"\"Faster\" is a comparative adjective.","a":true},{"s":"Adverbs often end in -ly.","a":true}],
+ memory:[[["go","went"],["eat","ate"],["see","saw"],["run","ran"]],[["big","huge"],["small","tiny"],["happy","glad"],["fast","quick"]],[["buy","bought"],["catch","caught"],["teach","taught"],["think","thought"]],[["enormous","gigantic"],["ancient","old"],["furious","angry"],["exhausted","tired"]],[["generous","mean"],["polite","rude"],["brave","cowardly"],["noisy","silent"]],[["hot","cold"],["up","down"],["day","night"],["open","closed"]],[["Egypt","Cairo"],["France","Paris"],["Japan","Tokyo"],["Italy","Rome"]],[["cow","milk"],["bee","honey"],["hen","eggs"],["sheep","wool"]],[["begin","start"],["end","finish"],["reply","answer"],["fix","repair"]],[["swim","swam"],["drink","drank"],["fly","flew"],["give","gave"]],[["doctor","hospital"],["teacher","school"],["chef","kitchen"],["pilot","plane"]],[["strong","weak"],["rich","poor"],["young","old"],["easy","hard"]],[["write","wrote"],["sing","sang"],["ride","rode"],["take","took"]],[["knife","cut"],["broom","sweep"],["pen","write"],["key","open"]],[["sunny","rainy"],["hot","freezing"],["dry","wet"],["light","dark"]],[["author","book"],["painter","picture"],["singer","song"],["farmer","crops"]],[["make","made"],["find","found"],["win","won"],["sleep","slept"]],[["clever","smart"],["scared","afraid"],["glad","pleased"],["angry","cross"]],[["desert","dry"],["ocean","salty"],["jungle","green"],["mountain","high"]],[["first","last"],["early","late"],["always","never"],["before","after"]]],
+ hang:[{"w":"holiday","h":"Time off from school"},{"w":"dinosaur","h":"A huge animal that lived long ago"},{"w":"mountain","h":"Very high land"},{"w":"birthday","h":"The day you were born"},{"w":"archaeologist","h":"This person digs up things from the past"},{"w":"thunderstorm","h":"Loud weather with lightning"},{"w":"tournament","h":"A competition with many matches"},{"w":"pharmacy","h":"You buy medicine here"},{"w":"greenhouse","h":"A glass building for growing plants"},{"w":"temperature","h":"How hot or cold something is"},{"w":"passenger","h":"A person travelling on a bus or plane"},{"w":"library","h":"A place full of books to borrow"},{"w":"volunteer","h":"A person who helps without pay"},{"w":"champion","h":"The winner of a competition"},{"w":"invitation","h":"A card asking you to a party"},{"w":"neighbour","h":"The person who lives next door"},{"w":"adventure","h":"An exciting and unusual experience"},{"w":"calendar","h":"It shows the days and months"},{"w":"vegetable","h":"A healthy food like a carrot"},{"w":"telephone","h":"You use it to call people"},{"w":"furniture","h":"Tables, chairs and beds"},{"w":"breakfast","h":"The first meal of the day"}]
+},
+6:{
+ spell:[{"w":"environment","h":"🌍"},{"w":"delicious","h":"😋"},{"w":"adventure","h":"🗺️"},{"w":"scientist","h":"🔬"},{"w":"restaurant","h":"🍽️"},{"w":"responsibility","h":"✅"},{"w":"photographer","h":"📷"},{"w":"atmosphere","h":"🌫️"},{"w":"independence","h":"🎉"},{"w":"pronunciation","h":"🗣️"},{"w":"achievement","h":"🏅"},{"w":"necessary","h":"📌"},{"w":"mysterious","h":"🕵️"},{"w":"temperature","h":"🌡️"},{"w":"electricity","h":"⚡"},{"w":"imagination","h":"💭"},{"w":"dictionary","h":"📖"},{"w":"celebration","h":"🎊"},{"w":"experiment","h":"🧪"},{"w":"magnificent","h":"✨"},{"w":"knowledge","h":"🧠"},{"w":"appreciate","h":"🙏"}],
+ sentence:["If it rains tomorrow we will stay at home","She has never been to London before","You should drink more water every day","The museum was built two hundred years ago","I have been learning English since I was six","If I had studied harder I would have passed","The bridge which was built in 1902 is still used","By the time we arrived the concert had started","Scientists have been studying climate change for years","Unless you apologise she will not speak to you","The film was far more interesting than I expected","I wish I could travel around the whole world","He asked me whether I had finished the report","This is the tallest building I have ever seen","The homework must be handed in by Friday","Although it was raining, we went for a walk","She would rather read a book than watch television","Neither the students nor the teacher was ready","The letter was written by my grandfather in 1960","We were exhausted after climbing the mountain","Not only is she clever but she is also kind","I have been waiting for this moment for years"],
+ match:[[["enormous","very big"],["ancient","very old"],["furious","very angry"],["exhausted","very tired"]],[["brave","not afraid"],["generous","likes giving"],["curious","wants to know"],["honest","tells the truth"]],[["recycle","use again"],["pollute","make dirty"],["protect","keep safe"],["destroy","break completely"]],[["reluctant","not willing"],["ambitious","wants to succeed"],["sceptical","does not believe easily"],["resilient","recovers quickly"]],[["decade","ten years"],["century","one hundred years"],["fortnight","two weeks"],["millennium","one thousand years"]],[["biodegradable","breaks down naturally"],["renewable","can be replaced"],["sustainable","can continue long"],["endangered","in danger of disappearing"]],[["metaphor","compare without like"],["simile","compare with like"],["idiom","phrase with hidden meaning"],["synonym","same meaning"]],[["whisper","speak very quietly"],["mutter","speak unclearly"],["bellow","shout very loudly"],["stammer","speak with pauses"]],[["expand","get bigger"],["shrink","get smaller"],["freeze","turn to ice"],["evaporate","turn to gas"]],[["optimist","expects the best"],["pessimist","expects the worst"],["genius","very clever person"],["coward","not brave"]],[["migrate","move to another place"],["hibernate","sleep through winter"],["camouflage","blend in"],["predator","hunts other animals"]],[["astronomy","study of stars"],["biology","study of living things"],["geology","study of rocks"],["history","study of the past"]],[["increase","go up"],["decrease","go down"],["maintain","keep the same"],["fluctuate","change often"]],[["cautious","careful"],["reckless","careless"],["diligent","hard-working"],["idle","doing nothing"]],[["comedy","makes you laugh"],["tragedy","sad ending"],["mystery","full of secrets"],["documentary","shows real facts"]],[["evidence","proof"],["witness","person who saw it"],["verdict","the decision"],["suspect","possibly guilty"]],[["fragile","breaks easily"],["flexible","bends easily"],["transparent","you can see through"],["waterproof","keeps water out"]],[["donate","give to charity"],["borrow","take for a while"],["earn","get by working"],["waste","use carelessly"]],[["annual","every year"],["monthly","every month"],["daily","every day"],["weekly","every week"]],[["vast","extremely large"],["minute","extremely small"],["ancient","extremely old"],["scorching","extremely hot"]]],
+ quiz:[{"q":"Which sentence is in the present perfect?","o":["I went to Cairo.","I have been to Cairo.","I go to Cairo.","I will go to Cairo."],"a":1},{"q":"Choose the synonym of \"difficult\".","o":["easy","hard","soft","light"],"a":1},{"q":"\"You ___ wear a helmet.\" (advice)","o":["should","can","might","would"],"a":0},{"q":"Which is a comparative adjective?","o":["good","best","better","well"],"a":2},{"q":"Which word is a conjunction?","o":["because","quickly","tomorrow","beautiful"],"a":0},{"q":"Which sentence is in the past perfect?","o":["She left before I arrived.","She had left before I arrived.","She has left.","She was leaving."],"a":1},{"q":"Reported speech: He said, \"I am tired.\"","o":["He said he is tired.","He said he was tired.","He said I am tired.","He said he had tired."],"a":1},{"q":"Which sentence uses the passive voice?","o":["The chef cooked the meal.","The meal was cooked by the chef.","The chef is cooking.","The chef will cook."],"a":1},{"q":"What does \"procrastinate\" mean?","o":["finish early","delay doing something","work very hard","plan carefully"],"a":1},{"q":"\"I wish I ___ taller.\"","o":["am","was","were","be"],"a":2},{"q":"Which is a third conditional sentence?","o":["If it rains, I will stay.","If it rained, I would stay.","If it had rained, I would have stayed.","If it rains, I stay."],"a":2},{"q":"Choose the antonym of \"generous\".","o":["kind","mean","rich","brave"],"a":1},{"q":"Which word is an adverb?","o":["happy","happiness","happily","happier"],"a":2},{"q":"\"By 2030, she ___ from university.\"","o":["graduates","will graduate","will have graduated"],"a":2},{"q":"Which sentence is correct?","o":["He suggested to go home.","He suggested going home.","He suggested go home.","He suggested we goes home."],"a":1},{"q":"What does the idiom \"break the ice\" mean?","o":["freeze water","start a conversation","break something","feel cold"],"a":1},{"q":"Which is a relative pronoun?","o":["and","which","very","slowly"],"a":1},{"q":"\"If only I ___ listened to my teacher!\"","o":["have","had","has","having"],"a":1},{"q":"Which word means the opposite of ancient?","o":["old","modern","tiny","huge"],"a":1},{"q":"\"The report ___ by the manager yesterday.\"","o":["signed","was signed","has signed","signs"],"a":1},{"q":"Choose the correct question tag: You're coming, ___?","o":["are you","aren't you","don't you","isn't it"],"a":1},{"q":"Which word is a preposition?","o":["under","jump","clever","quickly"],"a":0}],
+ riddle:[{"q":"I speak without a mouth and hear without ears. I come alive with wind. What am I?","o":["an echo","a bell","a ghost","a radio"],"a":0},{"q":"What has cities but no houses, forests but no trees, and water but no fish?","o":["a globe","a map","a dream","a painting"],"a":1},{"q":"What can travel around the world while staying in a corner?","o":["a bird","a stamp","a coin","a cloud"],"a":1},{"q":"What has to be broken before you can use it?","o":["a promise","an egg","a rule","a window"],"a":1},{"q":"I am not alive, but I grow. I need air, but water kills me. What am I?","o":["a plant","fire","a balloon","ice"],"a":1},{"q":"What belongs to you but other people use it more than you do?","o":["your phone","your name","your money","your time"],"a":1},{"q":"Forward I am heavy, backward I am not. What am I?","o":["a rock","a ton","a lorry","a stone"],"a":1},{"q":"What can fill a room but takes up no space?","o":["air","light","a sound","a smell"],"a":1},{"q":"The person who makes it sells it. The person who buys it never uses it. What is it?","o":["a book","a coffin","a car","a gift"],"a":1},{"q":"What has a head and a tail but no body?","o":["a snake","a coin","a comet","a kite"],"a":1},{"q":"I can be cracked, made, told and played. What am I?","o":["an egg","a joke","a code","a rule"],"a":1},{"q":"What gets sharper the more you use it?","o":["a knife","your brain","a pencil","a needle"],"a":1},{"q":"What has words but never speaks?","o":["a parrot","a book","a phone","a radio"],"a":1},{"q":"What runs around a garden yet never moves?","o":["a dog","a fence","the wind","a stream"],"a":1},{"q":"The more you remove from me, the bigger I get. What am I?","o":["a balloon","a hole","a cloud","a shadow"],"a":1},{"q":"What has a ring but no finger?","o":["a bell","a telephone","a tree","a chain"],"a":1},{"q":"I am tall when I am young and short when I am old. What am I?","o":["a person","a candle","a tree","a shadow"],"a":1},{"q":"What kind of tree can you carry in your hand?","o":["an oak","a palm","a pine","a birch"],"a":1},{"q":"What five-letter word becomes shorter when you add two letters?","o":["small","short","tiny","brief"],"a":1},{"q":"What has many keys but cannot open a single lock?","o":["a keychain","a piano","a car","a jailer"],"a":1},{"q":"What invention lets you look right through a wall?","o":["a mirror","a window","a camera","a screen"],"a":1},{"q":"What goes through towns and hills but never moves?","o":["a river","a road","a train","the wind"],"a":1}],
+ gap:[{"s":"I have ___ finished my project.","o":["yet","already","still"],"a":1},{"s":"If you heat ice, it ___.","o":["melt","melts","melted"],"a":1},{"s":"She asked me ___ I liked the film.","o":["what","if","which"],"a":1},{"s":"This is the ___ book I have ever read.","o":["good","better","best"],"a":2},{"s":"They ___ lived here since 2010.","o":["have","has","had"],"a":0},{"s":"By next year, I ___ English for eight years.","o":["will study","will have studied","am studying"],"a":1},{"s":"The homework ___ by all the students yesterday.","o":["finished","was finished","has finished"],"a":1},{"s":"He is ___ intelligent that he solved it in seconds.","o":["such","so","too"],"a":1},{"s":"If I ___ you, I would accept the offer.","o":["am","was","were"],"a":2},{"s":"I ___ rather stay at home tonight.","o":["would","should","could"],"a":0},{"s":"The Pyramids ___ thousands of years ago.","o":["build","were built","are building"],"a":1},{"s":"She works hard ___ she can pass the exam.","o":["so that","because","although"],"a":0},{"s":"I have known him ___ we were children.","o":["for","since","during"],"a":1},{"s":"You ___ have told me earlier!","o":["should","must","can"],"a":0},{"s":"Hardly ___ I sat down when the phone rang.","o":["did","had","have"],"a":1},{"s":"The more you practise, ___ you become.","o":["good","better","the better"],"a":2},{"s":"Neither the teacher nor the students ___ ready.","o":["was","were","been"],"a":1},{"s":"It was such a ___ day that we stayed inside.","o":["rain","rainy","rains"],"a":1},{"s":"I look forward ___ seeing you soon.","o":["to","for","at"],"a":0},{"s":"If only I ___ study harder last year.","o":["did","had","have"],"a":1},{"s":"The book ___ I borrowed was fascinating.","o":["who","which","where"],"a":1},{"s":"He denied ___ the window.","o":["break","to break","breaking"],"a":2}],
+ odd:[{"o":["whisper","shout","scream","yell"],"a":0,"why":"whisper is quiet"},{"o":["because","although","however","yesterday"],"a":3,"why":"yesterday is not a linking word"},{"o":["excited","thrilled","delighted","miserable"],"a":3,"why":"miserable is a negative feeling"},{"o":["recycle","reuse","reduce","pollute"],"a":3,"why":"pollute harms the environment"},{"o":["murmur","mutter","whisper","bellow"],"a":3,"why":"bellow is very loud"},{"o":["nevertheless","however","although","meanwhile"],"a":3,"why":"meanwhile is about time, not contrast"},{"o":["ecstatic","overjoyed","thrilled","devastated"],"a":3,"why":"devastated is a negative feeling"},{"o":["conserve","preserve","protect","squander"],"a":3,"why":"squander means to waste"},{"o":["optimistic","hopeful","positive","pessimistic"],"a":3,"why":"pessimistic expects the worst"},{"o":["decade","century","fortnight","triangle"],"a":3,"why":"triangle is not a period of time"},{"o":["simile","metaphor","idiom","paragraph"],"a":3,"why":"paragraph is not a figure of speech"},{"o":["cautious","careful","wary","reckless"],"a":3,"why":"reckless means not careful"},{"o":["migrate","hibernate","camouflage","celebrate"],"a":3,"why":"celebrate is not an animal behaviour"},{"o":["copper","oxygen","iron","gold"],"a":1,"why":"oxygen is a gas, not a metal"},{"o":["ancient","modern","recent","contemporary"],"a":0,"why":"ancient means old; the others mean new"},{"o":["increase","rise","grow","decline"],"a":3,"why":"decline means to go down"},{"o":["honesty","courage","laziness","kindness"],"a":2,"why":"laziness is not a good quality"},{"o":["evaporate","freeze","boil","calculate"],"a":3,"why":"calculate is not a change of state"},{"o":["fragile","delicate","brittle","sturdy"],"a":3,"why":"sturdy means strong"},{"o":["annually","monthly","daily","suddenly"],"a":3,"why":"suddenly is not about frequency"},{"o":["biology","chemistry","physics","geography"],"a":3,"why":"geography is not a laboratory science"},{"o":["generous","selfish","greedy","stingy"],"a":0,"why":"generous is positive; the others are negative"}],
+ tf:[{"s":"\"Since\" is used with a point in time (since 2015).","a":true},{"s":"\"Furious\" means very happy.","a":false},{"s":"A synonym is a word with the same meaning.","a":true},{"s":"We use \"must\" to talk about the past.","a":false},{"s":"\"Ancient\" means very old.","a":true},{"s":"\"For\" is used with a period of time.","a":true},{"s":"\"Notorious\" means famous for something good.","a":false},{"s":"In reported speech, \"will\" usually becomes \"would\".","a":true},{"s":"\"Whom\" is used for the subject of a sentence.","a":false},{"s":"An antonym is a word with the opposite meaning.","a":true},{"s":"The passive voice always needs the verb \"to be\".","a":true},{"s":"A simile compares things using \"like\" or \"as\".","a":true},{"s":"The third conditional talks about the real present.","a":false},{"s":"\"Beneath\" is a preposition.","a":true},{"s":"A conjunction joins words or sentences.","a":true},{"s":"\"Its\" and \"it's\" mean exactly the same thing.","a":false},{"s":"The prefix \"un-\" usually means \"not\".","a":true},{"s":"\"Advice\" is a countable noun.","a":false},{"s":"\"He works hard\" — \"hard\" here is an adverb.","a":true},{"s":"A relative clause gives extra information about a noun.","a":true},{"s":"\"Fewer\" is used with countable nouns.","a":true},{"s":"Every English sentence must contain an adjective.","a":false}],
+ memory:[[["scarce","plentiful"],["temporary","permanent"],["reluctant","eager"],["vague","clear"]],[["commence","begin"],["purchase","buy"],["enquire","ask"],["demolish","destroy"]],[["piece of cake","very easy"],["break a leg","good luck"],["under the weather","ill"],["once in a blue moon","very rarely"]],[["huge","tiny"],["brave","scared"],["ancient","modern"],["polite","rude"]],[["expand","contract"],["ascend","descend"],["accept","reject"],["arrive","depart"]],[["astronomy","stars"],["biology","life"],["geology","rocks"],["history","the past"]],[["metaphor","figure of speech"],["decade","ten years"],["synonym","same meaning"],["antonym","opposite"]],[["optimist","hopeful"],["pessimist","gloomy"],["genius","brilliant"],["coward","fearful"]],[["fragile","strong"],["generous","selfish"],["ancient","modern"],["victory","defeat"]],[["migrate","move away"],["hibernate","sleep in winter"],["camouflage","blend in"],["predator","hunter"]],[["renewable","solar power"],["endangered","the panda"],["pollution","dirty air"],["recycle","use again"]],[["furious","calm"],["exhausted","energetic"],["reluctant","willing"],["cautious","reckless"]],[["increase","rise"],["decrease","fall"],["maintain","keep"],["fluctuate","vary"]],[["comedy","funny"],["tragedy","sad"],["mystery","puzzling"],["documentary","factual"]],[["donate","give"],["borrow","take briefly"],["earn","work for"],["inherit","receive from family"]],[["annual","yearly"],["fragile","breakable"],["vast","enormous"],["minute","tiny"]],[["evidence","proof"],["witness","observer"],["verdict","decision"],["suspect","accused"]],[["transparent","see-through"],["flexible","bendy"],["waterproof","dry inside"],["portable","easy to carry"]],[["begin","commence"],["end","conclude"],["help","assist"],["show","demonstrate"]],[["brave as a lion","very brave"],["quiet as a mouse","very quiet"],["busy as a bee","very busy"],["cool as a cucumber","very calm"]]],
+ hang:[{"w":"photosynthesis","h":"How plants make food from sunlight"},{"w":"entrepreneur","h":"A person who starts a business"},{"w":"parliament","h":"Where laws are made"},{"w":"archipelago","h":"A group of islands"},{"w":"hieroglyphics","h":"Ancient Egyptian picture writing"},{"w":"responsibility","h":"A duty you must take care of"},{"w":"atmosphere","h":"The layer of gases around the Earth"},{"w":"independence","h":"Freedom from control by others"},{"w":"pronunciation","h":"The way a word is said"},{"w":"achievement","h":"Something great you have done"},{"w":"imagination","h":"The power to picture new ideas"},{"w":"electricity","h":"The power that runs your lights"},{"w":"celebration","h":"A happy event like a festival"},{"w":"experiment","h":"A scientific test to find out something"},{"w":"environment","h":"The natural world around us"},{"w":"knowledge","h":"Everything you have learned"},{"w":"magnificent","h":"Extremely beautiful or impressive"},{"w":"dictionary","h":"A book that explains word meanings"},{"w":"restaurant","h":"A place where you buy and eat meals"},{"w":"volcano","h":"A mountain that can erupt"},{"w":"continent","h":"A very large area of land like Africa"},{"w":"temperature","h":"A measure of heat or cold"}]
+}
+};
+
+const GAMES=[
+ {id:'spell',ic:'🔤',nm:'Spelling Scramble',ds:'Tap the letters to spell the word'},
+ {id:'sentence',ic:'🧩',nm:'Sentence Builder',ds:'Put the words in the right order'},
+ {id:'match',ic:'🔗',nm:'Match Up',ds:'Pair each word with its match'},
+ {id:'quiz',ic:'❓',nm:'Quick Quiz',ds:'Choose the correct answer'},
+ {id:'riddle',ic:'🕵️',nm:'Riddle Time',ds:'Solve the riddle'},
+ {id:'gap',ic:'✏️',nm:'Fill the Gap',ds:'Pick the missing word'},
+ {id:'odd',ic:'🎯',nm:'Odd One Out',ds:'Which word does not belong?'},
+ {id:'tf',ic:'⚖️',nm:'True or False',ds:'Is the sentence correct?'},
+ {id:'memory',ic:'🃏',nm:'Memory Match',ds:'Flip cards to find the pairs'},
+ {id:'hang',ic:'🎈',nm:'Guess the Word',ds:'Save the balloons — guess letter by letter'},
+ {id:'wheel',ic:'🎡',nm:'Spin the Wheel',ds:'Spin for a surprise challenge from any game'},
+ {id:'treasure',ic:'🏴‍☠️',nm:'Treasure Hunt',ds:'Answer 5 questions to reach the treasure before time runs out'}
+];
+const POOL=GAMES.filter(g=>!['wheel','treasure'].includes(g.id));
+
+/* editable data: saved in the browser */
+const KEY='wordquest-content-v3';
+let CONTENT;
+function loadData(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j[4]&&j[5]&&j[6]){CONTENT=j;return}}catch(e){}CONTENT=JSON.parse(JSON.stringify(DEFAULT))}
+function saveData(){try{localStorage.setItem(KEY,JSON.stringify(CONTENT));toast('Saved ✔')}catch(e){alert('Could not save — the images may be too large. Try smaller images.')}}
+loadData();
+/* render text OR image */
+const isImg=v=>typeof v==='string'&&(v.startsWith('data:')||v.startsWith('http'));
+const rh=v=>isImg(v)?`<img src="${v}" alt="">`:(v||'');
+
+/* ===================== STATE ===================== */
+let grade=4, turn=0, score=[0,0,0,0,0], done={}, cur=null;
+const NT=()=>S.teamCount;const nextT=()=>(turn+1)%NT();
+const $=s=>document.querySelector(s);
+
+/* stars */
+for(let i=0;i<70;i++){const s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';$('#stars').appendChild(s)}
+
+function go(n){stopTimer();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#scr-'+n).classList.add('active');if(n==='map')renderMap();if(n==='result')renderResult();if(n==='season')renderSeason();}
+function pickGrade(g){grade=g;done={};$('#gradeChip').textContent='Grade '+g;go('map')}
+function renderMap(){$('#trail').innerHTML=GAMES.map((g,i)=>`<button class="station ${done[g.id]?'done':''}" style="${g.id==='wheel'?'background:linear-gradient(135deg,#FFE29A,#FFC93C)':''}" onclick="startGame('${g.id}')"><span class="badge">Game ${i+1}</span><div class="ic">${g.ic}</div><div class="nm">${g.nm}</div><div class="ds">${g.ds}</div></button>`).join('')+`<button class="station" style="background:var(--sun)" onclick="go('result')"><div class="ic">🏆</div><div class="nm">Show winner</div><div class="ds">End the match & celebrate</div></button>`}
+function setTurn(t){turn=t%NT();document.querySelectorAll('.team').forEach((e,i)=>e.classList.toggle('turn',i===turn));const tb=$('#turnbar');tb.style.background=TC(turn);tb.textContent=NT()>1?`${TN(turn)}'s turn`:TN(turn);const w=$('#whorow');if(w)w.innerHTML=NT()>1?'Who answers? '+Array.from({length:NT()},(_,i)=>`<button class="tc ${i===turn?'on':''}" style="${i===turn?'':'border-color:'+TC(i)}" onclick="setTurn(${i});toast(TN(${i})+' answers now')">${TN(i)}</button>`).join(''):''}
+function renderScore(){$('#scoreboard').innerHTML=Array.from({length:NT()},(_,i)=>`<div class="team ${i===turn?'turn':''}" onclick="setTurn(${i})"><div class="dot" style="background:${TC(i)}">${'ABCDE'[i]}</div><div><div class="lbl">${TN(i)}</div><div class="pts">${score[i]}</div></div></div>`).join(NT()>1?'<span class="vs">VS</span>':'')}
+function addScore(t,n){score[t]=Math.max(0,score[t]+n);renderScore()}
+function resetScores(){score=[0,0,0,0,0];turn=0;renderScore();setTurn(0);toast('Scores reset')}
+function nextTurn(){setTurn(nextT())}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',1600)}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* ===================== SETTINGS & AUDIO ===================== */
+/* ============================================================
+   BUILT-IN CLOUD SETTINGS  —  edit the 3 lines below once,
+   then every device that opens this file syncs automatically
+   with no typing at all. Leave them empty to enter them by hand.
+   ============================================================ */
+const BUILTIN_BIN  = "";        /* e.g. "6a8f1a12f5f4af5e29459c91" */
+const BUILTIN_KEY  = "";        /* your JSONBin key                */
+const BUILTIN_MODE = "master";  /* "master" or "access"            */
+
+const SKEY='wordquest-settings-v2';
+const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,names:['Team A','Team B','Team C','Team D','Team E'],cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
+let S={...SDEF};try{S={...SDEF,...JSON.parse(localStorage.getItem(SKEY)||'{}')}}catch(e){}
+if(BUILTIN_BIN&&BUILTIN_KEY){if(!S.cloudBin)S.cloudBin=BUILTIN_BIN;if(!S.cloudKey)S.cloudKey=BUILTIN_KEY;if(BUILTIN_MODE)S.keyMode=BUILTIN_MODE;if(S.cloudOn!==false||!localStorage.getItem(SKEY))S.cloudOn=true;try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
+function saveS(){localStorage.setItem(SKEY,JSON.stringify(S));applyS()}
+function shade(h,f){const n=parseInt(h.slice(1),16);const r=(n>>16)&255,g=(n>>8)&255,b=n&255;return '#'+[r,g,b].map(x=>Math.round(x*f).toString(16).padStart(2,'0')).join('')}
+function applyS(){const r=document.documentElement.style;r.setProperty('--ok',S.okColor);r.setProperty('--okd',shade(S.okColor,.7));r.setProperty('--bad',S.badColor);r.setProperty('--badd',shade(S.badColor,.7));if(turn>=S.teamCount)turn=0;renderScore();
+ $('#musBtn').textContent=S.music?'🎵 Music on':'🎵 Music off';if(bgm)bgm.setVol(S.musicVol);if(customAudio)customAudio.volume=S.musicVol;setTurn(turn);try{if(typeof applyOsk==='function')applyOsk()}catch(e){}}
+const TN=i=>S.names[i]||'Team '+'ABCDE'[i];const TC=i=>S.cols[i]||'#ccc';
+
+const AC=window.AudioContext?new AudioContext():null;
+function tone(f,t0,dur,type='triangle',vol=1,slide){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t0+dur);g.gain.setValueAtTime(vol*S.sfxVol*.25,t0);g.gain.exponentialRampToValueAtTime(.001,t0+dur);o.connect(g);g.connect(AC.destination);o.start(t0);o.stop(t0+dur)}
+function noise(t0,dur,vol=1){if(!AC)return;const b=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const src=AC.createBufferSource(),g=AC.createGain();src.buffer=b;g.gain.setValueAtTime(vol*S.sfxVol*.2,t0);g.gain.exponentialRampToValueAtTime(.001,t0+dur);src.connect(g);g.connect(AC.destination);src.start(t0)}
+
+/* ---- sound presets ---- */
+const SFX={
+ ok:{
+  chime:{n:'Chime',f:t=>[523,659,784,1047].forEach((f,i)=>tone(f,t+i*.1,.25))},
+  fanfare:{n:'Fanfare',f:t=>[523,523,784,1047].forEach((f,i)=>tone(f,t+i*.13,.35,'square',.5))},
+  coins:{n:'Coins',f:t=>[988,1319,988,1319,1568].forEach((f,i)=>tone(f,t+i*.07,.15,'square',.35))},
+  tada:{n:'Ta-da!',f:t=>{tone(392,t,.2,'sawtooth',.4);tone(523,t+.18,.6,'sawtooth',.5);tone(659,t+.18,.6,'triangle',.5);tone(784,t+.18,.6,'triangle',.5)}},
+  sparkle:{n:'Sparkle',f:t=>[1568,2093,2637,3136,2637,3136].forEach((f,i)=>tone(f,t+i*.06,.2,'sine',.6))},
+  drum:{n:'Drum roll',f:t=>{for(let i=0;i<10;i++)noise(t+i*.05,.05,.6);tone(262,t+.55,.4,'triangle',1);tone(523,t+.55,.4,'triangle',.8)}}
+ },
+ bad:{
+  buzz:{n:'Buzz',f:t=>{tone(196,t,.25,'sawtooth',.8);tone(150,t+.18,.35,'sawtooth',.8)}},
+  boing:{n:'Boing',f:t=>tone(600,t,.5,'sine',.9,120)},
+  slide:{n:'Slide down',f:t=>tone(800,t,.6,'triangle',.8,200)},
+  trombone:{n:'Sad trombone',f:t=>[330,311,294,277].forEach((f,i)=>tone(f,t+i*.25,i===3?.7:.28,'sawtooth',.5))},
+  thud:{n:'Thud',f:t=>{noise(t,.15,.8);tone(90,t,.3,'sine',1,40)}},
+  wrong:{n:'Wrong wrong',f:t=>{tone(220,t,.15,'square',.5);tone(220,t+.2,.3,'square',.5)}}
+ },
+ click:{
+  tick:{n:'Tick',f:t=>tone(900,t,.06,'square',.35)},
+  pop:{n:'Pop',f:t=>tone(300,t,.12,'sine',.9,900)},
+  blip:{n:'Blip',f:t=>tone(1200,t,.08,'triangle',.5,1600)},
+  wood:{n:'Wood',f:t=>{noise(t,.04,.5);tone(500,t,.08,'triangle',.6,300)}},
+  bubble:{n:'Bubble',f:t=>tone(500,t,.15,'sine',.7,1200)},
+  soft:{n:'Soft tap',f:t=>tone(400,t,.1,'sine',.3)}
+ }
+};
+function play(kind,preset){if(!AC)return;AC.resume();(SFX[kind][preset]||Object.values(SFX[kind])[0]).f(AC.currentTime)}
+function beep(ok){if(!S.sfx)return;play(ok?'ok':'bad',ok?S.okSfx:S.badSfx)}
+function click(){if(!S.clicks)return;play('click',S.clickSfx)}
+function fanfare(){if(!S.sfx||!AC)return;AC.resume();const t=AC.currentTime;[523,523,523,659,784,659,784,1047].forEach((f,i)=>tone(f,t+i*.14,.3,'triangle'))}
+document.addEventListener('click',e=>{if(e.target.closest('button')&&!e.target.closest('.prev')&&!e.target.closest('.osk'))click()},true);
+
+/* ---- built-in music tracks (generated in the browser) ---- */
+const TRACKS={
+ jungle:{n:'Jungle Adventure',bpm:132,wave:'square',root:523.25,mel:[0,4,7,12,7,4,0,-5, 2,5,9,14,9,5,2,-3, 4,7,11,16,11,7,4,0, 5,9,12,17,12,9,5,-7],bass:[0,-5,2,-3,4,0,5,-7]},
+ space:{n:'Space Quest',bpm:110,wave:'sawtooth',root:440,mel:[0,3,7,10,12,10,7,3, 0,3,7,10,12,15,12,10, -2,2,5,9,12,9,5,2, -4,0,3,7,10,7,3,0],bass:[0,0,-2,-2,-4,-4,-5,-5]},
+ march:{n:'Happy March',bpm:150,wave:'triangle',root:587.33,mel:[0,0,4,4,7,7,4,-1, 2,2,5,5,9,9,5,-1, 0,4,7,12,7,4,0,4, 2,5,9,5,2,-1,0,-1],bass:[0,0,5,5,0,0,-5,-5]},
+ calm:{n:'Calm Study',bpm:84,wave:'sine',root:392,mel:[0,4,7,11,12,11,7,4, 2,5,9,12,14,12,9,5, -3,0,4,7,9,7,4,0, -5,-1,2,7,4,2,-1,-5],bass:[0,-3,-5,-7,0,-3,2,-5]},
+ pirate:{n:'Pirate Sea',bpm:120,wave:'square',root:440,mel:[0,0,3,5,7,7,5,3, 0,0,3,5,7,10,7,5, 3,3,5,7,8,8,7,5, 3,5,7,5,3,2,0,0],bass:[0,0,-4,-4,-2,-2,-5,-5]},
+ disco:{n:'Disco Fun',bpm:126,wave:'sawtooth',root:493.88,mel:[0,7,0,7,3,10,3,10, 5,12,5,12,7,14,7,14, 0,7,0,7,3,10,3,10, 5,12,7,14,10,7,5,3],bass:[0,0,3,3,5,5,7,7]}
+};
+let bgm=null,customAudio=null,customName='';
+function makeBgm(tr){const master=AC.createGain();master.gain.value=S.musicVol;master.connect(AC.destination);
+ let step=0,timer=null,next=0;const sd=60/tr.bpm/2;
+ function sched(){while(next<AC.currentTime+.3){const n=tr.mel[step%tr.mel.length];const o=AC.createOscillator(),g=AC.createGain();o.type=tr.wave;o.frequency.value=tr.root*Math.pow(2,n/12);g.gain.setValueAtTime(tr.wave==='sine'?.14:.08,next);g.gain.exponentialRampToValueAtTime(.001,next+sd*.9);o.connect(g);g.connect(master);o.start(next);o.stop(next+sd);
+  if(step%4===0){const b=AC.createOscillator(),bg=AC.createGain();b.type='triangle';b.frequency.value=tr.root/4*Math.pow(2,tr.bass[(step/4)%tr.bass.length]/12);bg.gain.setValueAtTime(.18,next);bg.gain.exponentialRampToValueAtTime(.001,next+sd*3.5);b.connect(bg);bg.connect(master);b.start(next);b.stop(next+sd*4)}
+  if(tr.bpm>=110&&step%2===0)noiseM(next,step%4===0?.08:.04);
+  next+=sd;step++}}
+ function noiseM(t0,dur){const b=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.5;const src=AC.createBufferSource(),g=AC.createGain();src.buffer=b;g.gain.setValueAtTime(.12,t0);g.gain.exponentialRampToValueAtTime(.001,t0+dur);src.connect(g);g.connect(master);src.start(t0)}
+ return{start(){AC.resume();next=AC.currentTime+.05;step=0;timer=setInterval(sched,100)},stop(){clearInterval(timer);timer=null;master.gain.setTargetAtTime(0,AC.currentTime,.05)},setVol(v){master.gain.value=v},get playing(){return !!timer}}}
+function changeTrack(k){S.track=k;if(bgm){bgm.stop();bgm=null}saveS();if(S.music&&!customAudio)musicOn()}
+function musicOn(){if(customAudio){customAudio.volume=S.musicVol;customAudio.play().catch(()=>{});return}if(!AC)return;if(!bgm)bgm=makeBgm(TRACKS[S.track]||TRACKS.jungle);if(!bgm.playing)bgm.start()}
+function musicOff(){if(customAudio)customAudio.pause();if(bgm)bgm.stop()}
+function toggleMusic(){S.music=!S.music;S.music?musicOn():musicOff();saveS()}
+function loadCustomMusic(inp){const f=inp.files[0];if(!f)return;musicOff();customAudio=new Audio(URL.createObjectURL(f));customAudio.loop=true;customName=f.name;if(S.music)musicOn();renderSettings();toast('Music loaded: '+f.name)}
+function clearCustomMusic(){musicOff();customAudio=null;customName='';if(S.music)musicOn();renderSettings()}
+/* first user gesture starts music if enabled (browsers block autoplay) */
+document.addEventListener('click',function once(){if(S.music&&unlocked)musicOn();document.removeEventListener('click',once)},{once:true});
+
+function openSettings(){$('#smodal').classList.add('open');renderSettings()}
+function closeSettings(){$('#smodal').classList.remove('open')}
+function sfxSel(kind,key){return `<select class="sel" onchange="S.${key}=this.value;saveS();play('${kind}',this.value)">${Object.entries(SFX[kind]).map(([k,p])=>`<option value="${k}" ${S[key]===k?'selected':''}>${p.n}</option>`).join('')}</select><button class="sm alt prev" onclick="play('${kind}',S.${key})">▶</button>`}
+function sw(k){return `<button class="sw ${S[k]?'on':''}" onclick="S.${k}=!S.${k};saveS();renderSettings()"></button>`}
+function renderSettings(){$('#sgrid').innerHTML=`
+ <div class="shead">🎵 Background music</div>
+ <div class="srow"><div class="l">Music<small>Plays a cheerful loop while you play</small></div><div class="c"><input type="range" min="0" max="1" step=".05" value="${S.musicVol}" oninput="S.musicVol=+this.value;saveS()">${sw('music')}</div></div>
+ <div class="srow"><div class="l">Built-in tune<small>Choose one of the loops</small></div><div class="c"><select class="sel" onchange="changeTrack(this.value)">${Object.entries(TRACKS).map(([k,t])=>`<option value="${k}" ${S.track===k?'selected':''}>${t.n}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">Your own music file<small>${customName?'Now playing: '+customName:'Use any MP3 instead of the built-in tune (for this session)'}</small></div><div class="c"><button class="sm alt" onclick="$('#musfile').click()">Choose file</button>${customName?'<button class="sm" onclick="clearCustomMusic()">Use built-in</button>':''}<input type="file" id="musfile" accept="audio/*" style="display:none" onchange="loadCustomMusic(this)"></div></div>
+ <div class="shead">🔔 Sound effects</div>
+ <div class="srow"><div class="l">Answer sounds<small>Correct / wrong jingles and the winner fanfare</small></div><div class="c"><input type="range" min="0" max="1" step=".05" value="${S.sfxVol}" oninput="S.sfxVol=+this.value;saveS()">${sw('sfx')}</div></div>
+ <div class="srow"><div class="l">Correct answer sound</div><div class="c">${sfxSel('ok','okSfx')}</div></div>
+ <div class="srow"><div class="l">Wrong answer sound</div><div class="c">${sfxSel('bad','badSfx')}</div></div>
+ <div class="srow"><div class="l">Button clicks<small>Plays on every button</small></div><div class="c">${sfxSel('click','clickSfx')}${sw('clicks')}</div></div>
+ <div class="shead">🎨 Colours</div>
+ <div class="srow"><div class="l">Correct answer colour</div><div class="c"><input type="color" value="${S.okColor}" oninput="S.okColor=this.value;saveS()"></div></div>
+ <div class="srow"><div class="l">Wrong answer colour</div><div class="c"><input type="color" value="${S.badColor}" oninput="S.badColor=this.value;saveS()"></div></div>
+ <div class="shead">👥 Teams</div>
+ <div class="srow"><div class="l">Number of teams<small>1 team = practice mode, up to 5 competing teams</small></div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;saveS();renderSettings()">${[1,2,3,4,5].map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
+ ${Array.from({length:S.teamCount},(_,i)=>`<div class="srow"><div class="l">Team ${'ABCDE'[i]}</div><div class="c"><input type="text" value="${S.names[i]}" maxlength="14" onchange="S.names[${i}]=this.value||'Team ${'ABCDE'[i]}';saveS()"><input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`).join('')}
+ <div class="shead">⏱️ Timer</div>
+ <div class="srow"><div class="l">Timer mode<small>Countdown ends the question when time is up · Stopwatch just counts how long it takes</small></div><div class="c"><select class="sel" onchange="S.timerMode=this.value;saveS();renderSettings()"><option value="off" ${S.timerMode==='off'?'selected':''}>Off</option><option value="down" ${S.timerMode==='down'?'selected':''}>Countdown (time limit)</option><option value="up" ${S.timerMode==='up'?'selected':''}>Stopwatch (no limit)</option></select></div></div>
+ ${S.timerMode==='down'?`<div class="srow"><div class="l">Time per question<small><b id="tsecl">${S.timerSec}</b> seconds</small></div><div class="c"><input type="range" min="5" max="120" step="5" value="${S.timerSec}" oninput="S.timerSec=+this.value;$('#tsecl').textContent=this.value;saveS()"></div></div>`:''}
+ <div class="srow"><div class="l">Treasure Hunt time<small>Always on for this game — <b id="trsl">${S.treasureSec}</b> seconds to reach the treasure</small></div><div class="c"><input type="range" min="30" max="300" step="10" value="${S.treasureSec}" oninput="S.treasureSec=+this.value;$('#trsl').textContent=this.value;saveS()"></div></div>
+ <div class="shead">⌨️ Touchscreen</div>
+ <div class="srow"><div class="l">On-screen keyboard<small>For boards or devices with no keyboard — type into any box; it stays open until you tap ⌄</small></div><div class="c">${sw('osk')}</div></div>
+ <div class="shead">☁️ Cloud sync (all devices)</div>
+ <div class="srow"><div class="l">Turn on cloud sync<small>Season scores follow you to any device, and save automatically when you close the game</small></div><div class="c">${sw('cloudOn')}</div></div>
+ <div class="srow"><div class="l">Bin ID</div><div class="c"><input type="text" value="${S.cloudBin}" placeholder="from JSONBin.io" style="padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700;width:190px" oninput="S.cloudBin=this.value.trim();saveS()"></div></div>
+ <div class="srow"><div class="l">Key</div><div class="c"><input type="text" value="${S.cloudKey}" placeholder="Access Key (recommended)" style="padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700;width:190px" oninput="S.cloudKey=this.value.trim();saveS()"></div></div>
+ <div class="srow"><div class="l">Key type<small>Auto tries both. Pick Master if your Access Key keeps failing.</small></div><div class="c"><select class="sel" onchange="S.keyMode=this.value;saveS()"><option value="access" ${(S.keyMode||'access')==='access'?'selected':''}>Access Key</option><option value="master" ${S.keyMode==='master'?'selected':''}>Master Key</option></select></div></div>
+ <div class="srow"><div class="l">Sync</div><div class="c"><button class="sm alt" onclick="testCloud()">Test connection</button><button class="sm" onclick="syncNow()">🔄 Sync now</button></div></div>
+ <div class="srow"><div class="cstat" id="cloudStat" style="width:100%;min-height:20px"></div></div>
+ <div class="shead">🎮 Rules</div>
+ <div class="srow"><div class="l">Lose 1 point on "Try again"<small>Like the original game</small></div><div class="c">${sw('penalty')}</div></div>`}
+function resetSettings(){if(!confirm('Restore default settings?'))return;musicOff();S={...SDEF};saveS();renderSettings()}
+
+function confetti(){const c=['#FFC93C','#FF6B6B','#4ECDC4','#7BD389','#fff'];for(let i=0;i<80;i++){const d=document.createElement('div');d.className='conf';d.style.left=Math.random()*100+'vw';d.style.background=c[i%5];d.style.animationDuration=(1.5+Math.random()*1.5)+'s';d.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}}
+
+/* ===================== GAME ENGINE ===================== */
+function startGame(id){if(id==='wheel')wheelState=null;cur={hook:null,id,i:0,items:id==='wheel'?[1,2,3,4,5,6,7,8]:id==='treasure'?Array.from({length:NT()},(_,i)=>i):shuffle(CONTENT[grade][id]).slice(0,4),results:[]};const g=GAMES.find(x=>x.id===id);$('#gIcon').textContent=g.ic;$('#gName').textContent=g.nm;go('game');setTurn(turn);renderRound()}
+function prog(){$('#prog').innerHTML=cur.items.map((_,i)=>`<i class="${cur.results[i]?'ok':i===cur.i?'on':''}"></i>`).join('')}
+function renderRound(){prog();const b=$('#board');b.innerHTML='';if(cur.i>=cur.items.length){done[cur.id]=true;b.innerHTML=`<div class="fb show"><div class="big">🎉</div><h3>Station complete!</h3><p>Great work, both teams.</p><div class="actions"><button class="btn" onclick="go('map')">Back to map</button><button class="btn mint" onclick="startGame('${cur.id}')">Play again</button></div></div>`;return}
+ R[cur.id](b,cur.items[cur.i]);if(!['wheel','treasure'].includes(cur.id))startTimer()}
+function feedback(ok,msg,pts=1){if(cur&&cur.hook){cur.hook(ok,msg);return}if(S.timerMode==='up'&&tElapsed)msg=(msg||'')+` · ⏱ ${fmt(tElapsed)}`;stopTimer();beep(ok);if(ok){addScore(turn,pts);confetti()}const bd=$('#board');bd.classList.add(ok?'flash-ok':'flash-bad');setTimeout(()=>bd.classList.remove('flash-ok','flash-bad'),900);const f=document.createElement('div');f.className='fb show '+(ok?'good':'badfb');f.innerHTML=`<div class="big">${ok?'🌟':'😅'}</div><h3>${ok?`+${pts} for ${TN(turn)}!`:'Not this time'}</h3>${ok||NT()===1?`<p>${msg||''}</p>`:`<p><button class="tc" style="background:var(--sky);color:#fff" onclick="this.parentNode.textContent='${(msg||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}'">👁 Show answer</button></p>`}<div class="actions"><button class="btn" id="nxt">${NT()>1?`Next → ${TN(nextT())}`:'Next →'}</button>${ok?'':'<button class="btn grey" id="retry">Try again</button>'}</div>${NT()>1?`<div class="chance">🔁 Same question, another chance for: ${Array.from({length:NT()},(_,i)=>i).filter(i=>i!==turn).map(i=>`<button class="tc" style="background:${TC(i)};color:#1B2A49" onclick="secondChance(${i})">${TN(i)}</button>`).join('')}</div>`:''}`;$('#board').appendChild(f);
+ f.querySelector('#nxt').onclick=()=>{cur.results[cur.i]=ok;cur.i++;nextTurn();renderRound()};const r=f.querySelector('#retry');if(r)r.onclick=()=>{if(S.penalty){addScore(turn,-1);toast('-1 point for '+TN(turn))}renderRound()}}
+
+/* timer */
+let tInt=null,tElapsed=0;
+const fmt=n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
+function stopTimer(){clearInterval(tInt);tInt=null;const t=$('#twrap');if(t)t.remove()}
+function startTimer(){stopTimer();tElapsed=0;if(S.timerMode==='off')return;const w=document.createElement('div');w.className='twrap';w.id='twrap';
+ if(S.timerMode==='up'){w.innerHTML=`<div class="timer up"><span class="tnum" id="tnum">⏱ 0:00</span></div>`;$('#board').prepend(w);tInt=setInterval(()=>{tElapsed++;const n=$('#tnum');if(!n){stopTimer();return}n.textContent='⏱ '+fmt(tElapsed)},1000);return}
+ let left=S.timerSec;w.innerHTML=`<div class="timer" id="tbar"><i style="width:100%"></i><span class="tnum" id="tnum">${left}</span></div>`;$('#board').prepend(w);
+ tInt=setInterval(()=>{left--;tElapsed++;const bar=$('#tbar');if(!bar){stopTimer();return}bar.querySelector('i').style.width=(left/S.timerSec*100)+'%';$('#tnum').textContent=left;if(left<=5){bar.classList.add('low');if(S.sfx&&AC&&left>0)tone(1200,AC.currentTime,.08,'square',.5)}if(left<=0){stopTimer();$('#board').querySelectorAll('button').forEach(b=>b.disabled=true);feedback(false,'⏰ Time is up!')}},1000)}
+const R={};
+/* letters / words arrange */
+function arrange(b,target,tokens,hint,sub){b.innerHTML=`${hint?`<div class="hint">${rh(hint)}</div>`:''}<div class="sub">${sub}</div><div class="answer" id="ans"></div><div class="tiles" id="pool"></div><div class="actions"><button class="btn mint" id="chk">Check answer</button><button class="btn grey" id="clr">Clear</button></div>`;
+ const pool=b.querySelector('#pool'),ans=b.querySelector('#ans');let picked=[];
+ shuffle(tokens).forEach((t,i)=>{const d=document.createElement('button');d.className='tile'+(t.length>1?' word':'');d.textContent=t;d.onclick=()=>{d.classList.add('used');const a=document.createElement('button');a.className='tile'+(t.length>1?' word':'');a.textContent=t;a.onclick=()=>{a.remove();d.classList.remove('used');picked=picked.filter(p=>p!==a)};ans.appendChild(a);picked.push(a)};pool.appendChild(d)});
+ b.querySelector('#clr').onclick=()=>{ans.innerHTML='';picked=[];pool.querySelectorAll('.tile').forEach(t=>t.classList.remove('used'))};
+ b.querySelector('#chk').onclick=()=>{const got=picked.map(p=>p.textContent).join(tokens[0].length>1?' ':'');const ok=got.toLowerCase()===target.toLowerCase();feedback(ok,ok?`"${target}" is correct!`:`The answer was: "${target}"`)}}
+R.spell=(b,it)=>arrange(b,it.w,it.w.split(''),it.h,'Tap the letters in order to spell the word');
+R.sentence=(b,it)=>arrange(b,it,it.split(' '),'','Tap the words to build the sentence');
+/* choice-based */
+function choice(b,q,opts,ans,hint,extra){b.innerHTML=`${hint?`<div class="hint">${hint}</div>`:''}<div class="q">${q}</div><div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>`;
+ b.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{const i=+o.dataset.i;const ok=i===ans;o.classList.add(ok?'right':'wrong');b.querySelectorAll('.opt').forEach(x=>x.style.pointerEvents='none');setTimeout(()=>feedback(ok,ok?(extra||''):`Correct answer: ${opts[ans]}${extra?' — '+extra:''}`),700)})}
+R.quiz=(b,it)=>choice(b,it.q,it.o,it.a);
+R.riddle=(b,it)=>choice(b,it.q,it.o,it.a,'🤔');
+R.gap=(b,it)=>choice(b,it.s.replace('___','<span style="color:#FF6B6B">_____</span>'),it.o,it.a,'✏️');
+R.odd=(b,it)=>choice(b,'Which word does NOT belong?',it.o,it.a,'🎯',it.why);
+R.tf=(b,it)=>choice(b,it.s,['✅ True','❌ False'],it.a?0:1,'⚖️');
+/* match */
+R.match=(b,pairs)=>{b.innerHTML=`<div class="sub">Tap a word, then tap its match</div><div class="match"><div class="mcol" id="L"></div><div class="mcol" id="Rc"></div></div>`;let sel=null,left=pairs.length,mist=0;
+ shuffle(pairs.map(p=>p[0])).forEach(w=>{const d=document.createElement('button');d.className='mitem';d.textContent=w;d.dataset.k=w;d.onclick=()=>{b.querySelectorAll('#L .mitem').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');sel=d};b.querySelector('#L').appendChild(d)});
+ shuffle(pairs.map(p=>p[1])).forEach(m=>{const d=document.createElement('button');d.className='mitem';d.innerHTML=rh(m);d.onclick=()=>{if(!sel)return;const ok=pairs.find(p=>p[0]===sel.dataset.k)[1]===m;if(ok){sel.classList.add('paired');d.classList.add('paired');sel.classList.remove('sel');sel=null;beep(true);if(--left===0)setTimeout(()=>feedback(true,mist?`Finished with ${mist} mistake${mist>1?'s':''}`:'Perfect — no mistakes!',mist?1:2),400)}else{mist++;d.classList.add('bad');beep(false);setTimeout(()=>d.classList.remove('bad'),400)}};b.querySelector('#Rc').appendChild(d)})}
+/* memory */
+R.memory=(b,pairs)=>{b.innerHTML=`<div class="sub">Find the matching pairs</div><div class="memgrid" id="mg"></div>`;const cards=shuffle(pairs.flatMap((p,i)=>[{k:i,t:p[0]},{k:i,t:p[1]}]));let open=[],found=0,flips=0,lock=false;
+ cards.forEach(c=>{const d=document.createElement('div');d.className='card';d.innerHTML=`<div class="in"><div class="face front">?</div><div class="face back">${rh(c.t)}</div></div>`;d.onclick=()=>{if(lock||d.classList.contains('flip'))return;d.classList.add('flip');open.push({d,c});if(open.length===2){lock=true;flips++;const[x,y]=open;if(x.c.k===y.c.k){x.d.classList.add('matched');y.d.classList.add('matched');beep(true);open=[];lock=false;if(++found===pairs.length)setTimeout(()=>feedback(true,`Solved in ${flips} tries`,flips<=pairs.length+2?2:1),500)}else setTimeout(()=>{x.d.classList.remove('flip');y.d.classList.remove('flip');open=[];lock=false},800)}};b.querySelector('#mg').appendChild(d)})}
+/* hangman */
+R.hang=(b,it)=>{const w=it.w.toUpperCase();let got=new Set(),lives=6;b.innerHTML=`${it.img?`<div class="hint">${rh(it.img)}</div>`:''}<div class="lives" id="lv"></div><div class="sub">Hint: ${it.h}</div><div class="hang" id="wd"></div><div class="kb" id="kb"></div>`;
+ const draw=()=>{b.querySelector('#lv').textContent='🎈'.repeat(lives)+'💥'.repeat(6-lives);b.querySelector('#wd').textContent=[...w].map(c=>got.has(c)?c:'_').join(' ')};draw();
+ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(L=>{const k=document.createElement('button');k.textContent=L;k.onclick=()=>{k.disabled=true;if(w.includes(L)){got.add(L);beep(true)}else{lives--;beep(false)}draw();if([...w].every(c=>got.has(c)))setTimeout(()=>feedback(true,`The word was ${it.w}`,lives>=4?2:1),300);else if(lives===0)setTimeout(()=>feedback(false,`The word was ${it.w}`),300)};b.querySelector('#kb').appendChild(k)})}
+
+/* wheel */
+const WCOL=[['#FF6B6B','Red'],['#FFC93C','Yellow'],['#4ECDC4','Teal'],['#7BD389','Green'],['#A78BFA','Purple'],['#FB923C','Orange'],['#60A5FA','Blue'],['#F472B6','Pink']];
+let wheelState=null;
+R.wheel=(b)=>{
+ if(!wheelState||wheelState.grade!==grade||wheelState.env.every(e=>e.used)){const types=shuffle(POOL).slice(0,8);wheelState={grade,rot:0,env:WCOL.map((c,i)=>{const pool=CONTENT[grade][types[i].id];return{color:c[0],name:c[1],g:types[i],it:pool[Math.floor(Math.random()*pool.length)],used:false}})}}
+ const W=wheelState,n=8,seg=360/n;
+ b.innerHTML=`<div class="q">Spin the wheel, then open the envelope!</div><div class="wheelrow"><div class="wheelbox"><div class="pointer">▼</div><canvas id="wc" width="360" height="360"></canvas></div>
+ <div class="envs">${W.env.map((e,i)=>`<div class="env ${e.used?'used':''}" id="env${i}" style="--c:${e.color}"><div class="flap"></div><div class="etype">${e.g.ic} ${e.g.nm}</div></div>`).join('')}</div></div>
+ <div class="actions" id="wact"><button class="btn" id="spinBtn">🎡 SPIN</button></div>`;
+ const cv=b.querySelector('#wc'),cx=cv.getContext('2d');
+ function draw(rot){if(!cx)return;cx.clearRect(0,0,360,360);cx.save();cx.translate(180,180);cx.rotate(rot*Math.PI/180);W.env.forEach((e,i)=>{cx.beginPath();cx.moveTo(0,0);cx.arc(0,0,170,(i*seg-90)*Math.PI/180,((i+1)*seg-90)*Math.PI/180);cx.closePath();cx.fillStyle=e.used?'#D9D2C2':e.color;cx.fill();cx.strokeStyle='#fff';cx.lineWidth=4;cx.stroke()});cx.beginPath();cx.arc(0,0,28,0,7);cx.fillStyle='#1B2A49';cx.fill();cx.restore()}
+ draw(W.rot);
+ b.querySelector('#spinBtn').onclick=function(){this.disabled=true;const avail=W.env.map((e,i)=>e.used?-1:i).filter(i=>i>=0);const idx=avail[Math.floor(Math.random()*avail.length)];
+  const start=W.rot,base=((start%360)+360)%360,targetAngle=360-(idx+.5)*seg,extra=360*(4+Math.floor(Math.random()*3));const end=start-base+targetAngle+extra;const dur=4200,t0=performance.now();let lastTick=0;
+  (function anim(now){const p=Math.min(1,(now-t0)/dur),ease=1-Math.pow(1-p,3);W.rot=start+(end-start)*ease;draw(W.rot);const tick=Math.floor(W.rot/seg);if(tick!==lastTick){lastTick=tick;if(S.sfx&&AC)tone(700,AC.currentTime,.03,'square',.25)}if(p<1)requestAnimationFrame(anim);else landed(idx)})(t0);
+  if(AC)AC.resume()};
+ function landed(idx){const e=W.env[idx];beep(true);const el=b.querySelector('#env'+idx);el.classList.add('hit');
+  b.querySelector('#wact').innerHTML=`<div class="landed" style="background:${e.color};color:#1B2A49">${e.name} envelope — ${e.g.nm}</div><button class="btn mint" id="openBtn">✉️ Open & answer</button>${Array.from({length:NT()},(_,i)=>i).filter(i=>i!==turn).map(i=>`<button class="btn grey" onclick="passTo(${i})">➡️ Pass to ${TN(i)}</button>`).join('')}`;
+  b.querySelector('#openBtn').onclick=()=>open(idx);
+  window.passTo=i=>{setTurn(i);toast(TN(turn)+' must answer!');b.querySelector('#wact').innerHTML=`<div class="landed" style="background:${e.color};color:#1B2A49">${TN(turn)} answers: ${e.g.nm}</div><button class="btn mint" id="openBtn">✉️ Open & answer</button>`;b.querySelector('#openBtn').onclick=()=>open(idx)}}
+ function open(idx){const e=W.env[idx];e.used=true;b.innerHTML='';R[e.g.id](b,e.it);const tag=document.createElement('div');tag.className='landed';tag.style.background=e.color;tag.style.color='#1B2A49';tag.innerHTML=`✉️ ${e.name} · ${e.g.ic} ${e.g.nm}`;b.prepend(tag);startTimer()}};
+/* treasure hunt */
+const TQ=['quiz','riddle','gap','odd','tf'];
+R.treasure=(b)=>{const STEPS=5;let pos=0,left=S.treasureSec,used=new Set();const team=turn;
+ b.innerHTML=`<div class="thead"><div class="landed" style="background:${TC(team)};color:#1B2A49">🏴‍☠️ ${TN(team)}'s treasure hunt</div><div class="tclock" id="tclock">⏳ ${fmt(left)}</div></div>
+ <div class="path"><svg viewBox="0 0 900 150" id="tsvg"><path d="M60 100 C200 20 300 150 450 80 S700 20 830 90" fill="none" stroke="#B9B0A0" stroke-width="10" stroke-dasharray="18 14" stroke-linecap="round"/>${[0,1,2,3,4].map(i=>{const [x,y]=TPT(i);return `<circle cx="${x}" cy="${y}" r="24" fill="#fff" stroke="#1B2A49" stroke-width="4" id="st${i}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="20" font-weight="700" fill="#1B2A49">${i+1}</text>`}).join('')}<text x="830" y="102" text-anchor="middle" font-size="46" id="chest">💰</text><text x="60" y="100" text-anchor="middle" font-size="44" id="kid">🧒</text></svg></div>
+ <div class="sub" id="tmsg">Answer the question to move forward!</div><div id="tq" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px"></div>`;
+ const kid=b.querySelector('#kid');function moveKid(i){const [x,y]=i>=STEPS?[830,100]:TPT(i);kid.setAttribute('x',x);kid.setAttribute('y',y+(i>=STEPS?2:-30))}moveKid(0);
+ function ask(){const q=b.querySelector('#tq');q.innerHTML='';const type=TQ[Math.floor(Math.random()*TQ.length)];const pool=CONTENT[grade][type];let it,tries=0;do{it=pool[Math.floor(Math.random()*pool.length)];tries++}while(used.has(it)&&tries<20);used.add(it);R[type](q,it);const g=POOL.find(x=>x.id===type);b.querySelector('#tmsg').textContent=`Station ${pos+1} of ${STEPS} · ${g.ic} ${g.nm}`}
+ cur.hook=(ok)=>{beep(ok);if(ok){pos++;b.querySelector('#st'+(pos-1)).setAttribute('fill','var(--ok)');moveKid(pos);if(pos>=STEPS){finish(true);return}toast('Correct! Move forward 🏃');}else{toast('Wrong — try another question');b.classList.add('flash-bad');setTimeout(()=>b.classList.remove('flash-bad'),600)}setTimeout(ask,ok?700:900)};
+ stopTimer();tInt=setInterval(()=>{left--;const c=b.querySelector('#tclock');if(!c){stopTimer();return}c.textContent='⏳ '+fmt(left);if(left<=10){c.classList.add('low');if(S.sfx&&AC)tone(1200,AC.currentTime,.08,'square',.5)}if(left<=0){stopTimer();finish(false)}},1000);
+ function finish(win){stopTimer();cur.hook=null;const pts=pos+(win?2:0);if(pts)addScore(team,pts);if(win){confetti();fanfare()}else beep(false);
+  const f=document.createElement('div');f.className='fb show '+(win?'good':'badfb');f.innerHTML=`<div class="big">${win?'💰':'⏰'}</div><h3>${win?`${TN(team)} found the treasure!`:'Time is up!'}</h3><p>${pos} of ${STEPS} stations reached · +${pts} points</p><div class="actions"><button class="btn" id="nxt">${cur.i<cur.items.length-1?`Next → ${TN(nextT())}'s turn`:'Finish'}</button></div>`;b.appendChild(f);
+  f.querySelector('#nxt').onclick=()=>{cur.results[cur.i]=win;cur.i++;nextTurn();renderRound()}}
+ ask()};
+function TPT(i){return [[60,100],[250,70],[450,80],[620,55],[760,80]][i]}
+function renderResult(){const arr=Array.from({length:NT()},(_,i)=>({i,s:score[i]})).sort((x,y)=>y.s-x.s);const top=arr[0].s,winners=arr.filter(x=>x.s===top);$('#final').innerHTML=arr.map((x,r)=>`<div class="f ${x.s===top&&NT()>1?'win':''}" style="border-top:10px solid ${TC(x.i)}"><div class="rank">${NT()>1?['🥇','🥈','🥉','4th','5th'][r]:''}</div><div class="lbl">${TN(x.i)}</div><div class="n">${x.s}</div></div>`).join('');$('#winTitle').textContent=NT()===1?`🎉 ${TN(0)} scored ${top}!`:winners.length>1?'🤝 It\'s a tie!':`🏆 ${TN(winners[0].i)} wins!`;renderAllTime();confetti();fanfare()}
+function renderAllTime(){const el=$('#alltime');if(!el)return;const rank=seasonTotals();if(!rank.length){el.innerHTML='';return}el.innerHTML=`<div style="font-family:'Fredoka';font-size:20px;color:var(--sun);margin:10px 0 4px">📊 All-time totals (by team name)</div><div class="totals">${rank.slice(0,5).map(([n,t],i)=>`<div class="tot" style="--c:${t.c};padding:12px 20px;min-width:130px"><div class="rank" style="font-size:18px">${['🥇','🥈','🥉','4th','5th'][i]||''}</div><div class="lbl">${n}</div><div class="n" style="font-size:38px">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div><div style="opacity:.7;font-size:13px">Press “Save session result” to add this match to the totals.</div>`}
+
+/* ===================== PICTURE FINDER ===================== */
+const EMOJI={apple:'🍎',banana:'🍌',orange:'🍊',grapes:'🍇',strawberry:'🍓',watermelon:'🍉',pineapple:'🍍',lemon:'🍋',cherry:'🍒',peach:'🍑',pear:'🍐',mango:'🥭',coconut:'🥥',carrot:'🥕',potato:'🥔',tomato:'🍅',onion:'🧅',corn:'🌽',broccoli:'🥦',pumpkin:'🎃',bread:'🍞',cheese:'🧀',egg:'🥚',milk:'🥛',pizza:'🍕',sandwich:'🥪',burger:'🍔',cake:'🎂',cookie:'🍪',chocolate:'🍫',icecream:'🍦',candy:'🍬',rice:'🍚',soup:'🍲',salad:'🥗',chicken:'🍗',fish:'🐟',juice:'🧃',water:'💧',tea:'🍵',coffee:'☕',
+dog:'🐶',cat:'🐱',puppy:'🐶',kitten:'🐱',mouse:'🐭',rabbit:'🐰',bear:'🐻',lion:'🦁',tiger:'🐯',cow:'🐮',pig:'🐷',horse:'🐴',sheep:'🐑',goat:'🐐',monkey:'🐵',elephant:'🐘',giraffe:'🦒',zebra:'🦓',camel:'🐪',hippo:'🦛',rhino:'🦏',wolf:'🐺',fox:'🦊',deer:'🦌',frog:'🐸',snake:'🐍',turtle:'🐢',crocodile:'🐊',whale:'🐳',dolphin:'🐬',shark:'🦈',octopus:'🐙',crab:'🦀',bird:'🐦',chick:'🐤',duck:'🦆',owl:'🦉',eagle:'🦅',penguin:'🐧',parrot:'🦜',butterfly:'🦋',bee:'🐝',ant:'🐜',spider:'🕷️',snail:'🐌',
+sun:'☀️',moon:'🌙',star:'⭐',cloud:'☁️',rain:'🌧️',snow:'❄️',wind:'🌬️',rainbow:'🌈',lightning:'⚡',fire:'🔥',tree:'🌳',flower:'🌸',rose:'🌹',leaf:'🍃',mountain:'⛰️',beach:'🏖️',island:'🏝️',desert:'🏜️',forest:'🌲',river:'🏞️',sea:'🌊',earth:'🌍',volcano:'🌋',
+house:'🏠',school:'🏫',hospital:'🏥',church:'⛪',mosque:'🕌',shop:'🏪',bank:'🏦',hotel:'🏨',castle:'🏰',tent:'⛺',bridge:'🌉',
+car:'🚗',bus:'🚌',train:'🚆',plane:'✈️',airplane:'✈️',ship:'🚢',boat:'⛵',bicycle:'🚲',bike:'🚲',motorbike:'🏍️',rocket:'🚀',helicopter:'🚁',taxi:'🚕',lorry:'🚚',truck:'🚚',ambulance:'🚑',
+book:'📖',pen:'🖊️',pencil:'✏️',ruler:'📏',scissors:'✂️',bag:'🎒',backpack:'🎒',computer:'💻',phone:'📱',clock:'⏰',watch:'⌚',key:'🔑',lamp:'💡',bed:'🛏️',chair:'🪑',door:'🚪',window:'🪟',television:'📺',tv:'📺',camera:'📷',umbrella:'☂️',glasses:'👓',hat:'🎩',shirt:'👕',dress:'👗',shoes:'👟',socks:'🧦',gloves:'🧤',scarf:'🧣',ball:'⚽',football:'⚽',basketball:'🏀',tennis:'🎾',kite:'🪁',guitar:'🎸',piano:'🎹',drum:'🥁',trumpet:'🎺',gift:'🎁',balloon:'🎈',birthday:'🎂',party:'🎉',trophy:'🏆',medal:'🏅',
+doctor:'🧑‍⚕️',nurse:'🧑‍⚕️',teacher:'🧑‍🏫',farmer:'🧑‍🌾',chef:'🧑‍🍳',cook:'🧑‍🍳',pilot:'🧑‍✈️',police:'👮',firefighter:'🧑‍🚒',scientist:'🧑‍🔬',astronaut:'🧑‍🚀',artist:'🧑‍🎨',singer:'🧑‍🎤',mechanic:'🧑‍🔧',dentist:'🦷',
+happy:'😊',sad:'😢',angry:'😠',tired:'😴',sleepy:'😴',scared:'😨',frightened:'😨',surprised:'😲',hungry:'🍽️',thirsty:'🥤',cold:'🥶',hot:'🥵',sick:'🤒',ill:'🤒',love:'❤️',laugh:'😂',cry:'😭',
+hand:'✋',eye:'👁️',ear:'👂',nose:'👃',mouth:'👄',tooth:'🦷',foot:'🦶',heart:'❤️',brain:'🧠',baby:'👶',boy:'👦',girl:'👧',man:'👨',woman:'👩',family:'👨‍👩‍👧',king:'🤴',queen:'👸',
+spring:'🌸',summer:'☀️',autumn:'🍂',winter:'❄️',morning:'🌅',night:'🌃',time:'⏰',money:'💰',music:'🎵',run:'🏃',swim:'🏊',dance:'💃',read:'📖',write:'✍️',sleep:'😴',eat:'🍽️',drink:'🥤',sing:'🎤',jump:'🤸',walk:'🚶',think:'🤔',map:'🗺️',flag:'🏁',magnet:'🧲',thermometer:'🌡️',telescope:'🔭',microscope:'🔬',compass:'🧭',robot:'🤖',ghost:'👻',dragon:'🐉',unicorn:'🦄',dinosaur:'🦕'};
+function emojiFor(w){w=(w||'').toLowerCase().trim();if(EMOJI[w])return EMOJI[w];if(w.endsWith('es')&&EMOJI[w.slice(0,-2)])return EMOJI[w.slice(0,-2)];if(w.endsWith('s')&&EMOJI[w.slice(0,-1)])return EMOJI[w.slice(0,-1)];const k=Object.keys(EMOJI).find(k=>w.includes(k));return k?EMOJI[k]:''}
+let picker={k:null,q:''};
+function openPicker(k,fromId){const q=v(fromId);if(!q){alert('Type the word first, then click Find pictures.');return}picker={k,q};$('#pmodal').classList.add('open');$('#ptitle').textContent='Pictures for "'+q+'"';const em=emojiFor(q);
+ $('#pgrid').innerHTML=`<div class="pnote" style="grid-column:1/-1">Emoji (works offline) — click to use</div>${em?`<button class="pick em" onclick="usePick('${em}')">${em}</button>`:''}<div class="pick em" style="opacity:.5;cursor:default">${em?'':'No emoji match'}</div><div class="pnote" style="grid-column:1/-1">Photos from the web (Openverse, free to use) — searching…</div><div id="pweb" style="display:contents"></div>`;
+ fetch('https://api.openverse.org/v1/images/?q='+encodeURIComponent(q)+'&license_type=commercial,modification&page_size=12&mature=false').then(r=>r.json()).then(j=>{const w=$('#pweb');if(!j.results||!j.results.length){w.innerHTML='<div class="pnote">No photos found — try another word.</div>';return}w.innerHTML=j.results.map(r=>`<button class="pick" onclick="useWeb('${r.thumbnail||r.url}')"><img src="${r.thumbnail||r.url}" alt="" loading="lazy"></button>`).join('')}).catch(()=>{$('#pweb').innerHTML='<div class="pnote">Could not reach the internet — use the emoji, or paste your own picture.</div>'})}
+function closePicker(){$('#pmodal').classList.remove('open')}
+function usePick(e){const k=picker.k;delete pendingImg[k];const inp=k==='hint'?$('#f_h'):$('#f_b'+k.slice(1));if(inp)inp.value=e;$('#drop_'+k).innerHTML=`<span style="font-size:32px">${e}</span> ✔ emoji chosen (click to change)<input type="file" accept="image/*" style="display:none" id="file_${k}">`;bindDrops();closePicker()}
+function useWeb(url){const k=picker.k;closePicker();$('#drop_'+k).textContent='Loading picture…';
+ const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{try{const c=document.createElement('canvas'),m=260,sc=Math.min(1,m/Math.max(img.width,img.height));c.width=img.width*sc;c.height=img.height*sc;c.getContext('2d').drawImage(img,0,0,c.width,c.height);pendingImg[k]=c.toDataURL('image/jpeg',.8)}catch(e){pendingImg[k]=url}showPicked(k)};img.onerror=()=>{pendingImg[k]=url;showPicked(k)};img.src=url}
+function showPicked(k){$('#drop_'+k).innerHTML=`<img src="${pendingImg[k]}"> ✔ picture ready (click to change)<input type="file" accept="image/*" style="display:none" id="file_${k}">`;bindDrops()}
+
+/* ===================== TEACHER PANEL ===================== */
+let pg=4,pgame='spell',pendingImg={};
+const FIELDS={
+ spell:{note:'Word + a hint (emoji or picture). The picture is shown above the letters.',make:()=>`<div class="row"><div><label>Word</label><input id="f_w" placeholder="apple"></div><div><label>Emoji hint (optional)</label><input id="f_h" placeholder="🍎"></div></div><label>Or a picture hint</label>${dropHTML('hint')}<button class="sm alt findbtn" onclick="openPicker('hint','f_w')">🔍 Find pictures for this word</button>`,
+  read:()=>{const w=v('f_w');if(!w)return null;return{w,h:pendingImg.hint||v('f_h')||'🔤'}},show:it=>`${rh(it.h)} <span class="tx">${it.w}</span>`},
+ sentence:{note:'Each sentence is split into word tiles the students put in order.',make:()=>`<label>Sentence</label><input id="f_s" placeholder="I like to play football">`,read:()=>v('f_s')||null,show:it=>`<span class="tx">${it}</span>`},
+ match:{note:'One round = 4 pairs. The right side can be a word, an emoji, or a picture.',make:()=>[1,2,3,4].map(i=>`<div class="row"><div><label>Word ${i}</label><input id="f_a${i}"></div><div><label>Match ${i} (text / emoji)</label><input id="f_b${i}">${dropHTML('m'+i,true)}<button class="sm alt findbtn" onclick="openPicker('m${i}','f_a${i}')">🔍 Find pictures</button></div></div>`).join(''),
+  read:()=>{const p=[];for(let i=1;i<=4;i++){const a=v('f_a'+i),b=pendingImg['m'+i]||v('f_b'+i);if(a&&b)p.push([a,b])}return p.length===4?p:null},show:it=>`<span class="tx">${it.map(p=>p[0]+' → '+(isImg(p[1])?'🖼️':p[1])).join(' · ')}</span>`},
+ quiz:{note:'A question with 4 options. Choose which one is correct.',make:mcq,read:readMcq,show:it=>`<span class="tx">${it.q} → <b>${it.o[it.a]}</b></span>`},
+ riddle:{note:'A riddle with 4 possible answers.',make:mcq,read:readMcq,show:it=>`<span class="tx">${it.q} → <b>${it.o[it.a]}</b></span>`},
+ gap:{note:'Write ___ (three underscores) where the missing word goes.',make:()=>`<label>Sentence with ___</label><input id="f_q" placeholder="I ___ a student."><div class="row4">${[1,2,3].map(i=>`<div><label>Option ${i}</label><input id="f_o${i}"></div>`).join('')}<div><label>Correct</label><select id="f_a"><option value="0">Option 1</option><option value="1">Option 2</option><option value="2">Option 3</option></select></div></div>`,
+  read:()=>{const s=v('f_q'),o=[1,2,3].map(i=>v('f_o'+i));if(!s.includes('___')||o.some(x=>!x))return null;return{s,o,a:+v('f_a')}},show:it=>`<span class="tx">${it.s} → <b>${it.o[it.a]}</b></span>`},
+ odd:{note:'4 words — pick the one that does not belong and say why.',make:()=>`<div class="row4">${[1,2,3,4].map(i=>`<div><label>Word ${i}</label><input id="f_o${i}"></div>`).join('')}</div><div class="row"><div><label>Odd one</label><select id="f_a">${[1,2,3,4].map(i=>`<option value="${i-1}">Word ${i}</option>`).join('')}</select></div><div><label>Why? (shown after answering)</label><input id="f_why"></div></div>`,
+  read:()=>{const o=[1,2,3,4].map(i=>v('f_o'+i));if(o.some(x=>!x))return null;return{o,a:+v('f_a'),why:v('f_why')}},show:it=>`<span class="tx">${it.o.join(', ')} → <b>${it.o[it.a]}</b></span>`},
+ tf:{note:'A statement that is true or false.',make:()=>`<div class="row"><div><label>Statement</label><input id="f_s"></div><div><label>Answer</label><select id="f_a"><option value="1">True</option><option value="0">False</option></select></div></div>`,
+  read:()=>{const s=v('f_s');return s?{s,a:v('f_a')==='1'}:null},show:it=>`<span class="tx">${it.s} → <b>${it.a?'True':'False'}</b></span>`},
+ memory:{note:'One round = 4 pairs (word ↔ word, word ↔ emoji, or word ↔ picture).',make:()=>[1,2,3,4].map(i=>`<div class="row"><div><label>Card ${i}A</label><input id="f_a${i}"></div><div><label>Card ${i}B (text / emoji)</label><input id="f_b${i}">${dropHTML('m'+i,true)}<button class="sm alt findbtn" onclick="openPicker('m${i}','f_a${i}')">🔍 Find pictures</button></div></div>`).join(''),
+  read:()=>{const p=[];for(let i=1;i<=4;i++){const a=v('f_a'+i),b=pendingImg['m'+i]||v('f_b'+i);if(a&&b)p.push([a,b])}return p.length===4?p:null},show:it=>`<span class="tx">${it.map(p=>p[0]+' ↔ '+(isImg(p[1])?'🖼️':p[1])).join(' · ')}</span>`},
+ hang:{note:'The word to guess + a text hint, and an optional picture.',make:()=>`<div class="row"><div><label>Word</label><input id="f_w"></div><div><label>Hint</label><input id="f_h"></div></div><label>Picture (optional)</label>${dropHTML('hint')}<button class="sm alt findbtn" onclick="openPicker('hint','f_w')">🔍 Find pictures for this word</button>`,read:()=>{const w=v('f_w');return w?{w:w.toLowerCase().replace(/[^a-z]/g,''),h:v('f_h'),img:pendingImg.hint||''}:null},show:it=>`${rh(it.img)}<span class="tx">${it.w} — ${it.h}</span>`}
+};
+function mcq(){return `<label>Question</label><input id="f_q"><div class="row4">${[1,2,3,4].map(i=>`<div><label>Option ${i}</label><input id="f_o${i}"></div>`).join('')}</div><label>Correct answer</label><select id="f_a">${[1,2,3,4].map(i=>`<option value="${i-1}">Option ${i}</option>`).join('')}</select>`}
+function readMcq(){const q=v('f_q'),o=[1,2,3,4].map(i=>v('f_o'+i));if(!q||o.some(x=>!x))return null;return{q,o,a:+v('f_a')}}
+const v=id=>($('#'+id)?.value||'').trim();
+function dropHTML(k,small){return `<div class="drop" id="drop_${k}" tabindex="0" style="${small?'margin-top:6px;min-height:44px;font-size:12px':''}">📷 Click to choose, or paste (Ctrl+V) / drop a picture<input type="file" accept="image/*" style="display:none" id="file_${k}"></div>`}
+function bindDrops(){document.querySelectorAll('.drop').forEach(d=>{const k=d.id.replace('drop_',''),f=d.querySelector('input');d.onclick=()=>f.click();f.onchange=()=>f.files[0]&&setImg(k,f.files[0]);d.onpaste=e=>{const it=[...e.clipboardData.items].find(i=>i.type.startsWith('image/'));if(it)setImg(k,it.getAsFile())};d.ondragover=e=>{e.preventDefault();d.classList.add('hit')};d.ondragleave=()=>d.classList.remove('hit');d.ondrop=e=>{e.preventDefault();d.classList.remove('hit');e.dataTransfer.files[0]&&setImg(k,e.dataTransfer.files[0])}})}
+function setImg(k,file){const img=new Image(),r=new FileReader();r.onload=()=>{img.onload=()=>{const c=document.createElement('canvas'),m=260,sc=Math.min(1,m/Math.max(img.width,img.height));c.width=img.width*sc;c.height=img.height*sc;c.getContext('2d').drawImage(img,0,0,c.width,c.height);pendingImg[k]=c.toDataURL('image/jpeg',.8);$('#drop_'+k).innerHTML=`<img src="${pendingImg[k]}"> ✔ picture ready (click to change)<input type="file" accept="image/*" style="display:none" id="file_${k}">`;bindDrops()};img.src=r.result};r.readAsDataURL(file)}
+function openPanel(){$('#modal').classList.add('open');pg=grade;renderPanel()}
+function closePanel(){$('#modal').classList.remove('open');if($('#scr-map').classList.contains('active'))renderMap()}
+function renderPanel(){pendingImg={};
+ $('#pnav').innerHTML=`<div class="gt">${[4,5,6].map(g=>`<button class="${pg===g?'on':''}" onclick="pg=${g};renderPanel()">G${g}</button>`).join('')}</div>`+POOL.map(g=>`<button class="gm ${pgame===g.id?'on':''}" onclick="pgame='${g.id}';renderPanel()">${g.ic} ${g.nm} <span style="opacity:.6">(${CONTENT[pg][g.id].length})</span></button>`).join('');
+ const F=FIELDS[pgame],items=CONTENT[pg][pgame];
+ $('#pmain').innerHTML=`<h3 style="font-size:22px;margin-bottom:4px">${GAMES.find(g=>g.id===pgame).nm} — Grade ${pg}</h3><div class="pnote">${F.note} Each round uses up to 4 random items from this list.</div>
+ <div class="form">${F.make()}<div style="display:flex;gap:8px;justify-content:flex-end"><button class="sm" onclick="addItem()">➕ Add to Grade ${pg}</button></div></div>
+ <div class="items">${items.map((it,i)=>`<div class="item">${F.show(it)}<button class="del" onclick="delItem(${i})">Delete</button></div>`).join('')||'<div class="pnote">No items yet — add one above.</div>'}</div>`;
+ bindDrops()}
+function addItem(){const it=FIELDS[pgame].read();if(!it){alert('Please fill in all the fields.');return}CONTENT[pg][pgame].push(it);saveData();renderPanel()}
+function delItem(i){if(CONTENT[pg][pgame].length<=1&&!confirm('This is the last item. Delete it anyway?'))return;CONTENT[pg][pgame].splice(i,1);saveData();renderPanel()}
+function exportData(){const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(CONTENT));a.download='word-quest-content.json';a.click()}
+function importData(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!(j[4]&&j[5]&&j[6]))throw 0;CONTENT=j;saveData();renderPanel()}catch(e){alert('This file is not a Word Quest content file.')}};r.readAsText(f);inp.value=''}
+function resetContent(){if(confirm('Restore the original content? Your changes will be lost.')){CONTENT=JSON.parse(JSON.stringify(DEFAULT));saveData();renderPanel()}}
+
+applyS();
+/* ===================== TEAMS QUICK MODAL ===================== */
+function openTeams(){$('#tmodal').classList.add('open');renderTeams()}
+function closeTeams(){$('#tmodal').classList.remove('open')}
+function renderTeams(){$('#tgrid').innerHTML=`<div class="srow"><div class="l">Class name<small>Stamped on saved sessions so you can compare classes (e.g. 4A, 4B)</small></div><div class="c"><input type="text" value="${S.className}" maxlength="16" placeholder="e.g. 4A" oninput="S.className=this.value||'Class A';saveS()"></div></div>
+ <div class="srow"><div class="l">Number of teams</div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;saveS();renderTeams()">${[1,2,3,4,5].map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
+ ${Array.from({length:S.teamCount},(_,i)=>`<div class="srow"><div class="l">Team ${'ABCDE'[i]}</div><div class="c"><input type="text" value="${S.names[i]}" maxlength="14" placeholder="Team name" oninput="S.names[${i}]=this.value||'Team ${'ABCDE'[i]}';saveS()"><input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`).join('')}
+ <div class="pnote">Tip: keep the same team names all year — the Season page adds up every saved session by team name.</div>`}
+
+/* ===================== SEASON LOG ===================== */
+const SEASONKEY='wordquest-season-v1';
+const AKEY='wordquest-archives-v1';
+let ARCHIVES=[];try{ARCHIVES=JSON.parse(localStorage.getItem(AKEY)||'[]')}catch(e){}
+function saveArchives(){localStorage.setItem(AKEY,JSON.stringify(ARCHIVES))}
+let SEASON=[];try{SEASON=JSON.parse(localStorage.getItem(SEASONKEY)||'[]')}catch(e){}
+function saveSeason(){localStorage.setItem(SEASONKEY,JSON.stringify(SEASON))}
+function saveSession(){const teams=Array.from({length:NT()},(_,i)=>({name:TN(i),color:TC(i),score:score[i]}));if(teams.every(t=>t.score===0)&&!confirm('All scores are 0. Save anyway?'))return;
+ SEASON.push({id:sessId(),date:new Date().toISOString(),grade,cls:S.className,teams});saveSeason();toast('Session saved 📊');if(cloudCfg())syncNow();confetti();go('season')}
+function totalsOf(list){const tot={};list.forEach(ss=>ss.teams.forEach(t=>{tot[t.name]=tot[t.name]||{s:0,n:0,w:0,c:t.color};tot[t.name].s+=t.score;tot[t.name].n++;const top=Math.max(...ss.teams.map(x=>x.score));if(t.score===top&&ss.teams.length>1)tot[t.name].w++;tot[t.name].c=t.color}));return Object.entries(tot).sort((a,b)=>b[1].s-a[1].s)}
+function seasonTotals(){return totalsOf(SEASON)}
+let cmp={grade:null,a:null,b:null};
+function closeYear(){if(!SEASON.length){alert('There are no sessions to archive yet.');return}
+ const tot=seasonTotals();const champ=prompt('🏆 Who is the champion of this year?\n(Edit the name if you want.)',tot.length?tot[0][0]:'');if(champ===null)return;
+ const y=new Date().getFullYear();const label=prompt('Name this school year:',(y-1)+'–'+y);if(label===null)return;
+ if(!confirm('Lock and archive this year?\n\n• The year is saved as a read-only record you can review any time.\n• The current season is then cleared so next year starts fresh.\n\nContinue?'))return;
+ const arc={id:sessId(),label:label,champion:champ,closed:new Date().toISOString(),sessions:JSON.parse(JSON.stringify(SEASON))};
+ ARCHIVES.push(arc);saveArchives();SEASON=[];saveSeason();if(cloudCfg())syncNow();confetti();fanfare();toast('Year archived 🏁');renderSeason()}
+function openArchives(){$('#amodal').classList.add('open');renderArchiveList()}
+function closeArchives(){$('#amodal').classList.remove('open')}
+function renderArchiveList(){const b=$('#abody');if(!ARCHIVES.length){b.innerHTML='<div class="empty">No archived years yet.<br>At the end of the year press "Close &amp; archive year".</div>';return}
+ b.innerHTML=ARCHIVES.slice().reverse().map((a,ri)=>{const i=ARCHIVES.length-1-ri;return `<div class="arccard"><div class="arctop"><div><div class="arclabel">🏁 ${a.label}</div><div class="arcchamp">🏆 Champion: <b>${a.champion||'—'}</b></div><small>${a.sessions.length} sessions · closed ${new Date(a.closed).toLocaleDateString('en-GB')}</small></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="sm" onclick="viewArchive(${i})">View</button><button class="sm alt" onclick="exportArchive(${i})">CSV</button><button class="del" onclick="delArchive(${i})">Delete</button></div></div></div>`}).join('')}
+function viewArchive(i){const a=ARCHIVES[i];const rank=totalsOf(a.sessions);const b=$('#abody');
+ b.innerHTML=`<button class="sm alt" onclick="renderArchiveList()">← All years</button>
+ <div style="text-align:center;margin:14px 0"><div style="font-family:'Fredoka';font-size:30px;color:var(--sun)">🏁 ${a.label}</div><div style="font-family:'Fredoka';font-size:22px">🏆 Champion: ${a.champion||'—'}</div></div>
+ <div class="totals">${rank.map(([n,t],r)=>`<div class="tot" style="--c:${t.c};padding:12px 18px;min-width:120px"><div class="rank">${['🥇','🥈','🥉','4th','5th'][r]||''}</div><div class="lbl">${n}</div><div class="n" style="font-size:34px">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
+ <table class="stable"><tr><th>Date</th><th>Class</th><th>Grade</th><th>Results</th></tr>${a.sessions.map(ss=>`<tr><td>${new Date(ss.date).toLocaleDateString('en-GB')}</td><td>${ss.cls||'—'}</td><td>Grade ${ss.grade}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td></tr>`).join('')}</table>`}
+function exportArchive(i){const a=ARCHIVES[i];const rows=[['Year',a.label],['Champion',a.champion||''],[],['Date','Class','Grade','Team','Score']];a.sessions.forEach(ss=>ss.teams.forEach(t=>rows.push([new Date(ss.date).toLocaleDateString('en-GB'),ss.cls||'',ss.grade,t.name,t.score])));const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const el=document.createElement('a');el.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);el.download='word-quest-'+a.label.replace(/[^0-9A-Za-z]+/g,'-')+'.csv';el.click()}
+function delArchive(i){if(!confirm('Delete this archived year for good?'))return;ARCHIVES.splice(i,1);saveArchives();if(cloudCfg())pushCloud(true);renderArchiveList()}
+
+function classesFor(g){return [...new Set(SEASON.filter(ss=>String(ss.grade)===String(g)).map(ss=>ss.cls||'Unlabelled'))]}
+function classStats(g,cls){const ss=SEASON.filter(s=>String(s.grade)===String(g)&&(s.cls||'Unlabelled')===cls);let total=0,best=0;ss.forEach(x=>{const sum=x.teams.reduce((a,t)=>a+t.score,0);total+=sum;best=Math.max(best,sum)});return {total,sess:ss.length,avg:ss.length?Math.round(total/ss.length):0,best}}
+function renderCompare(){const box=$('#compare');if(!box)return;const grades=[...new Set(SEASON.map(s=>String(s.grade)))].sort();if(!grades.length){box.innerHTML='';return}
+ if(!cmp.grade||!grades.includes(cmp.grade))cmp.grade=grades[0];
+ const cls=classesFor(cmp.grade);if(cls.length<1){box.innerHTML='';return}
+ if(!cls.includes(cmp.a))cmp.a=cls[0];if(!cls.includes(cmp.b))cmp.b=cls[1]||cls[0];
+ const A=classStats(cmp.grade,cmp.a),B=classStats(cmp.grade,cmp.b),mx=Math.max(A.total,B.total,1);
+ const bar=(v,c)=>`<div style="background:#E5DECF;border-radius:8px;height:22px;overflow:hidden"><div style="width:${v/mx*100}%;height:100%;background:${c};border-radius:8px"></div></div>`;
+ box.innerHTML=`<div class="shead" style="color:var(--sun);font-size:22px">⚖️ Compare two classes</div>
+ <div class="cmprow"><label>Grade</label><select class="sel" onchange="cmp.grade=this.value;cmp.a=null;cmp.b=null;renderCompare()">${grades.map(g=>`<option ${g===cmp.grade?'selected':''}>${g}</option>`).join('')}</select>
+ <select class="sel" onchange="cmp.a=this.value;renderCompare()">${cls.map(c=>`<option ${c===cmp.a?'selected':''}>${c}</option>`).join('')}</select><span style="font-family:'Fredoka'">vs</span>
+ <select class="sel" onchange="cmp.b=this.value;renderCompare()">${cls.map(c=>`<option ${c===cmp.b?'selected':''}>${c}</option>`).join('')}</select></div>
+ <table class="cmptable"><tr><th></th><th style="color:var(--teamA,#FF6B6B)">${cmp.a}</th><th style="color:var(--mint)">${cmp.b}</th></tr>
+ <tr><td>Total points</td><td><b>${A.total}</b></td><td><b>${B.total}</b></td></tr>
+ <tr><td>Sessions played</td><td>${A.sess}</td><td>${B.sess}</td></tr>
+ <tr><td>Average / session</td><td>${A.avg}</td><td>${B.avg}</td></tr>
+ <tr><td>Best single match</td><td>${A.best}</td><td>${B.best}</td></tr></table>
+ <div style="margin-top:12px;display:grid;gap:8px"><div style="font-weight:800">${cmp.a} — ${A.total}</div>${bar(A.total,'#FF6B6B')}<div style="font-weight:800">${cmp.b} — ${B.total}</div>${bar(B.total,'#4ECDC4')}</div>
+ <div style="text-align:center;margin-top:12px;font-family:'Fredoka';font-size:20px">${A.total===B.total?'🤝 Level so far!':`🏆 ${A.total>B.total?cmp.a:cmp.b} is ahead`}</div>`}
+function renderSeason(){const body=$('#seasonBody');if(!SEASON.length){body.innerHTML='<div class="empty">No sessions saved yet.<br>Finish a match, open "Show winner", then press "Save session result".</div>';return}
+ const rankC=1;
+  const rank=seasonTotals();
+ body.innerHTML=`<div id="compare" class="cmpbox"></div><div class="totals">${rank.map(([n,t],i)=>`<div class="tot" style="--c:${t.c}"><div class="rank">${['🥇','🥈','🥉'][i]||''}</div><div class="lbl">${n}</div><div class="n">${t.s}</div><small>${t.n} session${t.n>1?'s':''} · ${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
+ <table class="stable"><tr><th>#</th><th>Date</th><th>Class</th><th>Grade</th><th>Results</th><th></th></tr>${SEASON.map((ss,i)=>`<tr><td>${i+1}</td><td>${new Date(ss.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td>${ss.cls||'—'}</td><td>Grade ${ss.grade}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td><td><button class="del" onclick="delSession(${i})">Delete</button></td></tr>`).reverse().join('')}</table>`;renderCompare()}
+function delSession(i){if(!confirm('Delete this session?'))return;SEASON.splice(i,1);saveSeason();renderSeason()}
+function clearSeason(){if(!confirm('Delete ALL saved sessions for the season? This cannot be undone.'))return;if(!confirm('Are you sure? Export a CSV first if you want a copy.'))return;SEASON=[];saveSeason();renderSeason()}
+function exportSeason(){const rows=[['Date','Grade','Team','Score']];SEASON.forEach(ss=>ss.teams.forEach(t=>rows.push([new Date(ss.date).toLocaleDateString('en-GB'),ss.grade,t.name,t.score])));const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download='word-quest-season.csv';a.click()}
+
+function secondChance(i){setTurn(i);toast(TN(i)+' gets a chance on the same question');renderRound()}
+/* ===================== ON-SCREEN KEYBOARD ===================== */
+var oskField=null,oskShift=false,oskSym=false,oskOpen=false,oskBuilt=false;
+const OSK_ROWS=[['1','2','3','4','5','6','7','8','9','0'],['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m']];
+const OSK_SYM=[['1','2','3','4','5','6','7','8','9','0'],['@','#','$','_','&','-','+','(',')','/'],['*','"',"'",':',';','!','?','.',','],['=','%','[',']','{','}','\\']];
+function oskEditable(el){return el&&(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&/^(text|password|search|tel|email|number|url)$/i.test(el.type||'text')))}
+function buildOsk(){if(oskBuilt)return;oskBuilt=true;const k=document.createElement('div');k.className='osk';k.id='osk';document.body.appendChild(k);
+ const launch=document.createElement('button');launch.className='osklaunch';launch.id='osklaunch';launch.textContent='⌨️';launch.title='Show keyboard';launch.onclick=()=>{oskOpen=true;drawOsk()};document.body.appendChild(launch);
+ // keep focus in the field: never let the keyboard steal it
+ k.addEventListener('pointerdown',e=>{if(e.target.closest('.osk'))e.preventDefault()});
+ drawOsk()}
+function drawOsk(){const k=$('#osk');if(!k)return;const on=S.osk&&oskOpen;k.style.display=on?'block':'none';$('#osklaunch').style.display=(S.osk&&!oskOpen)?'flex':'none';if(!on)return;
+ const rows=oskSym?OSK_SYM:OSK_ROWS;let h='';
+ rows.forEach((r,i)=>{h+='<div class="oskrow">';if(i===3)h+=`<button class="osk-k wide" data-k="shift">${oskShift?'⬆️':'⇧'}</button>`;r.forEach(c=>{const ch=oskShift&&!oskSym?c.toUpperCase():c;h+=`<button class="osk-k" data-c="${ch}">${ch}</button>`});if(i===3)h+='<button class="osk-k wide" data-k="back">⌫</button>';h+='</div>'});
+ h+=`<div class="oskrow"><button class="osk-k wide" data-k="sym">${oskSym?'ABC':'?123'}</button><button class="osk-k" data-c=",">,</button><button class="osk-k space" data-k="space">space</button><button class="osk-k" data-c=".">.</button><button class="osk-k wide" data-k="enter">⏎</button><button class="osk-k wide" data-k="hide">⌄</button></div>`;
+ k.innerHTML=h;
+ k.querySelectorAll('.osk-k').forEach(b=>b.onclick=()=>oskKey(b));}
+function oskKey(b){const c=b.dataset.c,k=b.dataset.k;
+ if(k==='hide'){oskOpen=false;drawOsk();return}
+ if(k==='sym'){oskSym=!oskSym;drawOsk();return}
+ if(k==='shift'){oskShift=!oskShift;drawOsk();return}
+ const el=oskField;if(!el){return}
+ if(k==='enter'){if(el.id==='gpass'){tryUnlock();return}if(el.tagName==='TEXTAREA')oskInsert(el,'\n');el.dispatchEvent(new Event('change',{bubbles:true}));return}
+ if(k==='back'){oskBack(el);return}
+ if(k==='space'){oskInsert(el,' ');return}
+ if(c!=null){oskInsert(el,c);if(oskShift&&!oskSym){oskShift=false;drawOsk()}}}
+function oskPos(el){let s=el.selectionStart,e=el.selectionEnd;if(s==null){s=e=el.value.length}return[s,e]}
+function oskInsert(el,ch){try{el.focus({preventScroll:true})}catch(_){}
+ if(el.type==='number'){el.value=el.value+ch;el.dispatchEvent(new Event('input',{bubbles:true}));return}
+ const[s,e]=oskPos(el),t=el.value;el.value=t.slice(0,s)+ch+t.slice(e);const p=s+ch.length;try{el.setSelectionRange(p,p)}catch(_){}
+ el.dispatchEvent(new Event('input',{bubbles:true}))}
+function oskBack(el){try{el.focus({preventScroll:true})}catch(_){}
+ if(el.type==='number'){el.value=el.value.slice(0,-1);el.dispatchEvent(new Event('input',{bubbles:true}));return}
+ const[s,e]=oskPos(el),t=el.value;if(s===e){if(s>0){el.value=t.slice(0,s-1)+t.slice(e);const p=s-1;try{el.setSelectionRange(p,p)}catch(_){}}}else{el.value=t.slice(0,s)+t.slice(e);try{el.setSelectionRange(s,s)}catch(_){}}
+ el.dispatchEvent(new Event('input',{bubbles:true}))}
+/* focus tracking: mark editable fields so the device keyboard stays hidden, and show ours */
+document.addEventListener('focusin',e=>{if(!S.osk)return;const el=e.target;if(oskEditable(el)){el.setAttribute('inputmode','none');oskField=el;buildOsk();oskOpen=true;drawOsk()}});
+function applyOsk(){if(!oskBuilt&&S.osk)buildOsk();if(oskBuilt)drawOsk();document.querySelectorAll('input,textarea').forEach(el=>{if(oskEditable(el)){if(S.osk)el.setAttribute('inputmode','none');else el.removeAttribute('inputmode')}})}
+
+/* ===================== CLOUD SYNC (JSONBin.io) ===================== */
+function cloudCfg(){return S.cloudOn&&S.cloudBin&&S.cloudKey}
+function cloudHead(extra,mode){const h={};h[(mode||S.keyMode||'access')==='master'?'X-Master-Key':'X-Access-Key']=S.cloudKey;if(extra)Object.assign(h,extra);return h}
+/* send ONE key header only; if it is rejected, retry with the other kind and remember which works */
+async function cloudFetch(url,opts,extraHead){opts=opts||{};const first=S.keyMode||'access';
+ let r=await fetch(url,Object.assign({},opts,{headers:cloudHead(extraHead,first)}));
+ if(r.status===401||r.status===403){const other=first==='access'?'master':'access';
+  const r2=await fetch(url,Object.assign({},opts,{headers:cloudHead(extraHead,other)}));
+  if(r2.ok){S.keyMode=other;saveS();return r2}
+  return r}
+ return r}
+function sessId(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
+function ensureIds(){let ch=false;SEASON.forEach(s=>{if(!s.id){s.id=sessId();ch=true}});if(ch)saveSeason()}
+function mergeRemote(payload){let sess=[],arch=[];if(Array.isArray(payload))sess=payload;else if(payload&&typeof payload==='object'){sess=payload.sessions||[];arch=payload.archives||[]}
+ const seen=new Set(SEASON.map(s=>s.id));sess.forEach(r=>{if(r&&r.id&&!seen.has(r.id)){SEASON.push(r);seen.add(r.id)}});SEASON.sort((a,b)=>new Date(a.date)-new Date(b.date));saveSeason();
+ const aseen=new Set(ARCHIVES.map(a=>a.id));arch.forEach(a=>{if(a&&a.id&&!aseen.has(a.id)){ARCHIVES.push(a);aseen.add(a.id)}});saveArchives()}
+function cloudStat(msg,cls){const e=$('#cloudStat');if(e){e.textContent=msg;e.className='cstat '+(cls||'')}}
+async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);mergeRemote(arr);if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
+async function pushCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES}),keepalive:true},{'Content-Type':'application/json'});if(!r.ok)throw new Error('HTTP '+r.status);if(!silent)cloudStat('Saved to the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not save to cloud: '+e.message,'bad')}}
+async function syncNow(){if(!cloudCfg()){cloudStat('Turn on sync and fill in Bin ID + Key first','bad');return}cloudStat('Syncing\u2026');ensureIds();await pullCloud(true);await pushCloud(true);cloudStat('Synced across devices \u2714 ('+SEASON.length+' sessions)','ok');if($('#scr-season').classList.contains('active'))renderSeason()}
+async function testCloud(){if(!S.cloudBin||!S.cloudKey){cloudStat('Enter Bin ID and Key','bad');return}cloudStat('Testing\u2026');try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(r.ok)cloudStat('Connection works \u2714 (using '+(S.keyMode||'access')+' key)','ok');else cloudStat('Failed: HTTP '+r.status+(r.status===401?' \u2014 key rejected. Tick Read + Update on the key.':r.status===404?' (wrong Bin ID)':''),'bad')}catch(e){cloudStat('Failed: '+e.message,'bad')}}
+/* auto-push whenever the game is hidden or closed */
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&cloudCfg())pushCloud(true)});
+window.addEventListener('pagehide',()=>{if(cloudCfg())pushCloud(true)});
+setInterval(()=>{if(cloudCfg())pushCloud(true)},60000);
+window.addEventListener('DOMContentLoaded',()=>{ensureIds()});
+
+/* ===================== LICENSE + PASSWORD ===================== */
+const CREDIT_SIG='Miss Hagar Shaaban';
+const PKEY='wordquest-pass-v1';
+function getPass(){try{const raw=localStorage.getItem(PKEY);if(!raw)return '__none__';const v=atob(raw);return v?v:'__none__'}catch(e){return '__none__'}}
+function setPass(v){localStorage.setItem(PKEY,btoa(v))}
+// no default password — teacher sets one from Settings if desired
+let unlocked=false;
+function hasPass(){const v=getPass();return !!v&&v!=='__none__'}
+function initGate(){const inp=$('#gpass'),msg=$('#gcmsg'),btn=$('#openBtn'),err=$('#gerr'),tools=$('#gateTools');if(!inp)return;
+ if(hasPass()){inp.style.display='';inp.value='';inp.placeholder='Password';if(msg)msg.textContent='Type the password, then press Enter or tap Open';if(btn)btn.textContent='🔓 Open';setTimeout(()=>inp.focus(),60)}
+ else{inp.style.display='none';if(msg)msg.textContent='Press Enter or tap to open';if(btn)btn.textContent='▶ Open the games';setTimeout(()=>btn&&btn.focus(),60)}
+ if(tools)tools.innerHTML=hasPass()?'<button class="ghost" onclick="gateChangePass()">🔑 Change password</button>':'<button class="ghost" onclick="gateSetPass()">🔒 Set a password</button>';
+ if(err)err.textContent=''}
+function gateSetPass(){if(hasPass()){gateChangePass();return}const v=prompt('Type the new password (3 characters or more):','');if(v===null)return;const t=v.trim();if(t.length<3){alert('Use at least 3 characters.');return}setPass(t);alert('Password set. It will be asked for from now on.');initGate()}
+function gateChangePass(){const cur=prompt('Enter the CURRENT password first:','');if(cur===null)return;if(cur.trim()!==getPass()){alert('Wrong password. The password was not changed.');return}
+ const v=prompt('Enter the NEW password (3 characters or more).\nLeave it empty to remove the password:','');if(v===null)return;const t=v.trim();
+ if(t===''){if(confirm('Remove the password completely? Anyone will be able to open the game.')){localStorage.removeItem(PKEY);alert('Password removed.');initGate()}return}
+ if(t.length<3){alert('Use at least 3 characters. The password was not changed.');return}
+ setPass(t);alert('Password changed.');initGate()}
+function tryUnlock(){if(!hasPass()){doOpen();return}
+ const inp=$('#gpass');if(inp&&inp.style.display==='none')inp.style.display='';
+ const v=inp?inp.value.trim():'';
+ if(v===getPass()){doOpen()}
+ else{const e=$('#gerr');if(e)e.textContent=v?'Wrong password, try again':'Please type the password first';if(inp){inp.value='';inp.focus()}}}
+function doOpen(){unlocked=true;$('#gate').style.display='none';if(S&&S.music)musicOn();if(typeof ensureIds==='function')ensureIds();if(typeof cloudCfg==='function'&&cloudCfg())pullCloud(true)}
+function lockNow(){unlocked=false;$('#gate').style.display='flex';initGate();musicOff()}
+/* integrity: the credit must stay in place or the game disables itself */
+function creditCount(){return [...document.querySelectorAll('.wm-credit')].filter(e=>new RegExp(CREDIT_SIG.replace(/\s+/g,'\\s+'),'i').test(e.textContent)).length}
+function disableGame(){clearInterval(window.__ic);document.title='Disabled';document.documentElement.innerHTML='<div class="dead"><h1>Game disabled</h1><p>This game runs under the credit <b>&ldquo;Prepared by Miss Hagar Shaaban&rdquo;</b>. That credit has been changed or removed, so the game has switched itself off.</p><p>Restore the original file with the credit in place to use it again.</p></div>'}
+function checkIntegrity(){if(creditCount()<6)disableGame()}
+window.__ic=setInterval(checkIntegrity,3000);
+window.addEventListener('keydown',e=>{if(!unlocked&&e.key==='Enter'){e.preventDefault();tryUnlock()}});
+window.addEventListener('DOMContentLoaded',()=>{checkIntegrity();initGate()});
+
+/* keyboard: space = switch team */
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('#scr-game').classList.contains('active')&&e.target===document.body){e.preventDefault();nextTurn()}});
+</script>
+</body>
+</html>
