@@ -269,10 +269,12 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div class="glogo">🧭</div>
   <h2>Word Quest</h2>
   <div class="gc" id="gcmsg">Press Enter or tap to open</div>
-  <input type="password" id="gpass" placeholder="Password (optional)" style="display:none" onkeydown="if(event.key==='Enter'){event.preventDefault();tryUnlock()}">
+  <input type="password" id="gpass" placeholder="Password" onkeydown="if(event.key==='Enter'){event.preventDefault();tryUnlock()}">
   <div class="err" id="gerr"></div>
   <button class="btn" id="openBtn" onclick="tryUnlock()">▶ Open the games</button>
+  <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v12</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -503,8 +505,8 @@ function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
    then every device that opens this file syncs automatically
    with no typing at all. Leave them empty to enter them by hand.
    ============================================================ */
-const BUILTIN_BIN  = "6a8f1a12f5f4af5e29459c91";        /* e.g. "6a8f1a12f5f4af5e29459c91" */
-const BUILTIN_KEY  = "$2a$10$x544.sSaaatpHuiBcoZmSOvl9hTc52duU./lg9yA4dRy9.uJu8kGC";        /* your JSONBin key                */
+const BUILTIN_BIN  = "";        /* e.g. "6a8f1a12f5f4af5e29459c91" */
+const BUILTIN_KEY  = "";        /* your JSONBin key                */
 const BUILTIN_MODE = "master";  /* "master" or "access"            */
 
 const SKEY='wordquest-settings-v2';
@@ -614,9 +616,6 @@ function renderSettings(){$('#sgrid').innerHTML=`
  <div class="srow"><div class="l">Key type<small>Auto tries both. Pick Master if your Access Key keeps failing.</small></div><div class="c"><select class="sel" onchange="S.keyMode=this.value;saveS()"><option value="access" ${(S.keyMode||'access')==='access'?'selected':''}>Access Key</option><option value="master" ${S.keyMode==='master'?'selected':''}>Master Key</option></select></div></div>
  <div class="srow"><div class="l">Sync</div><div class="c"><button class="sm alt" onclick="testCloud()">Test connection</button><button class="sm" onclick="syncNow()">🔄 Sync now</button></div></div>
  <div class="srow"><div class="cstat" id="cloudStat" style="width:100%;min-height:20px"></div></div>
- <div class="shead">🔒 Password</div>
- <div class="srow"><div class="l">Current status<small id="passStat">${getPass()==='__none__'?'No password — anyone can open the game':'Password is set'}</small></div><div class="c"><button class="sm alt" onclick="removePass()">Remove password</button></div></div>
- <div class="srow"><div class="l">Set a new password<small>3 characters or more</small></div><div class="c"><input type="text" id="newpass" placeholder="New password" style="padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:800;width:150px"><button class="sm" onclick="if($('#newpass').value.trim().length<3){alert('Use at least 3 characters.')}else{setPass($('#newpass').value.trim());$('#newpass').value='';toast('Password set ✔');renderSettings()}">Set password</button></div></div>
  <div class="shead">🎮 Rules</div>
  <div class="srow"><div class="l">Lose 1 point on "Try again"<small>Like the original game</small></div><div class="c">${sw('penalty')}</div></div>`}
 function resetSettings(){if(!confirm('Restore default settings?'))return;musicOff();S={...SDEF};saveS();renderSettings()}
@@ -906,22 +905,37 @@ window.addEventListener('DOMContentLoaded',()=>{ensureIds()});
 /* ===================== LICENSE + PASSWORD ===================== */
 const CREDIT_SIG='Miss Hagar Shaaban';
 const PKEY='wordquest-pass-v1';
-function getPass(){try{const v=atob(localStorage.getItem(PKEY)||'');return (!v||v==='hagar'||v==='100489')?'__none__':v}catch(e){return '__none__'}}
+function getPass(){try{const raw=localStorage.getItem(PKEY);if(!raw)return '__none__';const v=atob(raw);return v?v:'__none__'}catch(e){return '__none__'}}
 function setPass(v){localStorage.setItem(PKEY,btoa(v))}
 // no default password — teacher sets one from Settings if desired
 let unlocked=false;
-function tryUnlock(){const saved=getPass();const noPass=!saved||saved==='__none__';const inp=$('#gpass');const v=inp?inp.value.trim():'';if(noPass){doOpen();return}if(inp&&inp.style.display==='none'){inp.style.display='';inp.placeholder='Enter password';$('#gcmsg').textContent='Type the password then press Open or Enter';$('#openBtn').textContent='🔓 Open';inp.focus();return}if(v===saved){inp.style.display='none';doOpen()}else{const e=$('#gerr');if(e)e.textContent=v?'Wrong password, try again':'Please type the password first';if(inp){inp.value='';inp.focus()}}}
+function hasPass(){const v=getPass();return !!v&&v!=='__none__'}
+function initGate(){const inp=$('#gpass'),msg=$('#gcmsg'),btn=$('#openBtn'),err=$('#gerr'),tools=$('#gateTools');if(!inp)return;
+ if(hasPass()){inp.style.display='';inp.value='';inp.placeholder='Password';if(msg)msg.textContent='Type the password, then press Enter or tap Open';if(btn)btn.textContent='🔓 Open';setTimeout(()=>inp.focus(),60)}
+ else{inp.style.display='none';if(msg)msg.textContent='Press Enter or tap to open';if(btn)btn.textContent='▶ Open the games';setTimeout(()=>btn&&btn.focus(),60)}
+ if(tools)tools.innerHTML=hasPass()?'<button class="ghost" onclick="gateChangePass()">🔑 Change password</button>':'<button class="ghost" onclick="gateSetPass()">🔒 Set a password</button>';
+ if(err)err.textContent=''}
+function gateSetPass(){if(hasPass()){gateChangePass();return}const v=prompt('Type the new password (3 characters or more):','');if(v===null)return;const t=v.trim();if(t.length<3){alert('Use at least 3 characters.');return}setPass(t);alert('Password set. It will be asked for from now on.');initGate()}
+function gateChangePass(){const cur=prompt('Enter the CURRENT password first:','');if(cur===null)return;if(cur.trim()!==getPass()){alert('Wrong password. The password was not changed.');return}
+ const v=prompt('Enter the NEW password (3 characters or more).\nLeave it empty to remove the password:','');if(v===null)return;const t=v.trim();
+ if(t===''){if(confirm('Remove the password completely? Anyone will be able to open the game.')){localStorage.removeItem(PKEY);alert('Password removed.');initGate()}return}
+ if(t.length<3){alert('Use at least 3 characters. The password was not changed.');return}
+ setPass(t);alert('Password changed.');initGate()}
+function tryUnlock(){if(!hasPass()){doOpen();return}
+ const inp=$('#gpass');if(inp&&inp.style.display==='none')inp.style.display='';
+ const v=inp?inp.value.trim():'';
+ if(v===getPass()){doOpen()}
+ else{const e=$('#gerr');if(e)e.textContent=v?'Wrong password, try again':'Please type the password first';if(inp){inp.value='';inp.focus()}}}
 function doOpen(){unlocked=true;$('#gate').style.display='none';if(S&&S.music)musicOn();if(typeof ensureIds==='function')ensureIds();if(typeof cloudCfg==='function'&&cloudCfg())pullCloud(true)}
-function lockNow(){unlocked=false;const inp=$('#gpass');if(inp){inp.value='';inp.style.display='none'};const saved=getPass();const noPass=!saved||saved==='__none__';$('#gcmsg').textContent=noPass?'Press Enter or tap to open':'Tap to open';$('#openBtn').textContent=noPass?'▶ Open the games':'🔒 Enter password';if($('#gerr'))$('#gerr').textContent='';$('#gate').style.display='flex';musicOff()}
+function lockNow(){unlocked=false;$('#gate').style.display='flex';initGate();musicOff()}
 /* integrity: the credit must stay in place or the game disables itself */
 function creditCount(){return [...document.querySelectorAll('.wm-credit')].filter(e=>new RegExp(CREDIT_SIG.replace(/\s+/g,'\\s+'),'i').test(e.textContent)).length}
 function disableGame(){clearInterval(window.__ic);document.title='Disabled';document.documentElement.innerHTML='<div class="dead"><h1>Game disabled</h1><p>This game runs under the credit <b>&ldquo;Prepared by Miss Hagar Shaaban&rdquo;</b>. That credit has been changed or removed, so the game has switched itself off.</p><p>Restore the original file with the credit in place to use it again.</p></div>'}
 function checkIntegrity(){if(creditCount()<6)disableGame()}
 window.__ic=setInterval(checkIntegrity,3000);
 window.addEventListener('keydown',e=>{if(!unlocked&&e.key==='Enter'){e.preventDefault();tryUnlock()}});
-window.addEventListener('DOMContentLoaded',()=>{checkIntegrity();setTimeout(()=>{const g=$('#openBtn');if(g)g.focus()},100)});
+window.addEventListener('DOMContentLoaded',()=>{checkIntegrity();initGate()});
 
-function removePass(){if(!confirm('Remove the password? Anyone will be able to open the game.'))return;localStorage.removeItem(PKEY);toast('Password removed');renderSettings()}
 /* keyboard: space = switch team */
 document.addEventListener('keydown',e=>{if(e.code==='Space'&&$('#scr-game').classList.contains('active')&&e.target===document.body){e.preventDefault();nextTurn()}});
 </script>
