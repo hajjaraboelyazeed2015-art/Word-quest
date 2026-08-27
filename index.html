@@ -275,7 +275,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v14</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v16</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -356,7 +356,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
 <!-- SEASON SCREEN -->
 <section class="screen" id="scr-season">
   <div class="map-wrap">
-    <div class="map-head"><span class="chip">📊 Season</span><h2 style="font-size:30px">Scores for the whole school year</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="exportSeason()">📤 Export CSV</button><button class="ghost" onclick="closeYear()">🏁 Close &amp; archive year</button><button class="ghost" onclick="openArchives()">📚 Archives</button><button class="ghost" onclick="clearSeason()">🗑️ Clear season</button><button class="ghost" onclick="go('map')">← Back</button></div></div>
+    <div class="map-head"><span class="chip">📊 Season</span><h2 style="font-size:30px">Scores for the whole school year</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="syncNow()">🔄 Refresh from cloud</button><button class="ghost" onclick="exportSeason()">📤 Export CSV</button><button class="ghost" onclick="closeYear()">🏁 Close &amp; archive year</button><button class="ghost" onclick="openArchives()">📚 Archives</button><button class="ghost" onclick="clearSeason()">🗑️ Clear season</button><button class="ghost" onclick="go('map')">← Back</button></div></div>
     <div id="seasonBody"></div>
   </div>
   <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
@@ -414,6 +414,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   </div>
 </div>
 
+<script src="config.js" onerror="console.log(0)"></script>
 <script>
 /* ===================== CONTENT ===================== */
 const DEFAULT = {
@@ -489,7 +490,7 @@ const $=s=>document.querySelector(s);
 /* stars */
 for(let i=0;i<70;i++){const s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';$('#stars').appendChild(s)}
 
-function go(n){stopTimer();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#scr-'+n).classList.add('active');if(n==='map')renderMap();if(n==='result')renderResult();if(n==='season')renderSeason();}
+function go(n){stopTimer();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#scr-'+n).classList.add('active');if(n==='map')renderMap();if(n==='result')renderResult();if(n==='season'){renderSeason();if(typeof cloudCfg==='function'&&cloudCfg())pullCloud(true)}}
 function pickGrade(g){grade=g;done={};$('#gradeChip').textContent='Grade '+g;go('map')}
 function renderMap(){$('#trail').innerHTML=GAMES.map((g,i)=>`<button class="station ${done[g.id]?'done':''}" style="${g.id==='wheel'?'background:linear-gradient(135deg,#FFE29A,#FFC93C)':''}" onclick="startGame('${g.id}')"><span class="badge">Game ${i+1}</span><div class="ic">${g.ic}</div><div class="nm">${g.nm}</div><div class="ds">${g.ds}</div></button>`).join('')+`<button class="station" style="background:var(--sun)" onclick="go('result')"><div class="ic">🏆</div><div class="nm">Show winner</div><div class="ds">End the match & celebrate</div></button>`}
 function setTurn(t){turn=t%NT();document.querySelectorAll('.team').forEach((e,i)=>e.classList.toggle('turn',i===turn));const tb=$('#turnbar');tb.style.background=TC(turn);tb.textContent=NT()>1?`${TN(turn)}'s turn`:TN(turn);const w=$('#whorow');if(w)w.innerHTML=NT()>1?'Who answers? '+Array.from({length:NT()},(_,i)=>`<button class="tc ${i===turn?'on':''}" style="${i===turn?'':'border-color:'+TC(i)}" onclick="setTurn(${i});toast(TN(${i})+' answers now')">${TN(i)}</button>`).join(''):''}
@@ -506,8 +507,8 @@ function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
    then every device that opens this file syncs automatically
    with no typing at all. Leave them empty to enter them by hand.
    ============================================================ */
-const BUILTIN_BIN  = "6a8f1a12f5f4af5e29459c91";        /* e.g. "6a8f1a12f5f4af5e29459c91" */
-const BUILTIN_KEY  = "$2a$10$x544.sSaaatpHuiBcoZmSOvl9hTc52duU./lg9yA4dRy9.uJu8kGC";        /* your JSONBin key                */
+const BUILTIN_BIN  = "";        /* e.g. "6a8f1a12f5f4af5e29459c91" */
+const BUILTIN_KEY  = "";        /* your JSONBin key                */
 const BUILTIN_MODE = "master";  /* "master" or "access"            */
 
 /* ------------------------------------------------------------
@@ -516,12 +517,30 @@ const BUILTIN_MODE = "master";  /* "master" or "access"            */
    devices and private/incognito windows.
    Leave it empty ("") for no password at all.
    ------------------------------------------------------------ */
-const BUILTIN_PASSWORD = "100489";    /* e.g. "100489" */
+const BUILTIN_PASSWORD = "";    /* e.g. "100489" */
+
+/* ------------------------------------------------------------
+   You do NOT have to edit the lines above every time.
+   Upload a small file called  config.js  next to this file once,
+   and it will fill them in and survive every future update:
+
+       window.WORDQUEST_CONFIG = {
+         bin:      "your bin id",
+         key:      "your jsonbin key",
+         mode:     "master",
+         password: "your password"
+       };
+   ------------------------------------------------------------ */
+const CFG = (typeof window!=='undefined' && window.WORDQUEST_CONFIG) || {};
+const CF_BIN  = CFG.bin      || BUILTIN_BIN;
+const CF_KEY  = CFG.key      || BUILTIN_KEY;
+const CF_MODE = CFG.mode     || BUILTIN_MODE;
+const CF_PASS = CFG.password || BUILTIN_PASSWORD;
 
 const SKEY='wordquest-settings-v2';
 const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,names:['Team A','Team B','Team C','Team D','Team E'],cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
 let S={...SDEF};try{S={...SDEF,...JSON.parse(localStorage.getItem(SKEY)||'{}')}}catch(e){}
-if(BUILTIN_BIN&&BUILTIN_KEY){if(!S.cloudBin)S.cloudBin=BUILTIN_BIN;if(!S.cloudKey)S.cloudKey=BUILTIN_KEY;if(BUILTIN_MODE)S.keyMode=BUILTIN_MODE;if(S.cloudOn!==false||!localStorage.getItem(SKEY))S.cloudOn=true;try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
+if(CF_BIN&&CF_KEY){S.cloudBin=CF_BIN;S.cloudKey=CF_KEY;if(CF_MODE)S.keyMode=CF_MODE;if(S.cloudOn!==false||!localStorage.getItem(SKEY))S.cloudOn=true;try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
 function saveS(){localStorage.setItem(SKEY,JSON.stringify(S));applyS()}
 function shade(h,f){const n=parseInt(h.slice(1),16);const r=(n>>16)&255,g=(n>>8)&255,b=n&255;return '#'+[r,g,b].map(x=>Math.round(x*f).toString(16).padStart(2,'0')).join('')}
 function applyS(){const r=document.documentElement.style;r.setProperty('--ok',S.okColor);r.setProperty('--okd',shade(S.okColor,.7));r.setProperty('--bad',S.badColor);r.setProperty('--badd',shade(S.badColor,.7));if(turn>=S.teamCount)turn=0;renderScore();
@@ -901,22 +920,26 @@ function mergeRemote(payload){let sess=[],arch=[];if(Array.isArray(payload))sess
  const seen=new Set(SEASON.map(s=>s.id));sess.forEach(r=>{if(r&&r.id&&!seen.has(r.id)){SEASON.push(r);seen.add(r.id)}});SEASON.sort((a,b)=>new Date(a.date)-new Date(b.date));saveSeason();
  const aseen=new Set(ARCHIVES.map(a=>a.id));arch.forEach(a=>{if(a&&a.id&&!aseen.has(a.id)){ARCHIVES.push(a);aseen.add(a.id)}});saveArchives()}
 function cloudStat(msg,cls){const e=$('#cloudStat');if(e){e.textContent=msg;e.className='cstat '+(cls||'')}}
-async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);mergeRemote(arr);if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
+async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);const before=SEASON.length+ARCHIVES.length;mergeRemote(arr);const after=SEASON.length+ARCHIVES.length;if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(after>before){toast('Updated from another device \u2601');if(typeof cloudBadge==='function')cloudBadge()}if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
 async function pushCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES}),keepalive:true},{'Content-Type':'application/json'});if(!r.ok)throw new Error('HTTP '+r.status);if(!silent)cloudStat('Saved to the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not save to cloud: '+e.message,'bad')}}
-async function syncNow(){if(!cloudCfg()){cloudStat('Turn on sync and fill in Bin ID + Key first','bad');return}cloudStat('Syncing\u2026');ensureIds();await pullCloud(true);await pushCloud(true);cloudStat('Synced across devices \u2714 ('+SEASON.length+' sessions)','ok');if($('#scr-season').classList.contains('active'))renderSeason()}
+async function syncNow(){if(!cloudCfg()){cloudStat('Turn on sync and fill in Bin ID + Key first','bad');return}cloudStat('Syncing\u2026');ensureIds();await pullCloud(true);await pushCloud(true);await pullCloud(true);cloudStat('Synced across devices \u2714 ('+SEASON.length+' sessions)','ok');if($('#scr-season').classList.contains('active'))renderSeason()}
 async function testCloud(){if(!S.cloudBin||!S.cloudKey){cloudStat('Enter Bin ID and Key','bad');return}cloudStat('Testing\u2026');try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(r.ok)cloudStat('Connection works \u2714 (using '+(S.keyMode||'access')+' key)','ok');else cloudStat('Failed: HTTP '+r.status+(r.status===401?' \u2014 key rejected. Tick Read + Update on the key.':r.status===404?' (wrong Bin ID)':''),'bad')}catch(e){cloudStat('Failed: '+e.message,'bad')}}
 /* auto-push whenever the game is hidden or closed */
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&cloudCfg())pushCloud(true)});
 window.addEventListener('pagehide',()=>{if(cloudCfg())pushCloud(true)});
-setInterval(()=>{if(cloudCfg())pushCloud(true)},60000);
+setInterval(()=>{if(cloudCfg()){pullCloud(true);pushCloud(true)}},45000);
+/* coming back to the tab? fetch whatever other devices saved while we were away */
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudCfg())pullCloud(true)});
+window.addEventListener('focus',()=>{if(cloudCfg())pullCloud(true)});
+window.addEventListener('online',()=>{if(cloudCfg())syncNow()});
 window.addEventListener('DOMContentLoaded',()=>{ensureIds()});
 
 /* ===================== LICENSE + PASSWORD ===================== */
 const CREDIT_SIG='Miss Hagar Shaaban';
 const PKEY='wordquest-pass-v1';
-function getPass(){if(BUILTIN_PASSWORD&&String(BUILTIN_PASSWORD).trim())return String(BUILTIN_PASSWORD).trim();
+function getPass(){if(CF_PASS&&String(CF_PASS).trim())return String(CF_PASS).trim();
  try{const raw=localStorage.getItem(PKEY);if(!raw)return '__none__';const v=atob(raw);return v?v:'__none__'}catch(e){return '__none__'}}
-function isBuiltinPass(){return !!(BUILTIN_PASSWORD&&String(BUILTIN_PASSWORD).trim())}
+function isBuiltinPass(){return !!(CF_PASS&&String(CF_PASS).trim())}
 function setPass(v){localStorage.setItem(PKEY,btoa(v))}
 // no default password — teacher sets one from Settings if desired
 let unlocked=false;
