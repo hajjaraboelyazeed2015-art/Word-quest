@@ -35,6 +35,9 @@ button{font-family:inherit;cursor:pointer;border:none}
 .osk-k:active{transform:translateY(2px);box-shadow:0 1px 0 #C9C2B2}
 .osk-k.wide{flex:1.4 1 0;background:#4ECDC4;box-shadow:0 3px 0 #2E9C94;font-size:18px}
 .osk-k.space{flex:5 1 0;max-width:none;background:#FFC93C;box-shadow:0 3px 0 #D9A518}
+.oskToggle{margin-left:6px;width:34px;height:34px;border-radius:9px;border:2px solid #D9D2C2;background:#fff;font-size:16px;vertical-align:middle;cursor:pointer;line-height:1}
+.oskToggle.on{background:var(--sun);border-color:#D9A518}
+.gate .oskToggle{position:absolute;right:-44px;top:0}
 .osklaunch{position:fixed;left:14px;bottom:14px;z-index:100000;width:56px;height:56px;border-radius:50%;background:var(--sun);color:#1B2A49;font-size:26px;border:none;box-shadow:0 5px 0 #D9A518;display:none;align-items:center;justify-content:center}
 /* stars */
 .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
@@ -275,7 +278,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v17</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v20</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -356,7 +359,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
 <!-- SEASON SCREEN -->
 <section class="screen" id="scr-season">
   <div class="map-wrap">
-    <div class="map-head"><span class="chip">📊 Season</span><h2 style="font-size:30px">Scores for the whole school year</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="syncNow()">🔄 Refresh from cloud</button><button class="ghost" onclick="exportSeason()">📤 Export CSV</button><button class="ghost" onclick="closeYear()">🏁 Close &amp; archive year</button><button class="ghost" onclick="openArchives()">📚 Archives</button><button class="ghost" onclick="clearSeason()">🗑️ Clear season</button><button class="ghost" onclick="go('map')">← Back</button></div></div>
+    <div class="map-head"><span class="chip">📊 Season</span><select class="sel" id="yearPick" onchange="viewYear=this.value;renderSeason()"></select><h2 style="font-size:30px">Scores for the whole school year</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="syncNow()">🔄 Refresh from cloud</button><button class="ghost" onclick="exportSeason()">📤 Export CSV</button><button class="ghost" onclick="closeYear()">🏁 Close &amp; archive year</button><button class="ghost" onclick="openArchives()">📚 Archives</button><button class="ghost" onclick="clearSeason()">🗑️ Clear scores…</button><button class="ghost" onclick="go('map')">← Back</button></div></div>
     <div id="seasonBody"></div>
   </div>
   <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
@@ -493,7 +496,7 @@ for(let i=0;i<70;i++){const s=document.createElement('i');s.style.left=Math.rand
 function go(n){stopTimer();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#scr-'+n).classList.add('active');if(n==='map')renderMap();if(n==='result')renderResult();if(n==='season'){renderSeason();if(typeof cloudCfg==='function'&&cloudCfg())pullCloud(true)}}
 function pickGrade(g){grade=g;done={};$('#gradeChip').textContent='Grade '+g;go('map')}
 function renderMap(){$('#trail').innerHTML=GAMES.map((g,i)=>`<button class="station ${done[g.id]?'done':''}" style="${g.id==='wheel'?'background:linear-gradient(135deg,#FFE29A,#FFC93C)':''}" onclick="startGame('${g.id}')"><span class="badge">Game ${i+1}</span><div class="ic">${g.ic}</div><div class="nm">${g.nm}</div><div class="ds">${g.ds}</div></button>`).join('')+`<button class="station" style="background:var(--sun)" onclick="go('result')"><div class="ic">🏆</div><div class="nm">Show winner</div><div class="ds">End the match & celebrate</div></button>`}
-function setTurn(t){turn=t%NT();document.querySelectorAll('.team').forEach((e,i)=>e.classList.toggle('turn',i===turn));const tb=$('#turnbar');tb.style.background=TC(turn);tb.textContent=NT()>1?`${TN(turn)}'s turn`:TN(turn);const w=$('#whorow');if(w)w.innerHTML=NT()>1?'Who answers? '+Array.from({length:NT()},(_,i)=>`<button class="tc ${i===turn?'on':''}" style="${i===turn?'':'border-color:'+TC(i)}" onclick="setTurn(${i});toast(TN(${i})+' answers now')">${TN(i)}</button>`).join(''):''}
+function setTurn(t){turn=t%NT();document.querySelectorAll('.team').forEach((e,i)=>e.classList.toggle('turn',i===turn));const tb=$('#turnbar');tb.style.background=TC(turn);tb.textContent=NT()>1?`${sideName(turn)}'s turn`:sideName(turn);const w=$('#whorow');if(w)w.innerHTML=NT()>1?'Who answers? '+Array.from({length:NT()},(_,i)=>`<button class="tc ${i===turn?'on':''}" style="${i===turn?'':'border-color:'+TC(i)}" onclick="setTurn(${i});toast(TN(${i})+' answers now')">${TN(i)}</button>`).join(''):''}
 function renderScore(){$('#scoreboard').innerHTML=Array.from({length:NT()},(_,i)=>`<div class="team ${i===turn?'turn':''}" onclick="setTurn(${i})"><div class="dot" style="background:${TC(i)}">${'ABCDE'[i]}</div><div><div class="lbl">${TN(i)}</div><div class="pts">${score[i]}</div></div></div>`).join(NT()>1?'<span class="vs">VS</span>':'')}
 function addScore(t,n){score[t]=Math.max(0,score[t]+n);renderScore()}
 function resetScores(){score=[0,0,0,0,0];turn=0;renderScore();setTurn(0);toast('Scores reset')}
@@ -538,7 +541,7 @@ const CF_MODE = CFG.mode     || BUILTIN_MODE;
 const CF_PASS = CFG.password || BUILTIN_PASSWORD;
 
 const SKEY='wordquest-settings-v2';
-const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,names:['Team A','Team B','Team C','Team D','Team E'],cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
+const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,compType:'teams',names:['Team A','Team B','Team C','Team D','Team E'],grades:['4','4','4','4','4'],classes:['4A','4A','4A','4A','4A'],roster:['Team A','Team B','Team C','Team D','Team E'],classList:['4A','4B','5A','5B','6A','6B'],cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
 let S={...SDEF};try{S={...SDEF,...JSON.parse(localStorage.getItem(SKEY)||'{}')}}catch(e){}
 if(CF_BIN&&CF_KEY){S.cloudBin=CF_BIN;S.cloudKey=CF_KEY;if(CF_MODE)S.keyMode=CF_MODE;if(S.cloudOn!==false||!localStorage.getItem(SKEY))S.cloudOn=true;try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
 function saveS(){localStorage.setItem(SKEY,JSON.stringify(S));applyS()}
@@ -546,6 +549,24 @@ function shade(h,f){const n=parseInt(h.slice(1),16);const r=(n>>16)&255,g=(n>>8)
 function applyS(){const r=document.documentElement.style;r.setProperty('--ok',S.okColor);r.setProperty('--okd',shade(S.okColor,.7));r.setProperty('--bad',S.badColor);r.setProperty('--badd',shade(S.badColor,.7));if(turn>=S.teamCount)turn=0;renderScore();
  $('#musBtn').textContent=S.music?'🎵 Music on':'🎵 Music off';if(bgm)bgm.setVol(S.musicVol);if(customAudio)customAudio.volume=S.musicVol;setTurn(turn);try{if(typeof applyOsk==='function')applyOsk()}catch(e){}}
 const TN=i=>S.names[i]||'Team '+'ABCDE'[i];const TC=i=>S.cols[i]||'#ccc';
+const TG=i=>S.grades&&S.grades[i]?S.grades[i]:String(grade);
+const TCL=i=>S.classes&&S.classes[i]?S.classes[i]:'';
+const COMPTYPES={grade:'Grade vs Grade',classes:'Class vs Class',teams:'Teams in one class'};
+/* how a side is labelled depends on what is competing */
+function sideName(i){const t=S.compType||'teams';
+ if(t==='grade')return 'Grade '+TG(i);
+ if(t==='classes')return TCL(i)||TN(i);
+ return TN(i)}
+/* a stable id for this exact line-up, so each contest keeps its own record */
+function compKey(){const t=S.compType||'teams';
+ const sides=Array.from({length:NT()},(_,i)=>sideName(i)).sort();
+ if(t==='grade')return 'grade|'+sides.join(' vs ');
+ if(t==='classes')return 'classes|'+sides.join(' vs ');
+ return 'teams|'+(TCL(0)||'class')+'|'+sides.join(' vs ')}
+function compLabel(k){k=k||compKey();const p=k.split('|');
+ if(p[0]==='grade')return '🎓 '+p[1];
+ if(p[0]==='classes')return '🏫 '+p[1];
+ return '👥 '+p[1]+': '+p[2]}
 
 const AC=window.AudioContext?new AudioContext():null;
 function tone(f,t0,dur,type='triangle',vol=1,slide){if(!AC)return;const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t0+dur);g.gain.setValueAtTime(vol*S.sfxVol*.25,t0);g.gain.exponentialRampToValueAtTime(.001,t0+dur);o.connect(g);g.connect(AC.destination);o.start(t0);o.stop(t0+dur)}
@@ -615,7 +636,7 @@ function openSettings(){$('#smodal').classList.add('open');renderSettings()}
 function closeSettings(){$('#smodal').classList.remove('open')}
 function sfxSel(kind,key){return `<select class="sel" onchange="S.${key}=this.value;saveS();play('${kind}',this.value)">${Object.entries(SFX[kind]).map(([k,p])=>`<option value="${k}" ${S[key]===k?'selected':''}>${p.n}</option>`).join('')}</select><button class="sm alt prev" onclick="play('${kind}',S.${key})">▶</button>`}
 function sw(k){return `<button class="sw ${S[k]?'on':''}" onclick="S.${k}=!S.${k};saveS();renderSettings()"></button>`}
-function renderSettings(){$('#sgrid').innerHTML=`
+function renderSettings(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);$('#sgrid').innerHTML=`
  <div class="shead">🎵 Background music</div>
  <div class="srow"><div class="l">Music<small>Plays a cheerful loop while you play</small></div><div class="c"><input type="range" min="0" max="1" step=".05" value="${S.musicVol}" oninput="S.musicVol=+this.value;saveS()">${sw('music')}</div></div>
  <div class="srow"><div class="l">Built-in tune<small>Choose one of the loops</small></div><div class="c"><select class="sel" onchange="changeTrack(this.value)">${Object.entries(TRACKS).map(([k,t])=>`<option value="${k}" ${S.track===k?'selected':''}>${t.n}</option>`).join('')}</select></div></div>
@@ -636,7 +657,10 @@ function renderSettings(){$('#sgrid').innerHTML=`
  ${S.timerMode==='down'?`<div class="srow"><div class="l">Time per question<small><b id="tsecl">${S.timerSec}</b> seconds</small></div><div class="c"><input type="range" min="5" max="120" step="5" value="${S.timerSec}" oninput="S.timerSec=+this.value;$('#tsecl').textContent=this.value;saveS()"></div></div>`:''}
  <div class="srow"><div class="l">Treasure Hunt time<small>Always on for this game — <b id="trsl">${S.treasureSec}</b> seconds to reach the treasure</small></div><div class="c"><input type="range" min="30" max="300" step="10" value="${S.treasureSec}" oninput="S.treasureSec=+this.value;$('#trsl').textContent=this.value;saveS()"></div></div>
  <div class="shead">⌨️ Touchscreen</div>
- <div class="srow"><div class="l">On-screen keyboard<small>For boards or devices with no keyboard — type into any box; it stays open until you tap ⌄</small></div><div class="c">${sw('osk')}</div></div>
+ <div class="srow"><div class="l">On-screen keyboard<small>Tap the ⌨️ button beside any text box to turn it on or off right there</small></div><div class="c">${sw('osk')}</div></div>
+ <div class="shead">📋 Fixed lists (used by the dropdowns)</div>
+ <div class="srow"><div class="l">Team names<small>One per line. These are the only names offered during a match, so a team is never typed differently twice.</small></div><div class="c"><textarea rows="5" style="width:190px;padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700" oninput="S.roster=this.value.split('\n').map(x=>x.trim()).filter(Boolean);saveS()">${(S.roster||[]).join('\n')}</textarea></div></div>
+ <div class="srow"><div class="l">Class names<small>One per line, e.g. 4A</small></div><div class="c"><textarea rows="5" style="width:190px;padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700" oninput="S.classList=this.value.split('\n').map(x=>x.trim()).filter(Boolean);saveS()">${(S.classList||[]).join('\n')}</textarea></div></div>
  <div class="shead">☁️ Cloud sync (all devices)</div>
  <div class="srow"><div class="l">Turn on cloud sync<small>Season scores follow you to any device, and save automatically when you close the game</small></div><div class="c">${sw('cloudOn')}</div></div>
  <div class="srow"><div class="l">Bin ID</div><div class="c"><input type="text" value="${S.cloudBin}" placeholder="from JSONBin.io" style="padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700;width:190px" oninput="S.cloudBin=this.value.trim();saveS()"></div></div>
@@ -655,7 +679,7 @@ function startGame(id){if(id==='wheel')wheelState=null;cur={hook:null,id,i:0,ite
 function prog(){$('#prog').innerHTML=cur.items.map((_,i)=>`<i class="${cur.results[i]?'ok':i===cur.i?'on':''}"></i>`).join('')}
 function renderRound(){prog();const b=$('#board');b.innerHTML='';if(cur.i>=cur.items.length){done[cur.id]=true;b.innerHTML=`<div class="fb show"><div class="big">🎉</div><h3>Station complete!</h3><p>Great work, both teams.</p><div class="actions"><button class="btn" onclick="go('map')">Back to map</button><button class="btn mint" onclick="startGame('${cur.id}')">Play again</button></div></div>`;return}
  R[cur.id](b,cur.items[cur.i]);if(!['wheel','treasure'].includes(cur.id))startTimer()}
-function feedback(ok,msg,pts=1){if(cur&&cur.hook){cur.hook(ok,msg);return}if(S.timerMode==='up'&&tElapsed)msg=(msg||'')+` · ⏱ ${fmt(tElapsed)}`;stopTimer();beep(ok);if(ok){addScore(turn,pts);confetti()}const bd=$('#board');bd.classList.add(ok?'flash-ok':'flash-bad');setTimeout(()=>bd.classList.remove('flash-ok','flash-bad'),900);const f=document.createElement('div');f.className='fb show '+(ok?'good':'badfb');f.innerHTML=`<div class="big">${ok?'🌟':'😅'}</div><h3>${ok?`+${pts} for ${TN(turn)}!`:'Not this time'}</h3>${ok||NT()===1?`<p>${msg||''}</p>`:`<p><button class="tc" style="background:var(--sky);color:#fff" onclick="this.parentNode.textContent='${(msg||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}'">👁 Show answer</button></p>`}<div class="actions"><button class="btn" id="nxt">${NT()>1?`Next → ${TN(nextT())}`:'Next →'}</button>${ok?'':'<button class="btn grey" id="retry">Try again</button>'}</div>${NT()>1?`<div class="chance">🔁 Same question, another chance for: ${Array.from({length:NT()},(_,i)=>i).filter(i=>i!==turn).map(i=>`<button class="tc" style="background:${TC(i)};color:#1B2A49" onclick="secondChance(${i})">${TN(i)}</button>`).join('')}</div>`:''}`;$('#board').appendChild(f);
+function feedback(ok,msg,pts=1){if(cur&&cur.hook){cur.hook(ok,msg);return}if(S.timerMode==='up'&&tElapsed)msg=(msg||'')+` · ⏱ ${fmt(tElapsed)}`;stopTimer();beep(ok);if(ok){addScore(turn,pts);confetti()}const bd=$('#board');bd.classList.add(ok?'flash-ok':'flash-bad');setTimeout(()=>bd.classList.remove('flash-ok','flash-bad'),900);const f=document.createElement('div');f.className='fb show '+(ok?'good':'badfb');f.innerHTML=`<div class="big">${ok?'🌟':'😅'}</div><h3>${ok?`+${pts} for ${sideName(turn)}!`:'Not this time'}</h3>${ok||NT()===1?`<p>${msg||''}</p>`:`<p><button class="tc" style="background:var(--sky);color:#fff" onclick="this.parentNode.textContent='${(msg||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}'">👁 Show answer</button></p>`}<div class="actions"><button class="btn" id="nxt">${NT()>1?`Next → ${sideName(nextT())}`:'Next →'}</button>${ok?'':'<button class="btn grey" id="retry">Try again</button>'}</div>${NT()>1?`<div class="chance">🔁 Same question, another chance for: ${Array.from({length:NT()},(_,i)=>i).filter(i=>i!==turn).map(i=>`<button class="tc" style="background:${TC(i)};color:#1B2A49" onclick="secondChance(${i})">${sideName(i)}</button>`).join('')}</div>`:''}`;$('#board').appendChild(f);
  f.querySelector('#nxt').onclick=()=>{cur.results[cur.i]=ok;cur.i++;nextTurn();renderRound()};const r=f.querySelector('#retry');if(r)r.onclick=()=>{if(S.penalty){addScore(turn,-1);toast('-1 point for '+TN(turn))}renderRound()}}
 
 /* timer */
@@ -712,14 +736,14 @@ R.wheel=(b)=>{
   (function anim(now){const p=Math.min(1,(now-t0)/dur),ease=1-Math.pow(1-p,3);W.rot=start+(end-start)*ease;draw(W.rot);const tick=Math.floor(W.rot/seg);if(tick!==lastTick){lastTick=tick;if(S.sfx&&AC)tone(700,AC.currentTime,.03,'square',.25)}if(p<1)requestAnimationFrame(anim);else landed(idx)})(t0);
   if(AC)AC.resume()};
  function landed(idx){const e=W.env[idx];beep(true);const el=b.querySelector('#env'+idx);el.classList.add('hit');
-  b.querySelector('#wact').innerHTML=`<div class="landed" style="background:${e.color};color:#1B2A49">${e.name} envelope — ${e.g.nm}</div><button class="btn mint" id="openBtn">✉️ Open & answer</button>${Array.from({length:NT()},(_,i)=>i).filter(i=>i!==turn).map(i=>`<button class="btn grey" onclick="passTo(${i})">➡️ Pass to ${TN(i)}</button>`).join('')}`;
+  b.querySelector('#wact').innerHTML=`<div class="landed" style="background:${e.color};color:#1B2A49">${e.name} envelope — ${e.g.nm}</div><button class="btn mint" id="openBtn">✉️ Open & answer</button>${Array.from({length:NT()},(_,i)=>i).filter(i=>i!==turn).map(i=>`<button class="btn grey" onclick="passTo(${i})">➡️ Pass to ${sideName(i)}</button>`).join('')}`;
   b.querySelector('#openBtn').onclick=()=>open(idx);
-  window.passTo=i=>{setTurn(i);toast(TN(turn)+' must answer!');b.querySelector('#wact').innerHTML=`<div class="landed" style="background:${e.color};color:#1B2A49">${TN(turn)} answers: ${e.g.nm}</div><button class="btn mint" id="openBtn">✉️ Open & answer</button>`;b.querySelector('#openBtn').onclick=()=>open(idx)}}
+  window.passTo=i=>{setTurn(i);toast(sideName(turn)+' must answer!');b.querySelector('#wact').innerHTML=`<div class="landed" style="background:${e.color};color:#1B2A49">${sideName(turn)} answers: ${e.g.nm}</div><button class="btn mint" id="openBtn">✉️ Open & answer</button>`;b.querySelector('#openBtn').onclick=()=>open(idx)}}
  function open(idx){const e=W.env[idx];e.used=true;b.innerHTML='';R[e.g.id](b,e.it);const tag=document.createElement('div');tag.className='landed';tag.style.background=e.color;tag.style.color='#1B2A49';tag.innerHTML=`✉️ ${e.name} · ${e.g.ic} ${e.g.nm}`;b.prepend(tag);startTimer()}};
 /* treasure hunt */
 const TQ=['quiz','riddle','gap','odd','tf'];
 R.treasure=(b)=>{const STEPS=5;let pos=0,left=S.treasureSec,used=new Set();const team=turn;
- b.innerHTML=`<div class="thead"><div class="landed" style="background:${TC(team)};color:#1B2A49">🏴‍☠️ ${TN(team)}'s treasure hunt</div><div class="tclock" id="tclock">⏳ ${fmt(left)}</div></div>
+ b.innerHTML=`<div class="thead"><div class="landed" style="background:${TC(team)};color:#1B2A49">🏴‍☠️ ${sideName(team)}'s treasure hunt</div><div class="tclock" id="tclock">⏳ ${fmt(left)}</div></div>
  <div class="path"><svg viewBox="0 0 900 150" id="tsvg"><path d="M60 100 C200 20 300 150 450 80 S700 20 830 90" fill="none" stroke="#B9B0A0" stroke-width="10" stroke-dasharray="18 14" stroke-linecap="round"/>${[0,1,2,3,4].map(i=>{const [x,y]=TPT(i);return `<circle cx="${x}" cy="${y}" r="24" fill="#fff" stroke="#1B2A49" stroke-width="4" id="st${i}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="20" font-weight="700" fill="#1B2A49">${i+1}</text>`}).join('')}<text x="830" y="102" text-anchor="middle" font-size="46" id="chest">💰</text><text x="60" y="100" text-anchor="middle" font-size="44" id="kid">🧒</text></svg></div>
  <div class="sub" id="tmsg">Answer the question to move forward!</div><div id="tq" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px"></div>`;
  const kid=b.querySelector('#kid');function moveKid(i){const [x,y]=i>=STEPS?[830,100]:TPT(i);kid.setAttribute('x',x);kid.setAttribute('y',y+(i>=STEPS?2:-30))}moveKid(0);
@@ -727,11 +751,11 @@ R.treasure=(b)=>{const STEPS=5;let pos=0,left=S.treasureSec,used=new Set();const
  cur.hook=(ok)=>{beep(ok);if(ok){pos++;b.querySelector('#st'+(pos-1)).setAttribute('fill','var(--ok)');moveKid(pos);if(pos>=STEPS){finish(true);return}toast('Correct! Move forward 🏃');}else{toast('Wrong — try another question');b.classList.add('flash-bad');setTimeout(()=>b.classList.remove('flash-bad'),600)}setTimeout(ask,ok?700:900)};
  stopTimer();tInt=setInterval(()=>{left--;const c=b.querySelector('#tclock');if(!c){stopTimer();return}c.textContent='⏳ '+fmt(left);if(left<=10){c.classList.add('low');if(S.sfx&&AC)tone(1200,AC.currentTime,.08,'square',.5)}if(left<=0){stopTimer();finish(false)}},1000);
  function finish(win){stopTimer();cur.hook=null;const pts=pos+(win?2:0);if(pts)addScore(team,pts);if(win){confetti();fanfare()}else beep(false);
-  const f=document.createElement('div');f.className='fb show '+(win?'good':'badfb');f.innerHTML=`<div class="big">${win?'💰':'⏰'}</div><h3>${win?`${TN(team)} found the treasure!`:'Time is up!'}</h3><p>${pos} of ${STEPS} stations reached · +${pts} points</p><div class="actions"><button class="btn" id="nxt">${cur.i<cur.items.length-1?`Next → ${TN(nextT())}'s turn`:'Finish'}</button></div>`;b.appendChild(f);
+  const f=document.createElement('div');f.className='fb show '+(win?'good':'badfb');f.innerHTML=`<div class="big">${win?'💰':'⏰'}</div><h3>${win?`${sideName(team)} found the treasure!`:'Time is up!'}</h3><p>${pos} of ${STEPS} stations reached · +${pts} points</p><div class="actions"><button class="btn" id="nxt">${cur.i<cur.items.length-1?`Next → ${sideName(nextT())}'s turn`:'Finish'}</button></div>`;b.appendChild(f);
   f.querySelector('#nxt').onclick=()=>{cur.results[cur.i]=win;cur.i++;nextTurn();renderRound()}}
  ask()};
 function TPT(i){return [[60,100],[250,70],[450,80],[620,55],[760,80]][i]}
-function renderResult(){const arr=Array.from({length:NT()},(_,i)=>({i,s:score[i]})).sort((x,y)=>y.s-x.s);const top=arr[0].s,winners=arr.filter(x=>x.s===top);$('#final').innerHTML=arr.map((x,r)=>`<div class="f ${x.s===top&&NT()>1?'win':''}" style="border-top:10px solid ${TC(x.i)}"><div class="rank">${NT()>1?['🥇','🥈','🥉','4th','5th'][r]:''}</div><div class="lbl">${TN(x.i)}</div><div class="n">${x.s}</div></div>`).join('');$('#winTitle').textContent=NT()===1?`🎉 ${TN(0)} scored ${top}!`:winners.length>1?'🤝 It\'s a tie!':`🏆 ${TN(winners[0].i)} wins!`;renderAllTime();confetti();fanfare()}
+function renderResult(){const arr=Array.from({length:NT()},(_,i)=>({i,s:score[i]})).sort((x,y)=>y.s-x.s);const top=arr[0].s,winners=arr.filter(x=>x.s===top);$('#final').innerHTML=arr.map((x,r)=>`<div class="f ${x.s===top&&NT()>1?'win':''}" style="border-top:10px solid ${TC(x.i)}"><div class="rank">${NT()>1?['🥇','🥈','🥉','4th','5th'][r]:''}</div><div class="lbl">${sideName(x.i)}</div><div class="n">${x.s}</div></div>`).join('');$('#winTitle').textContent=NT()===1?`🎉 ${sideName(0)} scored ${top}!`:winners.length>1?'🤝 It\'s a tie!':`🏆 ${sideName(winners[0].i)} wins!`;renderAllTime();confetti();fanfare()}
 function renderAllTime(){const el=$('#alltime');if(!el)return;const rank=seasonTotals();if(!rank.length){el.innerHTML='';return}el.innerHTML=`<div style="font-family:'Fredoka';font-size:20px;color:var(--sun);margin:10px 0 4px">📊 All-time totals (by team name)</div><div class="totals">${rank.slice(0,5).map(([n,t],i)=>`<div class="tot" style="--c:${t.c};padding:12px 20px;min-width:130px"><div class="rank" style="font-size:18px">${['🥇','🥈','🥉','4th','5th'][i]||''}</div><div class="lbl">${n}</div><div class="n" style="font-size:38px">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div><div style="opacity:.7;font-size:13px">Press “Save session result” to add this match to the totals.</div>`}
 
 /* ===================== PICTURE FINDER ===================== */
@@ -784,7 +808,7 @@ function bindDrops(){document.querySelectorAll('.drop').forEach(d=>{const k=d.id
 function setImg(k,file){const img=new Image(),r=new FileReader();r.onload=()=>{img.onload=()=>{const c=document.createElement('canvas'),m=260,sc=Math.min(1,m/Math.max(img.width,img.height));c.width=img.width*sc;c.height=img.height*sc;c.getContext('2d').drawImage(img,0,0,c.width,c.height);pendingImg[k]=c.toDataURL('image/jpeg',.8);$('#drop_'+k).innerHTML=`<img src="${pendingImg[k]}"> ✔ picture ready (click to change)<input type="file" accept="image/*" style="display:none" id="file_${k}">`;bindDrops()};img.src=r.result};r.readAsDataURL(file)}
 function openPanel(){$('#modal').classList.add('open');pg=grade;renderPanel()}
 function closePanel(){$('#modal').classList.remove('open');if($('#scr-map').classList.contains('active'))renderMap()}
-function renderPanel(){pendingImg={};
+function renderPanel(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);pendingImg={};
  $('#pnav').innerHTML=`<div class="gt">${[4,5,6].map(g=>`<button class="${pg===g?'on':''}" onclick="pg=${g};renderPanel()">G${g}</button>`).join('')}</div>`+POOL.map(g=>`<button class="gm ${pgame===g.id?'on':''}" onclick="pgame='${g.id}';renderPanel()">${g.ic} ${g.nm} <span style="opacity:.6">(${CONTENT[pg][g.id].length})</span></button>`).join('');
  const F=FIELDS[pgame],items=CONTENT[pg][pgame];
  $('#pmain').innerHTML=`<h3 style="font-size:22px;margin-bottom:4px">${GAMES.find(g=>g.id===pgame).nm} — Grade ${pg}</h3><div class="pnote">${F.note} Each round uses up to 4 random items from this list.</div>
@@ -801,29 +825,61 @@ applyS();
 /* ===================== TEAMS QUICK MODAL ===================== */
 function openTeams(){$('#tmodal').classList.add('open');renderTeams()}
 function closeTeams(){$('#tmodal').classList.remove('open')}
-function renderTeams(){$('#tgrid').innerHTML=`<div class="srow"><div class="l">Class name<small>Stamped on saved sessions so you can compare classes (e.g. 4A, 4B)</small></div><div class="c"><input type="text" value="${S.className}" maxlength="16" placeholder="e.g. 4A" oninput="S.className=this.value||'Class A';saveS()"></div></div>
- <div class="srow"><div class="l">Number of teams</div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;saveS();renderTeams()">${[1,2,3,4,5].map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
- ${Array.from({length:S.teamCount},(_,i)=>`<div class="srow"><div class="l">Team ${'ABCDE'[i]}</div><div class="c"><input type="text" value="${S.names[i]}" maxlength="14" placeholder="Team name" oninput="S.names[${i}]=this.value||'Team ${'ABCDE'[i]}';saveS()"><input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`).join('')}
- <div class="pnote">Tip: keep the same team names all year — the Season page adds up every saved session by team name.</div>`}
+function renderTeams(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);
+ const t=S.compType||'teams';const max=t==='teams'?5:4;
+ if(S.teamCount>max){S.teamCount=max;saveS()}
+ const lbl=t==='grade'?'Grade':(t==='classes'?'Class':'Team');
+ let rows='';
+ for(let i=0;i<S.teamCount;i++){
+  let fields='';
+  if(t==='grade'){fields=`<select class="sel" onchange="S.grades[${i}]=this.value;saveS();renderTeams()">${['4','5','6'].map(g=>`<option ${TG(i)===g?'selected':''}>${g}</option>`).join('')}</select>`}
+  else if(t==='classes'){const CL=(S.classList&&S.classList.length?S.classList:['4A','4B']);if(!CL.includes(TCL(i))){S.classes[i]=CL[Math.min(i,CL.length-1)]}
+   fields=`<select class="sel" onchange="S.classes[${i}]=this.value;saveS();renderTeams()">${CL.map(c=>`<option ${TCL(i)===c?'selected':''}>${c}</option>`).join('')}</select>
+   <select class="sel" onchange="S.grades[${i}]=this.value;saveS()">${['4','5','6'].map(g=>`<option ${TG(i)===g?'selected':''}>Gr ${g}</option>`).join('')}</select>`}
+  else{const R=(S.roster&&S.roster.length?S.roster:['Team A','Team B','Team C','Team D','Team E']);if(!R.includes(S.names[i])){S.names[i]=R[Math.min(i,R.length-1)]}
+   fields=`<select class="sel" onchange="S.names[${i}]=this.value;saveS();renderTeams()">${R.map(n=>`<option ${S.names[i]===n?'selected':''}>${n}</option>`).join('')}</select>`}
+  rows+=`<div class="srow"><div class="l">${lbl} ${i+1}</div><div class="c">${fields}<input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`}
+ const shared=(S.compType==='teams')?`<div class="srow"><div class="l">Which class is playing?<small>All the teams below belong to this class</small></div><div class="c"><select class="sel" onchange="for(let i=0;i<5;i++)S.classes[i]=this.value;saveS();renderTeams()">${(S.classList&&S.classList.length?S.classList:['4A']).map(c=>`<option ${TCL(0)===c?'selected':''}>${c}</option>`).join('')}</select><select class="sel" onchange="for(let i=0;i<5;i++)S.grades[i]=this.value;saveS()">${['4','5','6'].map(g=>`<option ${TG(0)===g?'selected':''}>Gr ${g}</option>`).join('')}</select></div></div>`:'';
+ $('#tgrid').innerHTML=`
+ <div class="srow"><div class="l">What is the contest?<small>This decides how the sides are named and where the record is kept</small></div><div class="c"><select class="sel" onchange="S.compType=this.value;saveS();renderTeams()">${Object.entries(COMPTYPES).map(([k,v])=>`<option value="${k}" ${t===k?'selected':''}>${v}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">How many sides?<small>${t==='teams'?'1 to 5 teams':'2 to 4'}</small></div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;saveS();renderTeams()">${Array.from({length:max},(_,n)=>n+1).filter(n=>t==='teams'||n>=2).map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
+ ${shared}${rows}
+ <div class="srow" style="background:#F1EAD8"><div class="l">This match will be recorded as<small style="opacity:1;font-weight:800;color:#1B2A49">${compLabel()}</small></div></div>
+ <div class="pnote">Names come from the fixed lists in ⚙️ Settings, so they are always spelled the same.<br>Each different line-up keeps its own separate record, so Grade 4 vs Grade 5 never mixes with 4A vs 4B.</div>`}
 
 /* ===================== SEASON LOG ===================== */
 const SEASONKEY='wordquest-season-v1';
 const AKEY='wordquest-archives-v1';
+const DKEY='wordquest-deleted-v1';
+let DELETED=[];try{DELETED=JSON.parse(localStorage.getItem(DKEY)||'[]')}catch(e){}
+function saveDeleted(){localStorage.setItem(DKEY,JSON.stringify(DELETED))}
+function markDeleted(ids){ids.filter(Boolean).forEach(id=>{if(!DELETED.includes(id))DELETED.push(id)});if(DELETED.length>800)DELETED=DELETED.slice(-800);saveDeleted()}
 let ARCHIVES=[];try{ARCHIVES=JSON.parse(localStorage.getItem(AKEY)||'[]')}catch(e){}
 function saveArchives(){localStorage.setItem(AKEY,JSON.stringify(ARCHIVES))}
 let SEASON=[];try{SEASON=JSON.parse(localStorage.getItem(SEASONKEY)||'[]')}catch(e){}
 function saveSeason(){localStorage.setItem(SEASONKEY,JSON.stringify(SEASON))}
-function saveSession(){const teams=Array.from({length:NT()},(_,i)=>({name:TN(i),color:TC(i),score:score[i]}));if(teams.every(t=>t.score===0)&&!confirm('All scores are 0. Save anyway?'))return;
- SEASON.push({id:sessId(),date:new Date().toISOString(),grade,cls:S.className,teams});saveSeason();toast('Session saved 📊');if(cloudCfg())syncNow();confetti();go('season')}
+function saveSession(){const teams=Array.from({length:NT()},(_,i)=>({name:sideName(i),color:TC(i),score:score[i],grade:TG(i),cls:TCL(i)}));if(teams.every(t=>t.score===0)&&!confirm('All scores are 0. Save anyway?'))return;
+ SEASON.push({id:sessId(),date:new Date().toISOString(),grade,cls:S.className,comp:compKey(),compType:S.compType||'teams',teams});saveSeason();toast('Session saved 📊');if(cloudCfg())syncNow();confetti();go('season')}
 function totalsOf(list){const tot={};list.forEach(ss=>ss.teams.forEach(t=>{tot[t.name]=tot[t.name]||{s:0,n:0,w:0,c:t.color};tot[t.name].s+=t.score;tot[t.name].n++;const top=Math.max(...ss.teams.map(x=>x.score));if(t.score===top&&ss.teams.length>1)tot[t.name].w++;tot[t.name].c=t.color}));return Object.entries(tot).sort((a,b)=>b[1].s-a[1].s)}
-function seasonTotals(){return totalsOf(SEASON)}
+function seasonTotals(){return totalsOf(yearSessions())}
 let cmp={grade:null,a:null,b:null};
+let viewYear='current';
+function yearSessions(){if(viewYear==='current')return SEASON;const a=ARCHIVES.find(x=>x.id===viewYear);return a?a.sessions:[]}
+function yearIsArchived(){return viewYear!=='current'}
+/* every delete must be confirmed AND unlocked with the password */
+function confirmDanger(what){
+ if(!confirm('DELETE: '+what+'\n\nThis cannot be undone. Continue?'))return false;
+ if(!hasPass()){return confirm('There is no password set on this file.\n\nDelete '+what+' anyway?')}
+ const v=prompt('Enter the password to delete '+what+':','');
+ if(v===null)return false;
+ if(String(v).trim()!==getPass()){alert('Wrong password. Nothing was deleted.');return false}
+ return true}
 function closeYear(){if(!SEASON.length){alert('There are no sessions to archive yet.');return}
  const tot=seasonTotals();const champ=prompt('🏆 Who is the champion of this year?\n(Edit the name if you want.)',tot.length?tot[0][0]:'');if(champ===null)return;
  const y=new Date().getFullYear();const label=prompt('Name this school year:',(y-1)+'–'+y);if(label===null)return;
- if(!confirm('Lock and archive this year?\n\n• The year is saved as a read-only record you can review any time.\n• The current season is then cleared so next year starts fresh.\n\nContinue?'))return;
+ if(!confirm('Lock and archive this year?\n\n\u2022 The year is saved as a read-only record.\n\u2022 All its scores are REMOVED from the season screen.\n\u2022 From then on they are visible only in \ud83d\udcda Archives.\n\nContinue?'))return;
  const arc={id:sessId(),label:label,champion:champ,closed:new Date().toISOString(),sessions:JSON.parse(JSON.stringify(SEASON))};
- ARCHIVES.push(arc);saveArchives();SEASON=[];saveSeason();if(cloudCfg())syncNow();confetti();fanfare();toast('Year archived 🏁');renderSeason()}
+ ARCHIVES.push(arc);saveArchives();markDeleted(SEASON.map(x=>x.id));SEASON=[];saveSeason();if(cloudCfg())syncNow();confetti();fanfare();alert('\u2705 '+arc.label+' is archived.\n\nIts scores are cleared from the season screen and can now be seen only in \ud83d\udcda Archives.');renderSeason()}
 function openArchives(){$('#amodal').classList.add('open');renderArchiveList()}
 function closeArchives(){$('#amodal').classList.remove('open')}
 function renderArchiveList(){const b=$('#abody');if(!ARCHIVES.length){b.innerHTML='<div class="empty">No archived years yet.<br>At the end of the year press "Close &amp; archive year".</div>';return}
@@ -832,13 +888,27 @@ function viewArchive(i){const a=ARCHIVES[i];const rank=totalsOf(a.sessions);cons
  b.innerHTML=`<button class="sm alt" onclick="renderArchiveList()">← All years</button>
  <div style="text-align:center;margin:14px 0"><div style="font-family:'Fredoka';font-size:30px;color:var(--sun)">🏁 ${a.label}</div><div style="font-family:'Fredoka';font-size:22px">🏆 Champion: ${a.champion||'—'}</div></div>
  <div class="totals">${rank.map(([n,t],r)=>`<div class="tot" style="--c:${t.c};padding:12px 18px;min-width:120px"><div class="rank">${['🥇','🥈','🥉','4th','5th'][r]||''}</div><div class="lbl">${n}</div><div class="n" style="font-size:34px">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
- <table class="stable"><tr><th>Date</th><th>Class</th><th>Grade</th><th>Results</th></tr>${a.sessions.map(ss=>`<tr><td>${new Date(ss.date).toLocaleDateString('en-GB')}</td><td>${ss.cls||'—'}</td><td>Grade ${ss.grade}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td></tr>`).join('')}</table>`}
+ <table class="stable"><tr><th>Date</th><th>Class</th><th>Grade</th><th>Results</th></tr>${a.sessions.map(ss=>`<tr><td>${new Date(ss.date).toLocaleDateString('en-GB')}</td><td style="font-size:12px">${compLabel(ss.comp||('teams|'+(ss.cls||'')+'|'+ss.teams.map(t=>t.name).sort().join(' vs ')))}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td></tr>`).join('')}</table>`}
 function exportArchive(i){const a=ARCHIVES[i];const rows=[['Year',a.label],['Champion',a.champion||''],[],['Date','Class','Grade','Team','Score']];a.sessions.forEach(ss=>ss.teams.forEach(t=>rows.push([new Date(ss.date).toLocaleDateString('en-GB'),ss.cls||'',ss.grade,t.name,t.score])));const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const el=document.createElement('a');el.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);el.download='word-quest-'+a.label.replace(/[^0-9A-Za-z]+/g,'-')+'.csv';el.click()}
-function delArchive(i){if(!confirm('Delete this archived year for good?'))return;ARCHIVES.splice(i,1);saveArchives();if(cloudCfg())pushCloud(true);renderArchiveList()}
+function restoreYear(id){const a=ARCHIVES.find(x=>x.id===id);if(!a)return;
+ if(!confirm('Bring “'+a.label+'” back into the live season?\n\nIts '+a.sessions.length+' sessions will appear on the season screen again.'))return;
+ const have=new Set(SEASON.map(x=>x.id));a.sessions.forEach(ss=>{DELETED=DELETED.filter(d=>d!==ss.id);if(!have.has(ss.id))SEASON.push(ss)});
+ saveDeleted();SEASON.sort((x,y)=>new Date(x.date)-new Date(y.date));saveSeason();
+ ARCHIVES=ARCHIVES.filter(x=>x.id!==id);saveArchives();if(cloudCfg())pushCloud(true);
+ viewYear='current';toast('Year restored');renderSeason()}
+function exportArchiveById(id){const i=ARCHIVES.findIndex(x=>x.id===id);if(i>=0)exportArchive(i)}
+function delArchive(i){const a=ARCHIVES[i];if(!confirmDanger('the archived year \u201c'+a.label+'\u201d ('+a.sessions.length+' sessions)'))return;markDeleted([a.id].concat((a.sessions||[]).map(x=>x.id)));ARCHIVES.splice(i,1);saveArchives();if(cloudCfg())syncNow();toast('Archived year deleted');renderArchiveList()}
 
-function classesFor(g){return [...new Set(SEASON.filter(ss=>String(ss.grade)===String(g)).map(ss=>ss.cls||'Unlabelled'))]}
-function classStats(g,cls){const ss=SEASON.filter(s=>String(s.grade)===String(g)&&(s.cls||'Unlabelled')===cls);let total=0,best=0;ss.forEach(x=>{const sum=x.teams.reduce((a,t)=>a+t.score,0);total+=sum;best=Math.max(best,sum)});return {total,sess:ss.length,avg:ss.length?Math.round(total/ss.length):0,best}}
-function renderCompare(){const box=$('#compare');if(!box)return;const grades=[...new Set(SEASON.map(s=>String(s.grade)))].sort();if(!grades.length){box.innerHTML='';return}
+function classesFor(g){return [...new Set(yearSessions().filter(ss=>String(ss.grade)===String(g)).map(ss=>ss.cls||'Unlabelled'))]}
+function classStats(g,cls){const ss=yearSessions().filter(s=>String(s.grade)===String(g)&&(s.cls||'Unlabelled')===cls);let total=0,best=0;ss.forEach(x=>{const sum=x.teams.reduce((a,t)=>a+t.score,0);total+=sum;best=Math.max(best,sum)});return {total,sess:ss.length,avg:ss.length?Math.round(total/ss.length):0,best}}
+function compGroups(){const g={};yearSessions().forEach(ss=>{const k=ss.comp||('teams|'+(ss.cls||'')+'|'+ss.teams.map(t=>t.name).sort().join(' vs '));(g[k]=g[k]||[]).push(ss)});return g}
+function renderContests(){const box=$('#contests');if(!box)return;const g=compGroups();const keys=Object.keys(g);
+ if(!keys.length){box.innerHTML='';return}
+ box.innerHTML=`<div class="shead" style="color:var(--sun);font-size:22px">🏅 Separate records by contest</div>`+keys.map(k=>{
+  const list=g[k];const rank=totalsOf(list);
+  return `<div class="cmpbox" style="margin-bottom:14px"><div style="font-family:'Fredoka';font-size:19px;margin-bottom:8px">${compLabel(k)} <span style="opacity:.6;font-size:14px">· ${list.length} match${list.length===1?'':'es'}</span></div>
+  <div class="totals" style="margin:6px 0 0">${rank.map(([n,t],i)=>`<div class="tot" style="--c:${t.c};padding:10px 16px;min-width:110px"><div class="rank" style="font-size:16px">${['🥇','🥈','🥉','4th','5th'][i]||''}</div><div class="lbl">${n}</div><div class="n" style="font-size:30px">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div></div>`}).join('')}
+function renderCompare(){const box=$('#compare');if(!box)return;const grades=[...new Set(yearSessions().map(s=>String(s.grade)))].sort();if(!grades.length){box.innerHTML='';return}
  if(!cmp.grade||!grades.includes(cmp.grade))cmp.grade=grades[0];
  const cls=classesFor(cmp.grade);if(cls.length<1){box.innerHTML='';return}
  if(!cls.includes(cmp.a))cmp.a=cls[0];if(!cls.includes(cmp.b))cmp.b=cls[1]||cls[0];
@@ -855,13 +925,45 @@ function renderCompare(){const box=$('#compare');if(!box)return;const grades=[..
  <tr><td>Best single match</td><td>${A.best}</td><td>${B.best}</td></tr></table>
  <div style="margin-top:12px;display:grid;gap:8px"><div style="font-weight:800">${cmp.a} — ${A.total}</div>${bar(A.total,'#FF6B6B')}<div style="font-weight:800">${cmp.b} — ${B.total}</div>${bar(B.total,'#4ECDC4')}</div>
  <div style="text-align:center;margin-top:12px;font-family:'Fredoka';font-size:20px">${A.total===B.total?'🤝 Level so far!':`🏆 ${A.total>B.total?cmp.a:cmp.b} is ahead`}</div>`}
-function renderSeason(){const body=$('#seasonBody');if(!SEASON.length){body.innerHTML='<div class="empty">No sessions saved yet.<br>Finish a match, open "Show winner", then press "Save session result".</div>';return}
+function renderSeason(){const body=$('#seasonBody');
+ const yp=$('#yearPick');if(yp){if(viewYear!=='current'&&!ARCHIVES.some(a=>a.id===viewYear))viewYear='current';
+  yp.innerHTML=`<option value="current" ${viewYear==='current'?'selected':''}>This season (live)</option>`+ARCHIVES.map(a=>`<option value="${a.id}" ${viewYear===a.id?'selected':''}>🏁 ${a.label}</option>`).join('')}
+ const LIST=yearSessions();
+ if(yearIsArchived()){const a=ARCHIVES.find(x=>x.id===viewYear);const rank=totalsOf(LIST);
+  body.innerHTML=`<div class="cmpbox" style="text-align:center"><div style="font-family:'Fredoka';font-size:26px;color:#1B2A49">🏁 ${a.label}</div><div style="font-weight:800">🏆 Champion: ${a.champion||'—'}</div><small style="opacity:.7">Locked record · ${LIST.length} sessions</small><div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sm" onclick="restoreYear('${a.id}')">↩️ Bring back to the live season</button><button class="sm alt" onclick="exportArchiveById('${a.id}')">📤 CSV</button></div></div>
+  <div class="totals">${rank.map(([n,t],i)=>`<div class="tot" style="--c:${t.c}"><div class="rank">${['🥇','🥈','🥉','4th','5th'][i]||''}</div><div class="lbl">${n}</div><div class="n">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
+  <table class="stable"><tr><th>Date</th><th>Contest</th><th>Results</th></tr>${LIST.map(ss=>`<tr><td>${new Date(ss.date).toLocaleDateString('en-GB')}</td><td style="font-size:12px">${compLabel(ss.comp||'')}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td></tr>`).join('')}</table>`;
+  return}
+ if(!SEASON.length){body.innerHTML='<div class="empty">No sessions saved yet.<br>Finish a match, open "Show winner", then press "Save session result".</div>';return}
  const rankC=1;
   const rank=seasonTotals();
- body.innerHTML=`<div id="compare" class="cmpbox"></div><div class="totals">${rank.map(([n,t],i)=>`<div class="tot" style="--c:${t.c}"><div class="rank">${['🥇','🥈','🥉'][i]||''}</div><div class="lbl">${n}</div><div class="n">${t.s}</div><small>${t.n} session${t.n>1?'s':''} · ${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
- <table class="stable"><tr><th>#</th><th>Date</th><th>Class</th><th>Grade</th><th>Results</th><th></th></tr>${SEASON.map((ss,i)=>`<tr><td>${i+1}</td><td>${new Date(ss.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td>${ss.cls||'—'}</td><td>Grade ${ss.grade}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td><td><button class="del" onclick="delSession(${i})">Delete</button></td></tr>`).reverse().join('')}</table>`;renderCompare()}
-function delSession(i){if(!confirm('Delete this session?'))return;SEASON.splice(i,1);saveSeason();renderSeason()}
-function clearSeason(){if(!confirm('Delete ALL saved sessions for the season? This cannot be undone.'))return;if(!confirm('Are you sure? Export a CSV first if you want a copy.'))return;SEASON=[];saveSeason();renderSeason()}
+ body.innerHTML=`<div id="contests"></div><div id="compare" class="cmpbox"></div><div class="totals">${rank.map(([n,t],i)=>`<div class="tot" style="--c:${t.c}"><div class="rank">${['🥇','🥈','🥉'][i]||''}</div><div class="lbl">${n}</div><div class="n">${t.s}</div><small>${t.n} session${t.n>1?'s':''} · ${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
+ <table class="stable"><tr><th>#</th><th>Date</th><th>Contest</th><th>Results</th><th></th></tr>${SEASON.map((ss,i)=>`<tr><td>${i+1}</td><td>${new Date(ss.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td style="font-size:12px">${compLabel(ss.comp||('teams|'+(ss.cls||'')+'|'+ss.teams.map(t=>t.name).sort().join(' vs ')))}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td><td><button class="del" onclick="delSession(${i})">Delete</button></td></tr>`).reverse().join('')}</table>`;renderContests();renderCompare()}
+function delSession(i){const ss=SEASON[i];if(!confirmDanger('this session ('+new Date(ss.date).toLocaleDateString('en-GB')+')'))return;markDeleted([ss.id]);SEASON.splice(i,1);saveSeason();if(cloudCfg())syncNow();renderSeason()}
+function clearSeason(){
+ if(!SEASON.length){alert('There is nothing to clear yet.');return}
+ const groups=compGroups();const keys=Object.keys(groups);
+ let menu='WHAT DO YOU WANT TO CLEAR?\n\n  1 = Last session only\n  2 = One contest\n  3 = The whole year\n\nType 1, 2 or 3:';
+ const pick=prompt(menu,'1');if(pick===null)return;
+ const c=String(pick).trim();
+ if(c==='1'){
+  const last=SEASON[SEASON.length-1];
+  const desc='the last session ('+compLabel(last.comp||'')+', '+new Date(last.date).toLocaleDateString('en-GB')+')';
+  if(!confirmDanger(desc))return;
+  markDeleted([last.id]);SEASON.pop();saveSeason();if(cloudCfg())syncNow();toast('Last session cleared');renderSeason();return}
+ if(c==='2'){
+  let list='WHICH CONTEST?\n\n'+keys.map((k,i)=>'  '+(i+1)+' = '+compLabel(k)+'  ('+groups[k].length+')').join('\n')+'\n\nType a number:';
+  const n=prompt(list,'1');if(n===null)return;
+  const idx=parseInt(n,10)-1;if(isNaN(idx)||!keys[idx]){alert('That number is not on the list.');return}
+  const key=keys[idx];
+  if(!confirmDanger('every score for '+compLabel(key)+' ('+groups[key].length+' match(es))'))return;
+  markDeleted(groups[key].map(x=>x.id));SEASON=SEASON.filter(ss=>{const k=ss.comp||('teams|'+(ss.cls||'')+'|'+ss.teams.map(t=>t.name).sort().join(' vs '));return k!==key});
+  saveSeason();if(cloudCfg())syncNow();toast('Contest cleared');renderSeason();return}
+ if(c==='3'){
+  if(!confirmDanger('the WHOLE year ('+SEASON.length+' sessions)'))return;
+  alert('Tip: use "Close & archive year" instead if you want to keep the record.');
+  markDeleted(SEASON.map(x=>x.id));SEASON=[];saveSeason();if(cloudCfg())syncNow();toast('Season cleared');renderSeason();return}
+ alert('Please type 1, 2 or 3.')}
 function exportSeason(){const rows=[['Date','Grade','Team','Score']];SEASON.forEach(ss=>ss.teams.forEach(t=>rows.push([new Date(ss.date).toLocaleDateString('en-GB'),ss.grade,t.name,t.score])));const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);a.download='word-quest-season.csv';a.click()}
 
 function secondChance(i){setTurn(i);toast(TN(i)+' gets a chance on the same question');renderRound()}
@@ -900,8 +1002,19 @@ function oskBack(el){try{el.focus({preventScroll:true})}catch(_){}
  const[s,e]=oskPos(el),t=el.value;if(s===e){if(s>0){el.value=t.slice(0,s-1)+t.slice(e);const p=s-1;try{el.setSelectionRange(p,p)}catch(_){}}}else{el.value=t.slice(0,s)+t.slice(e);try{el.setSelectionRange(s,s)}catch(_){}}
  el.dispatchEvent(new Event('input',{bubbles:true}))}
 /* focus tracking: mark editable fields so the device keyboard stays hidden, and show ours */
-document.addEventListener('focusin',e=>{if(!S.osk)return;const el=e.target;if(oskEditable(el)){el.setAttribute('inputmode','none');oskField=el;buildOsk();oskOpen=true;drawOsk()}});
-function applyOsk(){if(!oskBuilt&&S.osk)buildOsk();if(oskBuilt)drawOsk();document.querySelectorAll('input,textarea').forEach(el=>{if(oskEditable(el)){if(S.osk)el.setAttribute('inputmode','none');else el.removeAttribute('inputmode')}})}
+document.addEventListener('focusin',e=>{const el=e.target;if(!oskEditable(el))return;oskField=el;buildOsk();attachToggle(el);if(S.osk){el.setAttribute('inputmode','none');oskOpen=true;drawOsk()}});
+/* a small keyboard button sits beside every text box, so it can be turned on or off right there */
+function attachToggle(el){if(!el||el.dataset.oskBtn)return;el.dataset.oskBtn='1';
+ const b=document.createElement('button');b.type='button';b.className='oskToggle';b.title='Show / hide the on-screen keyboard';b.textContent='⌨️';
+ b.onmousedown=ev=>ev.preventDefault();
+ b.onclick=ev=>{ev.preventDefault();ev.stopPropagation();oskField=el;S.osk=!S.osk;saveS();
+  if(S.osk){el.setAttribute('inputmode','none');buildOsk();oskOpen=true}else{el.removeAttribute('inputmode');oskOpen=false}
+  drawOsk();markToggles();try{el.focus({preventScroll:true})}catch(_){}};
+ if(el.parentNode){if(getComputedStyle(el.parentNode).position==='static')el.parentNode.style.position='relative';el.parentNode.insertBefore(b,el.nextSibling)}
+ markToggles()}
+function markToggles(){document.querySelectorAll('.oskToggle').forEach(b=>b.classList.toggle('on',!!S.osk))}
+function attachAllToggles(){document.querySelectorAll('input,textarea').forEach(el=>{if(oskEditable(el))attachToggle(el)})}
+function applyOsk(){if(!oskBuilt&&S.osk)buildOsk();if(oskBuilt)drawOsk();setTimeout(attachAllToggles,0);setTimeout(markToggles,0);document.querySelectorAll('input,textarea').forEach(el=>{if(oskEditable(el)){if(S.osk)el.setAttribute('inputmode','none');else el.removeAttribute('inputmode')}})}
 
 /* ===================== CLOUD SYNC (JSONBin.io) ===================== */
 function cloudCfg(){return S.cloudOn&&S.cloudBin&&S.cloudKey}
@@ -916,12 +1029,15 @@ async function cloudFetch(url,opts,extraHead){opts=opts||{};const first=S.keyMod
  return r}
 function sessId(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
 function ensureIds(){let ch=false;SEASON.forEach(s=>{if(!s.id){s.id=sessId();ch=true}});if(ch)saveSeason()}
-function mergeRemote(payload){let sess=[],arch=[];if(Array.isArray(payload))sess=payload;else if(payload&&typeof payload==='object'){sess=payload.sessions||[];arch=payload.archives||[]}
+function mergeRemote(payload){let sess=[],arch=[],rdel=[];if(Array.isArray(payload))sess=payload;else if(payload&&typeof payload==='object'){sess=payload.sessions||[];arch=payload.archives||[];rdel=payload.deleted||[]}
+ if(rdel.length){rdel.forEach(id=>{if(!DELETED.includes(id))DELETED.push(id)});saveDeleted();
+  SEASON=SEASON.filter(x=>!DELETED.includes(x.id));ARCHIVES=ARCHIVES.filter(a=>!DELETED.includes(a.id));saveSeason();saveArchives()}
+ sess=sess.filter(r=>r&&!DELETED.includes(r.id));arch=arch.filter(a=>a&&!DELETED.includes(a.id));
  const seen=new Set(SEASON.map(s=>s.id));sess.forEach(r=>{if(r&&r.id&&!seen.has(r.id)){SEASON.push(r);seen.add(r.id)}});SEASON.sort((a,b)=>new Date(a.date)-new Date(b.date));saveSeason();
  const aseen=new Set(ARCHIVES.map(a=>a.id));arch.forEach(a=>{if(a&&a.id&&!aseen.has(a.id)){ARCHIVES.push(a);aseen.add(a.id)}});saveArchives()}
 function cloudStat(msg,cls){const e=$('#cloudStat');if(e){e.textContent=msg;e.className='cstat '+(cls||'')}}
 async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}throw new Error('HTTP '+r.status+(d?' - '+d:''))}const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);const before=SEASON.length+ARCHIVES.length;mergeRemote(arr);const after=SEASON.length+ARCHIVES.length;if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(after>before){toast('Updated from another device \u2601');if(typeof cloudBadge==='function')cloudBadge()}if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
-async function pushCloud(silent,unloading){if(!cloudCfg())return false;try{const opts={method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES})};if(unloading)opts.keepalive=true;
+async function pushCloud(silent,unloading){if(!cloudCfg())return false;try{const opts={method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES,deleted:DELETED})};if(unloading)opts.keepalive=true;
  const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,opts,{'Content-Type':'application/json'});
  if(!r.ok){let detail='';try{const j=await r.clone().json();detail=j.message||JSON.stringify(j)}catch(_){}
   throw new Error('HTTP '+r.status+(detail?' - '+detail:''))}
@@ -935,7 +1051,7 @@ async function testCloud(){if(!S.cloudBin||!S.cloudKey){cloudStat('Enter Bin ID 
   readOK=r.ok;if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}readMsg='HTTP '+r.status+(d?' - '+d:'')}}
  catch(e){readMsg=e.message}
  cloudStat('Testing write\u2026');
- try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES})},{'Content-Type':'application/json'});
+ try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES,deleted:DELETED})},{'Content-Type':'application/json'});
   writeOK=r.ok;if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}writeMsg='HTTP '+r.status+(d?' - '+d:'')}}
  catch(e){writeMsg=e.message}
  const mode=S.keyMode||'access';
@@ -963,7 +1079,7 @@ function setPass(v){localStorage.setItem(PKEY,btoa(v))}
 // no default password — teacher sets one from Settings if desired
 let unlocked=false;
 function hasPass(){const v=getPass();return !!v&&v!=='__none__'}
-function initGate(){const inp=$('#gpass'),msg=$('#gcmsg'),btn=$('#openBtn'),err=$('#gerr'),tools=$('#gateTools');if(!inp)return;
+function initGate(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);const inp=$('#gpass'),msg=$('#gcmsg'),btn=$('#openBtn'),err=$('#gerr'),tools=$('#gateTools');if(!inp)return;
  if(hasPass()){inp.style.display='';inp.value='';inp.placeholder='Password';if(msg)msg.textContent='Type the password, then press Enter or tap Open';if(btn)btn.textContent='🔓 Open';setTimeout(()=>inp.focus(),60)}
  else{inp.style.display='none';if(msg)msg.textContent='Press Enter or tap to open';if(btn)btn.textContent='▶ Open the games';setTimeout(()=>btn&&btn.focus(),60)}
  if(tools)tools.innerHTML=isBuiltinPass()?'<span style="font-size:12px;opacity:.6;font-weight:800">🔒 Password is built into this file</span>':(hasPass()?'<button class="ghost" onclick="gateChangePass()">🔑 Change password</button>':'<button class="ghost" onclick="gateSetPass()">🔒 Set a password</button>');
