@@ -275,7 +275,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v13</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v14</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -509,6 +509,14 @@ function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
 const BUILTIN_BIN  = "6a8f1a12f5f4af5e29459c91";        /* e.g. "6a8f1a12f5f4af5e29459c91" */
 const BUILTIN_KEY  = "$2a$10$x544.sSaaatpHuiBcoZmSOvl9hTc52duU./lg9yA4dRy9.uJu8kGC";        /* your JSONBin key                */
 const BUILTIN_MODE = "master";  /* "master" or "access"            */
+
+/* ------------------------------------------------------------
+   BUILT-IN PASSWORD — type it between the quotes and every
+   device that opens this file will ask for it, including new
+   devices and private/incognito windows.
+   Leave it empty ("") for no password at all.
+   ------------------------------------------------------------ */
+const BUILTIN_PASSWORD = "100489";    /* e.g. "100489" */
 
 const SKEY='wordquest-settings-v2';
 const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,names:['Team A','Team B','Team C','Team D','Team E'],cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
@@ -906,7 +914,9 @@ window.addEventListener('DOMContentLoaded',()=>{ensureIds()});
 /* ===================== LICENSE + PASSWORD ===================== */
 const CREDIT_SIG='Miss Hagar Shaaban';
 const PKEY='wordquest-pass-v1';
-function getPass(){try{const raw=localStorage.getItem(PKEY);if(!raw)return '__none__';const v=atob(raw);return v?v:'__none__'}catch(e){return '__none__'}}
+function getPass(){if(BUILTIN_PASSWORD&&String(BUILTIN_PASSWORD).trim())return String(BUILTIN_PASSWORD).trim();
+ try{const raw=localStorage.getItem(PKEY);if(!raw)return '__none__';const v=atob(raw);return v?v:'__none__'}catch(e){return '__none__'}}
+function isBuiltinPass(){return !!(BUILTIN_PASSWORD&&String(BUILTIN_PASSWORD).trim())}
 function setPass(v){localStorage.setItem(PKEY,btoa(v))}
 // no default password — teacher sets one from Settings if desired
 let unlocked=false;
@@ -914,11 +924,11 @@ function hasPass(){const v=getPass();return !!v&&v!=='__none__'}
 function initGate(){const inp=$('#gpass'),msg=$('#gcmsg'),btn=$('#openBtn'),err=$('#gerr'),tools=$('#gateTools');if(!inp)return;
  if(hasPass()){inp.style.display='';inp.value='';inp.placeholder='Password';if(msg)msg.textContent='Type the password, then press Enter or tap Open';if(btn)btn.textContent='🔓 Open';setTimeout(()=>inp.focus(),60)}
  else{inp.style.display='none';if(msg)msg.textContent='Press Enter or tap to open';if(btn)btn.textContent='▶ Open the games';setTimeout(()=>btn&&btn.focus(),60)}
- if(tools)tools.innerHTML=hasPass()?'<button class="ghost" onclick="gateChangePass()">🔑 Change password</button>':'<button class="ghost" onclick="gateSetPass()">🔒 Set a password</button>';
+ if(tools)tools.innerHTML=isBuiltinPass()?'<span style="font-size:12px;opacity:.6;font-weight:800">🔒 Password is built into this file</span>':(hasPass()?'<button class="ghost" onclick="gateChangePass()">🔑 Change password</button>':'<button class="ghost" onclick="gateSetPass()">🔒 Set a password</button>');
  if(err)err.textContent='';cloudBadge()}
 function cloudBadge(){const b=$('#cloudBadge');if(!b)return;if(!S.cloudBin||!S.cloudKey){b.innerHTML='<span style="color:#FF6B6B">\u2601 Cloud: NOT set up on this device</span>';return}b.innerHTML='\u2601 Cloud: checking\u2026';cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(d=>{const arr=Array.isArray(d)?d:(d.sessions||d.record?.sessions||[]);const ar=(d&&d.archives)||(d&&d.record&&d.record.archives)||[];b.innerHTML='<span style="color:#7BD389">\u2601 Cloud connected \u2714 \u00b7 '+arr.length+' saved session'+(arr.length===1?'':'s')+(ar.length?' \u00b7 '+ar.length+' archived year'+(ar.length===1?'':'s'):'')+'</span>';}).catch(e=>{b.innerHTML='<span style="color:#FF6B6B">\u2601 Cloud error: '+e.message+'</span>'})}
-function gateSetPass(){if(hasPass()){gateChangePass();return}const v=prompt('Type the new password (3 characters or more):','');if(v===null)return;const t=v.trim();if(t.length<3){alert('Use at least 3 characters.');return}setPass(t);alert('Password set. It will be asked for from now on.');initGate()}
-function gateChangePass(){const cur=prompt('Enter the CURRENT password first:','');if(cur===null)return;if(cur.trim()!==getPass()){alert('Wrong password. The password was not changed.');return}
+function gateSetPass(){if(isBuiltinPass()){gateChangePass();return}if(hasPass()){gateChangePass();return}const v=prompt('Type the new password (3 characters or more):','');if(v===null)return;const t=v.trim();if(t.length<3){alert('Use at least 3 characters.');return}setPass(t);alert('Password set. It will be asked for from now on.');initGate()}
+function gateChangePass(){if(isBuiltinPass()){alert('This password is written inside the file.\n\nTo change it, edit the BUILTIN_PASSWORD line near the top of the file and upload it again.');return}const cur=prompt('Enter the CURRENT password first:','');if(cur===null)return;if(cur.trim()!==getPass()){alert('Wrong password. The password was not changed.');return}
  const v=prompt('Enter the NEW password (3 characters or more).\nLeave it empty to remove the password:','');if(v===null)return;const t=v.trim();
  if(t===''){if(confirm('Remove the password completely? Anyone will be able to open the game.')){localStorage.removeItem(PKEY);alert('Password removed.');initGate()}return}
  if(t.length<3){alert('Use at least 3 characters. The password was not changed.');return}
