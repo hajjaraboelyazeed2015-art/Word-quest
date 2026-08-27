@@ -15,7 +15,7 @@ window.WORDQUEST_CONFIG = {
   bin: "6a8f1a12f5f4af5e29459c91",
 
   /* Your JSONBin key. Paste it between the quotes. */
-  key: "PUT-YOUR-KEY-HERE",
+  key: "$2a$10$x544.sSaaatpHuiBcoZmSOvl9hTc52duU./lg9yA4dRy9.uJu8kGC",
 
   /* "master" if you pasted a Master Key,
      "access" if you pasted an Access Key   */
