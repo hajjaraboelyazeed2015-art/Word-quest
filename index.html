@@ -275,7 +275,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v16</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v17</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -920,13 +920,32 @@ function mergeRemote(payload){let sess=[],arch=[];if(Array.isArray(payload))sess
  const seen=new Set(SEASON.map(s=>s.id));sess.forEach(r=>{if(r&&r.id&&!seen.has(r.id)){SEASON.push(r);seen.add(r.id)}});SEASON.sort((a,b)=>new Date(a.date)-new Date(b.date));saveSeason();
  const aseen=new Set(ARCHIVES.map(a=>a.id));arch.forEach(a=>{if(a&&a.id&&!aseen.has(a.id)){ARCHIVES.push(a);aseen.add(a.id)}});saveArchives()}
 function cloudStat(msg,cls){const e=$('#cloudStat');if(e){e.textContent=msg;e.className='cstat '+(cls||'')}}
-async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);const before=SEASON.length+ARCHIVES.length;mergeRemote(arr);const after=SEASON.length+ARCHIVES.length;if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(after>before){toast('Updated from another device \u2601');if(typeof cloudBadge==='function')cloudBadge()}if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
-async function pushCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES}),keepalive:true},{'Content-Type':'application/json'});if(!r.ok)throw new Error('HTTP '+r.status);if(!silent)cloudStat('Saved to the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not save to cloud: '+e.message,'bad')}}
+async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}throw new Error('HTTP '+r.status+(d?' - '+d:''))}const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);const before=SEASON.length+ARCHIVES.length;mergeRemote(arr);const after=SEASON.length+ARCHIVES.length;if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(after>before){toast('Updated from another device \u2601');if(typeof cloudBadge==='function')cloudBadge()}if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
+async function pushCloud(silent,unloading){if(!cloudCfg())return false;try{const opts={method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES})};if(unloading)opts.keepalive=true;
+ const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,opts,{'Content-Type':'application/json'});
+ if(!r.ok){let detail='';try{const j=await r.clone().json();detail=j.message||JSON.stringify(j)}catch(_){}
+  throw new Error('HTTP '+r.status+(detail?' - '+detail:''))}
+ if(!silent)cloudStat('Saved to the cloud \u2714','ok');return true}
+ catch(e){if(!silent)cloudStat('Could not SAVE to cloud: '+e.message,'bad');return false}}
 async function syncNow(){if(!cloudCfg()){cloudStat('Turn on sync and fill in Bin ID + Key first','bad');return}cloudStat('Syncing\u2026');ensureIds();await pullCloud(true);await pushCloud(true);await pullCloud(true);cloudStat('Synced across devices \u2714 ('+SEASON.length+' sessions)','ok');if($('#scr-season').classList.contains('active'))renderSeason()}
-async function testCloud(){if(!S.cloudBin||!S.cloudKey){cloudStat('Enter Bin ID and Key','bad');return}cloudStat('Testing\u2026');try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(r.ok)cloudStat('Connection works \u2714 (using '+(S.keyMode||'access')+' key)','ok');else cloudStat('Failed: HTTP '+r.status+(r.status===401?' \u2014 key rejected. Tick Read + Update on the key.':r.status===404?' (wrong Bin ID)':''),'bad')}catch(e){cloudStat('Failed: '+e.message,'bad')}}
+async function testCloud(){if(!S.cloudBin||!S.cloudKey){cloudStat('Enter Bin ID and Key','bad');return}
+ cloudStat('Testing read\u2026');
+ let readOK=false,readMsg='',writeOK=false,writeMsg='';
+ try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});
+  readOK=r.ok;if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}readMsg='HTTP '+r.status+(d?' - '+d:'')}}
+ catch(e){readMsg=e.message}
+ cloudStat('Testing write\u2026');
+ try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES})},{'Content-Type':'application/json'});
+  writeOK=r.ok;if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}writeMsg='HTTP '+r.status+(d?' - '+d:'')}}
+ catch(e){writeMsg=e.message}
+ const mode=S.keyMode||'access';
+ if(readOK&&writeOK)cloudStat('Connection works \u2714  Read OK \u00b7 Write OK  (using '+mode+' key)','ok');
+ else if(readOK&&!writeOK)cloudStat('Read OK, but WRITE FAILED: '+writeMsg+'  \u2192 this key can read but not update. Create a key with BOTH Read and Update, or use the Master Key.','bad');
+ else if(!readOK&&writeOK)cloudStat('Write OK but read failed: '+readMsg,'bad');
+ else cloudStat('Both failed: '+readMsg+'  \u2192 check the Bin ID, the key, and the Key type.','bad')}
 /* auto-push whenever the game is hidden or closed */
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&cloudCfg())pushCloud(true)});
-window.addEventListener('pagehide',()=>{if(cloudCfg())pushCloud(true)});
+window.addEventListener('pagehide',()=>{if(cloudCfg())pushCloud(true,true)});
 setInterval(()=>{if(cloudCfg()){pullCloud(true);pushCloud(true)}},45000);
 /* coming back to the tab? fetch whatever other devices saved while we were away */
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudCfg())pullCloud(true)});
