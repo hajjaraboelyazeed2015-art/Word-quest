@@ -173,6 +173,9 @@ header{position:relative;z-index:2;display:flex;align-items:center;justify-conte
 input[type=range]{width:140px;accent-color:var(--sky)}
 input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:8px;padding:2px;background:#fff}
 .cstat{font-weight:800;font-size:13px}.cstat.ok{color:#2E9C94}.cstat.bad{color:#C64848}
+.chiplet{display:inline-flex;align-items:center;gap:5px;background:#fff;border:2px solid #D9D2C2;border-radius:999px;padding:5px 10px;margin:3px;font-weight:800;font-size:13px}
+.chiplet.on{background:var(--ok);border-color:var(--okd);color:#fff}
+.chiplet button{background:var(--coral);color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:1;padding:0;font-weight:800}
 .sel{padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:800;font-size:14px;background:#fff;color:var(--ink)}
 .srow input[type=text]{padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:800;width:130px}
 .shead{font-family:'Fredoka';font-size:18px;margin-top:6px;opacity:.8}
@@ -190,6 +193,86 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
 .timer.up{background:transparent;height:0;margin-top:14px}.timer.up .tnum{left:0;right:auto;top:-22px;color:var(--sky)}
 .tnum{position:absolute;right:-2px;top:-30px;font-family:'Fredoka';font-size:22px}
 .twrap{width:100%;position:relative;margin-top:14px}
+/* fun zone */
+.avatar{display:inline-grid;place-items:center;border-radius:50%;object-fit:cover;background:#E5DECF;border:3px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.15);color:#1B2A49;font-family:'Fredoka';vertical-align:middle}
+.avatar.ph{background:repeating-linear-gradient(45deg,#EFE8D8,#EFE8D8 6px,#E5DECF 6px,#E5DECF 12px)}
+.ntag{display:inline-flex;align-items:center;gap:6px;font-weight:800}
+.pickgrid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:10px}
+.pcard{display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:3px solid #D9D2C2;border-radius:14px;padding:8px 10px;cursor:pointer;font-weight:800;font-size:13px;color:#1B2A49;opacity:.45;min-width:86px}
+.pcard.on{opacity:1;border-color:var(--ok)}
+.pcard input{margin:0}
+.readybox{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px;background:#fff;border:3px solid #E5DECF;border-radius:18px}
+.vsrow{display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center}
+.vsp{text-align:center}
+.vsn{font-family:'Fredoka';font-size:19px;margin-top:4px;color:#1B2A49}
+.vsx{font-family:'Fredoka';font-size:26px;color:#C64848}
+.duelcol h4{display:flex;align-items:center;gap:8px;justify-content:center}
+.stucard{display:inline-flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:2px solid #E5DECF;border-radius:12px;padding:6px;margin:3px;font-weight:800;font-size:12px;position:relative}
+.stucard .phbtn{background:none;border:none;padding:0;cursor:pointer}
+.stucard .stuname{max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stucard .del{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--coral);color:#fff;font-size:11px;font-weight:800;padding:0}
+.wbrow{display:flex;gap:5px;justify-content:center;margin:5px 0}
+.wbrow.done .wbcell{background:var(--ok);border-color:var(--okd);color:#fff}
+.wbcell{width:38px;height:42px;border-radius:8px;border:2px solid var(--sky);background:#fff;font-family:'Fredoka';font-size:20px;color:var(--ink);cursor:pointer}
+.wbcell.fixed{background:#E5DECF;cursor:default}
+.wbcell.lock{pointer-events:none}
+.wbbank{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:8px}
+.wbl{width:36px;height:36px;border-radius:8px;border:2px solid #D9D2C2;background:#FFF8E7;font-family:'Fredoka';font-size:17px;color:var(--ink);cursor:pointer}
+.wbl.sel{background:var(--sun);border-color:#D9A518}
+.wbl:disabled{opacity:.25}
+.sdpair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sdimg{width:100%;border-radius:10px;border:2px solid #D9D2C2;background:#fff}
+.sdimg.nocur,.sdimg.nocur *{cursor:default!important}
+.cbrows{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;min-height:30px}
+.cbrow{display:flex;align-items:center;gap:8px;justify-content:center}
+.cbg{display:flex;gap:4px}
+.cbg i{width:20px;height:20px;border-radius:5px;display:inline-block}
+.cbfb{font-weight:800;font-size:12px;color:#1B2A49;min-width:120px;text-align:left}
+.cbslots{display:flex;gap:6px;justify-content:center;margin:6px 0}
+.cbslot{width:38px;height:38px;border-radius:9px;border:3px dashed #B9B0A0}
+.cbpick{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;align-items:center}
+.patblk{background:#fff;border:2px solid #E5DECF;border-radius:12px;padding:8px;margin:6px 0}
+.sm.wrongopt{background:#FF6B6B!important;color:#fff!important;opacity:1!important}
+.patblk.ok{border-color:var(--okd);background:color-mix(in srgb,var(--ok) 20%,#fff)}
+.patseq{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.patopts{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.sud6{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;max-width:250px;margin:8px auto}
+.sud6 .sudcell{font-size:17px}
+.sudpad{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.sudnum{width:38px;height:38px;border-radius:9px;border:2px solid var(--sky);background:#fff;font-family:'Fredoka';font-size:18px;color:var(--ink);cursor:pointer}
+.sudnum.on{background:var(--sun);border-color:#D9A518}
+.sudnum.era{background:#E5DECF}
+.cbdot{width:44px;height:44px;border-radius:50%;border:3px solid rgba(0,0,0,.15);cursor:pointer}
+.sudgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;max-width:190px;margin:8px auto}
+.sudcell{aspect-ratio:1;border-radius:8px;background:#fff;border:2px solid var(--sky);font-family:'Fredoka';font-size:22px;display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.sudcell.fixed{background:#E5DECF;cursor:default}
+.crgrid{display:grid;gap:3px;max-width:250px;margin:8px auto}
+.crcell{aspect-ratio:1;border-radius:5px;border:2px solid rgba(0,0,0,.12);font-size:17px;cursor:pointer;color:#1B2A49;line-height:1}
+.crcell.has{box-shadow:inset 0 0 0 3px #1B2A49}
+.trwrap{display:flex;flex-direction:column;gap:12px;width:100%}
+.trbracket{background:#F7F2E4;border:2px solid #E5DECF;border-radius:12px;padding:6px;overflow-x:auto}
+.trmatch{width:100%}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
+.duelcol{background:#fff;border:3px solid #D9D2C2;border-radius:14px;padding:12px;text-align:center}
+.duelcol.a{border-color:#4ECDC4}.duelcol.b{border-color:#FF6B6B}
+.duelcol h4{font-family:'Fredoka';font-size:19px;margin-bottom:6px}
+.duelcol input[type=text]{width:100%;padding:9px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:800;font-size:16px}
+.wlist{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:8px;max-height:120px;overflow:auto}
+.wlist span{background:var(--ok);color:#fff;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:800}
+@media(max-width:700px){.duel{grid-template-columns:1fr}}
+.nhgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:330px;margin:12px auto}
+.nhcard{aspect-ratio:1;border-radius:12px;background:var(--sky);color:var(--sun);border:3px solid var(--sky);box-shadow:0 4px 0 rgba(0,0,0,.25);font-family:'Fredoka';font-size:24px;cursor:pointer;transition:.15s}
+.nhcard.show{background:#fff;color:var(--ink)}
+.nhcard.found{background:var(--ok);border-color:var(--okd);color:#fff;pointer-events:none}
+.nhcard.wrong{background:var(--bad);border-color:var(--badd);color:#fff;animation:shake .4s}
+.nhcard:hover:not(.found){transform:translateY(-3px)}
+.tttgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:10px auto}
+.tttcell{aspect-ratio:1;border-radius:14px;background:#fff;border:3px solid var(--sky);box-shadow:0 4px 0 var(--sky);font-size:42px;display:grid;place-items:center;cursor:pointer}
+.tttcell:disabled{cursor:default;opacity:.95}
+.tttcell:hover:not(:disabled){background:#FFF3CE}
+.simon{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:320px;margin:12px auto}
+.simpad{aspect-ratio:1;border-radius:20px;background:var(--c);opacity:.55;border:4px solid rgba(0,0,0,.15);cursor:pointer;transition:.1s}
+.simpad.lit{opacity:1;transform:scale(1.05);box-shadow:0 0 30px var(--c)}
 /* wheel */
 .wheelrow{display:flex;gap:30px;align-items:center;justify-content:center;width:100%;flex-wrap:wrap}
 .wheelbox{position:relative;width:min(340px,80vw)}
@@ -278,7 +361,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v20</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v28</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -312,9 +395,28 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
       <button class="gcard" onclick="pickGrade(4)"><div class="num">4</div><div class="t">Grade 4</div><div class="s">Simple words · short sentences</div></button>
       <button class="gcard" onclick="pickGrade(5)"><div class="num">5</div><div class="t">Grade 5</div><div class="s">Longer words · past tense</div></button>
       <button class="gcard" onclick="pickGrade(6)"><div class="num">6</div><div class="t">Grade 6</div><div class="s">Vocabulary · grammar challenges</div></button>
+      <button class="gcard" style="background:linear-gradient(160deg,#FFE29A,#FFC93C)" onclick="go('fun')"><div class="num">🎈</div><div class="t">Fun Zone</div><div class="s">Just for fun · no scores</div></button>
     </div>
   </div>
   <div class="credit wm-credit">Prepared by <b>Miss Hagar Shaaban</b></div>
+</section>
+
+<!-- FUN ZONE -->
+<section class="screen" id="scr-fun">
+  <div class="map-wrap">
+    <div class="map-head"><span class="chip">🎈 Fun Zone</span><h2 style="font-size:28px">Games just for fun — nothing is scored</h2><button class="ghost" onclick="go('grade')">← Home</button></div>
+    <div class="trail" id="funTrail"></div>
+  </div>
+  <div class="credit wm-credit">Prepared by Miss Hagar Shaaban</div>
+</section>
+
+<section class="screen" id="scr-funplay">
+  <div class="game-wrap">
+    <div class="gtitle"><span id="fIcon" style="font-size:40px"></span><h2 id="fName"></h2></div>
+    <div class="board" id="funBoard" style="min-height:420px"></div>
+    <div style="margin-top:16px"><button class="ghost" onclick="go('fun')">← Back to Fun Zone</button></div>
+  </div>
+  <div class="credit wm-credit">Prepared by Miss Hagar Shaaban</div>
 </section>
 
 <!-- MAP SCREEN -->
@@ -493,11 +595,11 @@ const $=s=>document.querySelector(s);
 /* stars */
 for(let i=0;i<70;i++){const s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';$('#stars').appendChild(s)}
 
-function go(n){stopTimer();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#scr-'+n).classList.add('active');if(n==='map')renderMap();if(n==='result')renderResult();if(n==='season'){renderSeason();if(typeof cloudCfg==='function'&&cloudCfg())pullCloud(true)}}
+function go(n){stopTimer();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('#scr-'+n).classList.add('active');if(n==='map')renderMap();if(n==='fun')renderFun();if(n==='result')renderResult();if(n==='season'){renderSeason();if(typeof cloudCfg==='function'&&cloudCfg())pullCloud(true)}}
 function pickGrade(g){grade=g;done={};$('#gradeChip').textContent='Grade '+g;go('map')}
-function renderMap(){$('#trail').innerHTML=GAMES.map((g,i)=>`<button class="station ${done[g.id]?'done':''}" style="${g.id==='wheel'?'background:linear-gradient(135deg,#FFE29A,#FFC93C)':''}" onclick="startGame('${g.id}')"><span class="badge">Game ${i+1}</span><div class="ic">${g.ic}</div><div class="nm">${g.nm}</div><div class="ds">${g.ds}</div></button>`).join('')+`<button class="station" style="background:var(--sun)" onclick="go('result')"><div class="ic">🏆</div><div class="nm">Show winner</div><div class="ds">End the match & celebrate</div></button>`}
-function setTurn(t){turn=t%NT();document.querySelectorAll('.team').forEach((e,i)=>e.classList.toggle('turn',i===turn));const tb=$('#turnbar');tb.style.background=TC(turn);tb.textContent=NT()>1?`${sideName(turn)}'s turn`:sideName(turn);const w=$('#whorow');if(w)w.innerHTML=NT()>1?'Who answers? '+Array.from({length:NT()},(_,i)=>`<button class="tc ${i===turn?'on':''}" style="${i===turn?'':'border-color:'+TC(i)}" onclick="setTurn(${i});toast(TN(${i})+' answers now')">${TN(i)}</button>`).join(''):''}
-function renderScore(){$('#scoreboard').innerHTML=Array.from({length:NT()},(_,i)=>`<div class="team ${i===turn?'turn':''}" onclick="setTurn(${i})"><div class="dot" style="background:${TC(i)}">${'ABCDE'[i]}</div><div><div class="lbl">${TN(i)}</div><div class="pts">${score[i]}</div></div></div>`).join(NT()>1?'<span class="vs">VS</span>':'')}
+function renderMap(){$('#trail').innerHTML=GAMES.map((g,i)=>`<button class="station ${done[g.id]?'done':''}" onclick="startGame('${g.id}')"><span class="badge">Game ${i+1}</span><div class="ic">${g.ic}</div><div class="nm">${g.nm}</div><div class="ds">${g.ds}</div></button>`).join('')+`<button class="station" style="background:var(--sun)" onclick="go('result')"><div class="ic">🏆</div><div class="nm">Show winner</div><div class="ds">End the match & celebrate</div></button>`}
+function setTurn(t){normalizeSides();turn=t%NT();document.querySelectorAll('.team').forEach((e,i)=>e.classList.toggle('turn',i===turn));const tb=$('#turnbar');tb.style.background=TC(turn);tb.textContent=NT()>1?`${sideName(turn)}'s turn`:sideName(turn);const w=$('#whorow');if(w)w.innerHTML=NT()>1?'Who answers? '+Array.from({length:NT()},(_,i)=>`<button class="tc ${i===turn?'on':''}" style="${i===turn?'':'border-color:'+TC(i)}" onclick="setTurn(${i});toast(sideName(${i})+' answers now')">${sideName(i)}</button>`).join(''):''}
+function renderScore(){$('#scoreboard').innerHTML=Array.from({length:NT()},(_,i)=>`<div class="team ${i===turn?'turn':''}" onclick="setTurn(${i})"><div class="dot" style="background:${TC(i)}">${'ABCDE'[i]}</div><div><div class="lbl">${sideName(i)}</div><div class="pts">${score[i]}</div></div></div>`).join(NT()>1?'<span class="vs">VS</span>':'')}
 function addScore(t,n){score[t]=Math.max(0,score[t]+n);renderScore()}
 function resetScores(){score=[0,0,0,0,0];turn=0;renderScore();setTurn(0);toast('Scores reset')}
 function nextTurn(){setTurn(nextT())}
@@ -541,7 +643,10 @@ const CF_MODE = CFG.mode     || BUILTIN_MODE;
 const CF_PASS = CFG.password || BUILTIN_PASSWORD;
 
 const SKEY='wordquest-settings-v2';
-const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,compType:'teams',names:['Team A','Team B','Team C','Team D','Team E'],grades:['4','4','4','4','4'],classes:['4A','4A','4A','4A','4A'],roster:['Team A','Team B','Team C','Team D','Team E'],classList:['4A','4B','5A','5B','6A','6B'],cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
+const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,compType:'teams',names:['Team A','Team B','Team C','Team D','Team E'],grades:['4','4','4','4','4'],classes:['4A','4A','4A','4A','4A'],roster:['Team A','Team B','Team C','Team D','Team E'],classList:['4A','4B','5A','5B','6A','6B'],students:{},funClass:'',aiLevel:'medium',
+ gradeClasses:{'4':['4A','4B'],'5':['5A','5B'],'6':['6A','6B']},
+ classTeams:{},classStudents:{},teamStudents:{},photos:{},
+ timerModes:{},setGrade:'4',setClass:'',setTeam:'',cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
 let S={...SDEF};try{S={...SDEF,...JSON.parse(localStorage.getItem(SKEY)||'{}')}}catch(e){}
 if(CF_BIN&&CF_KEY){S.cloudBin=CF_BIN;S.cloudKey=CF_KEY;if(CF_MODE)S.keyMode=CF_MODE;if(S.cloudOn!==false||!localStorage.getItem(SKEY))S.cloudOn=true;try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
 function saveS(){localStorage.setItem(SKEY,JSON.stringify(S));applyS()}
@@ -551,19 +656,47 @@ function applyS(){const r=document.documentElement.style;r.setProperty('--ok',S.
 const TN=i=>S.names[i]||'Team '+'ABCDE'[i];const TC=i=>S.cols[i]||'#ccc';
 const TG=i=>S.grades&&S.grades[i]?S.grades[i]:String(grade);
 const TCL=i=>S.classes&&S.classes[i]?S.classes[i]:'';
-const COMPTYPES={grade:'Grade vs Grade',classes:'Class vs Class',teams:'Teams in one class'};
+const COMPTYPES={grade:'Grade vs Grade',classes:'Class vs Class',teams:'Teams in one class',students:'Student vs Student'};
+/* ---- roster helpers ---- */
+function gClasses(g){S.gradeClasses=S.gradeClasses||{};return S.gradeClasses[String(g)]||[]}
+function allClasses(){return ['4','5','6'].reduce((a,g)=>a.concat(gClasses(g)),[])}
+function cTeams(c){S.classTeams=S.classTeams||{};return S.classTeams[c]||[]}
+function cStudents(c){S.classStudents=S.classStudents||{};return S.classStudents[c]||[]}
+function tStudents(c,t){S.teamStudents=S.teamStudents||{};return S.teamStudents[c+'|'+t]||[]}
+function classOfGrade(c){for(const g of ['4','5','6'])if(gClasses(g).includes(c))return g;return '4'}
+function addTo(arr,val){val=(val||'').trim();if(!val)return false;if(arr.includes(val))return false;arr.push(val);return true}
+/* one-time migration from the older flat lists */
+(function migrate(){if(S.__migrated)return;S.__migrated=true;
+ if(S.classList&&S.classList.length){S.gradeClasses=S.gradeClasses||{};
+  S.classList.forEach(c=>{const g=/^[456]/.test(c)?c[0]:'4';S.gradeClasses[g]=S.gradeClasses[g]||[];if(!S.gradeClasses[g].includes(c))S.gradeClasses[g].push(c)})}
+ if(S.students&&Object.keys(S.students).length){S.classStudents=S.classStudents||{};Object.entries(S.students).forEach(([c,list])=>{if(!S.classStudents[c])S.classStudents[c]=list.slice()})}
+ if(S.roster&&S.roster.length){S.classTeams=S.classTeams||{};allClasses().forEach(c=>{if(!S.classTeams[c])S.classTeams[c]=S.roster.slice(0,2)})}
+ try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}})();
+/* per-game timer mode: falls back to the global one, so new games appear automatically */
+function timerFor(id){const m=(S.timerModes||{})[id];return m||S.timerMode||'off'}
 /* how a side is labelled depends on what is competing */
+function normalizeSides(){const t=S.compType||'teams';const CL=allClasses();
+ S.names=S.names||[];S.classes=S.classes||[];S.grades=S.grades||[];
+ for(let i=0;i<5;i++){if(!S.grades[i])S.grades[i]='4';if(!S.classes[i])S.classes[i]=CL[0]||'';if(!S.names[i])S.names[i]='Team '+'ABCDE'[i]}
+ if(t==='grade'){const G=['4','5','6'];for(let i=0;i<S.teamCount;i++){if(!G.includes(S.grades[i])||(i>0&&S.grades.slice(0,i).includes(S.grades[i])))S.grades[i]=G[i%3]}}
+ if(t==='classes'){for(let i=0;i<S.teamCount;i++){if(!CL.includes(S.classes[i])||(i>0&&S.classes.slice(0,i).includes(S.classes[i])))S.classes[i]=CL[i%Math.max(1,CL.length)]||''}}
+ if(t==='teams'||t==='students'){const home=CL.includes(S.classes[0])?S.classes[0]:(CL[0]||'');
+  for(let i=0;i<5;i++){S.classes[i]=home;S.grades[i]=classOfGrade(home)}
+  const pool=t==='students'?cStudents(home):cTeams(home);
+  for(let i=0;i<S.teamCount;i++){if(!pool.includes(S.names[i])||(i>0&&S.names.slice(0,i).includes(S.names[i])))S.names[i]=pool[i%Math.max(1,pool.length)]||''}}}
 function sideName(i){const t=S.compType||'teams';
- if(t==='grade')return 'Grade '+TG(i);
- if(t==='classes')return TCL(i)||TN(i);
- return TN(i)}
+ if(t==='grade')return 'Grade '+(S.grades[i]||'4');
+ if(t==='classes')return (S.classes&&S.classes[i])||('Class '+(i+1));
+ return (S.names&&S.names[i])||('Side '+(i+1))}
 /* a stable id for this exact line-up, so each contest keeps its own record */
 function compKey(){const t=S.compType||'teams';
  const sides=Array.from({length:NT()},(_,i)=>sideName(i)).sort();
+ if(t==='students')return 'students|'+(TCL(0)||'class')+'|'+sides.join(' vs ');
  if(t==='grade')return 'grade|'+sides.join(' vs ');
  if(t==='classes')return 'classes|'+sides.join(' vs ');
  return 'teams|'+(TCL(0)||'class')+'|'+sides.join(' vs ')}
 function compLabel(k){k=k||compKey();const p=k.split('|');
+ if(p[0]==='students')return '🧒 '+p[1]+': '+p[2];
  if(p[0]==='grade')return '🎓 '+p[1];
  if(p[0]==='classes')return '🏫 '+p[1];
  return '👥 '+p[1]+': '+p[2]}
@@ -636,40 +769,81 @@ function openSettings(){$('#smodal').classList.add('open');renderSettings()}
 function closeSettings(){$('#smodal').classList.remove('open')}
 function sfxSel(kind,key){return `<select class="sel" onchange="S.${key}=this.value;saveS();play('${kind}',this.value)">${Object.entries(SFX[kind]).map(([k,p])=>`<option value="${k}" ${S[key]===k?'selected':''}>${p.n}</option>`).join('')}</select><button class="sm alt prev" onclick="play('${kind}',S.${key})">▶</button>`}
 function sw(k){return `<button class="sw ${S[k]?'on':''}" onclick="S.${k}=!S.${k};saveS();renderSettings()"></button>`}
-function renderSettings(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);$('#sgrid').innerHTML=`
+function renderSettings(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);
+ const CL=allClasses();
+ const g=S.setGrade||'4';
+ const c=S.setClass&&CL.includes(S.setClass)?S.setClass:(gClasses(g)[0]||'');
+ S.setClass=c;
+ const teamsOfC=cTeams(c);
+ const t=S.setTeam&&teamsOfC.includes(S.setTeam)?S.setTeam:(teamsOfC[0]||'');
+ S.setTeam=t;
+ const ALLGAMES=GAMES.map(x=>({id:x.id,ic:x.ic,nm:x.nm}));
+ $('#sgrid').innerHTML=`
  <div class="shead">🎵 Background music</div>
  <div class="srow"><div class="l">Music<small>Plays a cheerful loop while you play</small></div><div class="c"><input type="range" min="0" max="1" step=".05" value="${S.musicVol}" oninput="S.musicVol=+this.value;saveS()">${sw('music')}</div></div>
- <div class="srow"><div class="l">Built-in tune<small>Choose one of the loops</small></div><div class="c"><select class="sel" onchange="changeTrack(this.value)">${Object.entries(TRACKS).map(([k,t])=>`<option value="${k}" ${S.track===k?'selected':''}>${t.n}</option>`).join('')}</select></div></div>
- <div class="srow"><div class="l">Your own music file<small>${customName?'Now playing: '+customName:'Use any MP3 instead of the built-in tune (for this session)'}</small></div><div class="c"><button class="sm alt" onclick="$('#musfile').click()">Choose file</button>${customName?'<button class="sm" onclick="clearCustomMusic()">Use built-in</button>':''}<input type="file" id="musfile" accept="audio/*" style="display:none" onchange="loadCustomMusic(this)"></div></div>
+ <div class="srow"><div class="l">Built-in tune</div><div class="c"><select class="sel" onchange="changeTrack(this.value)">${Object.entries(TRACKS).map(([k,tr])=>`<option value="${k}" ${S.track===k?'selected':''}>${tr.n}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">Your own music file<small>${customName?'Now playing: '+customName:'Use any MP3 instead of the built-in tune'}</small></div><div class="c"><button class="sm alt" onclick="$('#musfile').click()">Choose file</button>${customName?'<button class="sm" onclick="clearCustomMusic()">Use built-in</button>':''}<input type="file" id="musfile" accept="audio/*" style="display:none" onchange="loadCustomMusic(this)"></div></div>
+
  <div class="shead">🔔 Sound effects</div>
  <div class="srow"><div class="l">Answer sounds<small>Correct / wrong jingles and the winner fanfare</small></div><div class="c"><input type="range" min="0" max="1" step=".05" value="${S.sfxVol}" oninput="S.sfxVol=+this.value;saveS()">${sw('sfx')}</div></div>
  <div class="srow"><div class="l">Correct answer sound</div><div class="c">${sfxSel('ok','okSfx')}</div></div>
  <div class="srow"><div class="l">Wrong answer sound</div><div class="c">${sfxSel('bad','badSfx')}</div></div>
- <div class="srow"><div class="l">Button clicks<small>Plays on every button</small></div><div class="c">${sfxSel('click','clickSfx')}${sw('clicks')}</div></div>
- <div class="shead">🎨 Colours</div>
- <div class="srow"><div class="l">Correct answer colour</div><div class="c"><input type="color" value="${S.okColor}" oninput="S.okColor=this.value;saveS()"></div></div>
- <div class="srow"><div class="l">Wrong answer colour</div><div class="c"><input type="color" value="${S.badColor}" oninput="S.badColor=this.value;saveS()"></div></div>
- <div class="shead">👥 Teams</div>
- <div class="srow"><div class="l">Number of teams<small>1 team = practice mode, up to 5 competing teams</small></div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;saveS();renderSettings()">${[1,2,3,4,5].map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
- ${Array.from({length:S.teamCount},(_,i)=>`<div class="srow"><div class="l">Team ${'ABCDE'[i]}</div><div class="c"><input type="text" value="${S.names[i]}" maxlength="14" onchange="S.names[${i}]=this.value||'Team ${'ABCDE'[i]}';saveS()"><input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`).join('')}
- <div class="shead">⏱️ Timer</div>
- <div class="srow"><div class="l">Timer mode<small>Countdown ends the question when time is up · Stopwatch just counts how long it takes</small></div><div class="c"><select class="sel" onchange="S.timerMode=this.value;saveS();renderSettings()"><option value="off" ${S.timerMode==='off'?'selected':''}>Off</option><option value="down" ${S.timerMode==='down'?'selected':''}>Countdown (time limit)</option><option value="up" ${S.timerMode==='up'?'selected':''}>Stopwatch (no limit)</option></select></div></div>
- ${S.timerMode==='down'?`<div class="srow"><div class="l">Time per question<small><b id="tsecl">${S.timerSec}</b> seconds</small></div><div class="c"><input type="range" min="5" max="120" step="5" value="${S.timerSec}" oninput="S.timerSec=+this.value;$('#tsecl').textContent=this.value;saveS()"></div></div>`:''}
- <div class="srow"><div class="l">Treasure Hunt time<small>Always on for this game — <b id="trsl">${S.treasureSec}</b> seconds to reach the treasure</small></div><div class="c"><input type="range" min="30" max="300" step="10" value="${S.treasureSec}" oninput="S.treasureSec=+this.value;$('#trsl').textContent=this.value;saveS()"></div></div>
- <div class="shead">⌨️ Touchscreen</div>
- <div class="srow"><div class="l">On-screen keyboard<small>Tap the ⌨️ button beside any text box to turn it on or off right there</small></div><div class="c">${sw('osk')}</div></div>
- <div class="shead">📋 Fixed lists (used by the dropdowns)</div>
- <div class="srow"><div class="l">Team names<small>One per line. These are the only names offered during a match, so a team is never typed differently twice.</small></div><div class="c"><textarea rows="5" style="width:190px;padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700" oninput="S.roster=this.value.split('\n').map(x=>x.trim()).filter(Boolean);saveS()">${(S.roster||[]).join('\n')}</textarea></div></div>
- <div class="srow"><div class="l">Class names<small>One per line, e.g. 4A</small></div><div class="c"><textarea rows="5" style="width:190px;padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700" oninput="S.classList=this.value.split('\n').map(x=>x.trim()).filter(Boolean);saveS()">${(S.classList||[]).join('\n')}</textarea></div></div>
- <div class="shead">☁️ Cloud sync (all devices)</div>
- <div class="srow"><div class="l">Turn on cloud sync<small>Season scores follow you to any device, and save automatically when you close the game</small></div><div class="c">${sw('cloudOn')}</div></div>
- <div class="srow"><div class="l">Bin ID</div><div class="c"><input type="text" value="${S.cloudBin}" placeholder="from JSONBin.io" style="padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700;width:190px" oninput="S.cloudBin=this.value.trim();saveS()"></div></div>
- <div class="srow"><div class="l">Key</div><div class="c"><input type="text" value="${S.cloudKey}" placeholder="Access Key (recommended)" style="padding:8px 10px;border:2px solid #D9D2C2;border-radius:8px;font-family:inherit;font-weight:700;width:190px" oninput="S.cloudKey=this.value.trim();saveS()"></div></div>
- <div class="srow"><div class="l">Key type<small>Auto tries both. Pick Master if your Access Key keeps failing.</small></div><div class="c"><select class="sel" onchange="S.keyMode=this.value;saveS()"><option value="access" ${(S.keyMode||'access')==='access'?'selected':''}>Access Key</option><option value="master" ${S.keyMode==='master'?'selected':''}>Master Key</option></select></div></div>
- <div class="srow"><div class="l">Sync</div><div class="c"><button class="sm alt" onclick="testCloud()">Test connection</button><button class="sm" onclick="syncNow()">🔄 Sync now</button></div></div>
- <div class="srow"><div class="cstat" id="cloudStat" style="width:100%;min-height:20px"></div></div>
+ <div class="srow"><div class="l">Button clicks</div><div class="c">${sfxSel('click','clickSfx')}${sw('clicks')}</div></div>
+
+ <div class="shead">⏱️ Timer for each game</div>
+ <div class="pnote">Off · Countdown (a time limit) · Stopwatch (counts up, no limit). Any new game is added here automatically.</div>
+ ${ALLGAMES.map(x=>`<div class="srow"><div class="l">${x.ic} ${x.nm}</div><div class="c"><select class="sel" onchange="S.timerModes=S.timerModes||{};S.timerModes['${x.id}']=this.value;saveS();renderSettings()">
+   <option value="off" ${timerFor(x.id)==='off'?'selected':''}>Off</option>
+   <option value="down" ${timerFor(x.id)==='down'?'selected':''}>Countdown</option>
+   <option value="up" ${timerFor(x.id)==='up'?'selected':''}>Stopwatch</option></select>
+   ${timerFor(x.id)==='down'?`<input type="number" min="5" max="300" step="5" value="${S.timerSec}" style="width:70px;padding:7px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800" onchange="S.timerSec=+this.value||30;saveS()"><span style="font-weight:800;font-size:12px">sec</span>`:''}</div></div>`).join('')}
+
+ <div class="shead">🏫 Classes in each grade</div>
+ <div class="srow"><div class="l">Grade</div><div class="c"><select class="sel" onchange="S.setGrade=this.value;S.setClass='';saveS();renderSettings()">${['4','5','6'].map(x=>`<option ${g===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">Add a class to Grade ${g}</div><div class="c"><input type="text" id="newClass" maxlength="14" placeholder="e.g. ${g}A" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:130px"><button class="sm" onclick="addClass()">＋ Add</button></div></div>
+ <div class="srow"><div class="l">Classes in Grade ${g}<small>${gClasses(g).length} class(es)</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end">${gClasses(g).map(x=>`<span class="chiplet">${x}<button onclick="delClass('${x}')">✕</button></span>`).join('')||'<small>none yet</small>'}</div></div>
+
+ <div class="shead">👥 Teams &amp; students in a class</div>
+ <div class="srow"><div class="l">Class</div><div class="c"><select class="sel" onchange="S.setClass=this.value;S.setTeam='';saveS();renderSettings()">${CL.map(x=>`<option ${c===x?'selected':''}>${x}</option>`).join('')||'<option>—</option>'}</select></div></div>
+ <div class="srow"><div class="l">Add a student to ${c||'—'}</div><div class="c"><input type="text" id="newStu" maxlength="20" placeholder="Student name" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:150px"><button class="sm" onclick="addStudent()">＋ Add</button></div></div>
+ <div class="srow"><div class="l">Students in ${c||'—'}<small>${cStudents(c).length} student(s) · tap a photo box to add a picture</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:230px;overflow:auto">${cStudents(c).map(x=>`<span class="stucard"><button class="phbtn" onclick="pickPhoto('${x.replace(/'/g,"\\'")}')">${avatar(x,52,c)}</button><span class="stuname">${x}</span><button class="del" onclick="delStudent('${x.replace(/'/g,"\\'")}')">✕</button></span>`).join('')||'<small>none yet</small>'}</div></div>
+ <div class="srow"><div class="l">Add a team to ${c||'—'}</div><div class="c"><input type="text" id="newTeam" maxlength="16" placeholder="Team name" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:150px"><button class="sm" onclick="addTeam()">＋ Add</button></div></div>
+ <div class="srow"><div class="l">Teams in ${c||'—'}<small>${teamsOfC.length} team(s)</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end">${teamsOfC.map(x=>`<span class="chiplet">${x}<button onclick="delTeam('${x.replace(/'/g,"\\'")}')">✕</button></span>`).join('')||'<small>none yet</small>'}</div></div>
+ ${teamsOfC.length?`
+ <div class="srow"><div class="l">Put students into a team</div><div class="c"><select class="sel" onchange="S.setTeam=this.value;saveS();renderSettings()">${teamsOfC.map(x=>`<option ${t===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">Members of ${t||'—'}<small>${tStudents(c,t).length} member(s) · tap a name to add or remove</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:170px;overflow:auto">${cStudents(c).map(n=>{const inT=tStudents(c,t).includes(n);return `<span class="chiplet ${inT?'on':''}" style="cursor:pointer" onclick="toggleMember('${n.replace(/'/g,"\\'")}')">${inT?'✓ ':''}${n}</span>`}).join('')||'<small>add students first</small>'}</div></div>`:''}
+
  <div class="shead">🎮 Rules</div>
- <div class="srow"><div class="l">Lose 1 point on "Try again"<small>Like the original game</small></div><div class="c">${sw('penalty')}</div></div>`}
+ <div class="srow"><div class="l">Lose 1 point on "Try again"</div><div class="c">${sw('penalty')}</div></div>
+ <div class="srow" style="background:#F1EAD8"><div class="l">Save settings<small>Everything saves as you type — press this to confirm and close</small></div><div class="c"><button class="sm" onclick="confirmSaveSettings()">💾 Save &amp; close</button></div></div>`}
+function addClass(){const v=($('#newClass')||{}).value||'';const g=S.setGrade||'4';S.gradeClasses=S.gradeClasses||{};S.gradeClasses[g]=S.gradeClasses[g]||[];
+ if(addTo(S.gradeClasses[g],v)){S.setClass=v.trim();saveS();toast('Class added');renderSettings()}else if(v.trim())alert('That class is already in the list.')}
+function delClass(x){if(!confirm('Remove class '+x+'?\n\nIts teams and students will also be removed.'))return;const g=S.setGrade||'4';
+ S.gradeClasses[g]=gClasses(g).filter(y=>y!==x);delete (S.classStudents||{})[x];delete (S.classTeams||{})[x];
+ Object.keys(S.teamStudents||{}).forEach(k=>{if(k.indexOf(x+'|')===0)delete S.teamStudents[k]});
+ if(S.setClass===x)S.setClass='';saveS();renderSettings()}
+function addStudent(){const c=S.setClass;if(!c){alert('Add a class first.');return}const v=($('#newStu')||{}).value||'';
+ S.classStudents=S.classStudents||{};S.classStudents[c]=S.classStudents[c]||[];
+ if(addTo(S.classStudents[c],v)){saveS();toast('Student added');renderSettings()}else if(v.trim())alert('That name is already in the class.')}
+function delStudent(n){const c=S.setClass;if(!confirm('Remove '+n+' from '+c+'?'))return;
+ S.classStudents[c]=cStudents(c).filter(x=>x!==n);if(S.photos)delete S.photos[c+'|'+n];
+ Object.keys(S.teamStudents||{}).forEach(k=>{if(k.indexOf(c+'|')===0)S.teamStudents[k]=S.teamStudents[k].filter(x=>x!==n)});
+ saveS();renderSettings()}
+function addTeam(){const c=S.setClass;if(!c){alert('Add a class first.');return}const v=($('#newTeam')||{}).value||'';
+ S.classTeams=S.classTeams||{};S.classTeams[c]=S.classTeams[c]||[];
+ if(addTo(S.classTeams[c],v)){S.setTeam=v.trim();saveS();toast('Team added');renderSettings()}else if(v.trim())alert('That team is already in the class.')}
+function delTeam(x){const c=S.setClass;if(!confirm('Remove team '+x+' from '+c+'?'))return;
+ S.classTeams[c]=cTeams(c).filter(y=>y!==x);delete (S.teamStudents||{})[c+'|'+x];if(S.setTeam===x)S.setTeam='';saveS();renderSettings()}
+function toggleMember(n){const c=S.setClass,t=S.setTeam;if(!t)return;const k=c+'|'+t;S.teamStudents=S.teamStudents||{};S.teamStudents[k]=S.teamStudents[k]||[];
+ const i=S.teamStudents[k].indexOf(n);if(i>=0)S.teamStudents[k].splice(i,1);else S.teamStudents[k].push(n);saveS();renderSettings()}
+function pickPhoto(name){const c=S.setClass;const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+ inp.onchange=()=>{const f=inp.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{const img=new Image();img.onload=()=>{const cv=document.createElement('canvas'),m=160;
+    const side=Math.min(img.width,img.height);cv.width=cv.height=m;
+    cv.getContext('2d').drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,m,m);
+    S.photos=S.photos||{};S.photos[c+'|'+name]=cv.toDataURL('image/jpeg',.8);saveS();renderSettings()};img.src=rd.result};
+  rd.readAsDataURL(f)};inp.click()}
+function confirmSaveSettings(){saveS();if(cloudCfg())pushCloud(true);toast('Settings saved ✔');closeSettings()}
 function resetSettings(){if(!confirm('Restore default settings?'))return;musicOff();S={...SDEF};saveS();renderSettings()}
 
 function confetti(){const c=['#FFC93C','#FF6B6B','#4ECDC4','#7BD389','#fff'];for(let i=0;i<80;i++){const d=document.createElement('div');d.className='conf';d.style.left=Math.random()*100+'vw';d.style.background=c[i%5];d.style.animationDuration=(1.5+Math.random()*1.5)+'s';d.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}}
@@ -686,8 +860,8 @@ function feedback(ok,msg,pts=1){if(cur&&cur.hook){cur.hook(ok,msg);return}if(S.t
 let tInt=null,tElapsed=0;
 const fmt=n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
 function stopTimer(){clearInterval(tInt);tInt=null;const t=$('#twrap');if(t)t.remove()}
-function startTimer(){stopTimer();tElapsed=0;if(S.timerMode==='off')return;const w=document.createElement('div');w.className='twrap';w.id='twrap';
- if(S.timerMode==='up'){w.innerHTML=`<div class="timer up"><span class="tnum" id="tnum">⏱ 0:00</span></div>`;$('#board').prepend(w);tInt=setInterval(()=>{tElapsed++;const n=$('#tnum');if(!n){stopTimer();return}n.textContent='⏱ '+fmt(tElapsed)},1000);return}
+function startTimer(){stopTimer();tElapsed=0;const MODE=cur?timerFor(cur.id):(S.timerMode||'off');if(MODE==='off')return;const w=document.createElement('div');w.className='twrap';w.id='twrap';
+ if(MODE==='up'){w.innerHTML=`<div class="timer up"><span class="tnum" id="tnum">⏱ 0:00</span></div>`;$('#board').prepend(w);tInt=setInterval(()=>{tElapsed++;const n=$('#tnum');if(!n){stopTimer();return}n.textContent='⏱ '+fmt(tElapsed)},1000);return}
  let left=S.timerSec;w.innerHTML=`<div class="timer" id="tbar"><i style="width:100%"></i><span class="tnum" id="tnum">${left}</span></div>`;$('#board').prepend(w);
  tInt=setInterval(()=>{left--;tElapsed++;const bar=$('#tbar');if(!bar){stopTimer();return}bar.querySelector('i').style.width=(left/S.timerSec*100)+'%';$('#tnum').textContent=left;if(left<=5){bar.classList.add('low');if(S.sfx&&AC&&left>0)tone(1200,AC.currentTime,.08,'square',.5)}if(left<=0){stopTimer();$('#board').querySelectorAll('button').forEach(b=>b.disabled=true);feedback(false,'⏰ Time is up!')}},1000)}
 const R={};
@@ -742,14 +916,17 @@ R.wheel=(b)=>{
  function open(idx){const e=W.env[idx];e.used=true;b.innerHTML='';R[e.g.id](b,e.it);const tag=document.createElement('div');tag.className='landed';tag.style.background=e.color;tag.style.color='#1B2A49';tag.innerHTML=`✉️ ${e.name} · ${e.g.ic} ${e.g.nm}`;b.prepend(tag);startTimer()}};
 /* treasure hunt */
 const TQ=['quiz','riddle','gap','odd','tf'];
-R.treasure=(b)=>{const STEPS=5;let pos=0,left=S.treasureSec,used=new Set();const team=turn;
+R.treasure=(b)=>{const STEPS=5;let pos=0,left=(timerFor('treasure')==='down'?Math.max(30,S.timerSec*4):S.treasureSec),used=new Set();const team=turn;
  b.innerHTML=`<div class="thead"><div class="landed" style="background:${TC(team)};color:#1B2A49">🏴‍☠️ ${sideName(team)}'s treasure hunt</div><div class="tclock" id="tclock">⏳ ${fmt(left)}</div></div>
  <div class="path"><svg viewBox="0 0 900 150" id="tsvg"><path d="M60 100 C200 20 300 150 450 80 S700 20 830 90" fill="none" stroke="#B9B0A0" stroke-width="10" stroke-dasharray="18 14" stroke-linecap="round"/>${[0,1,2,3,4].map(i=>{const [x,y]=TPT(i);return `<circle cx="${x}" cy="${y}" r="24" fill="#fff" stroke="#1B2A49" stroke-width="4" id="st${i}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="20" font-weight="700" fill="#1B2A49">${i+1}</text>`}).join('')}<text x="830" y="102" text-anchor="middle" font-size="46" id="chest">💰</text><text x="60" y="100" text-anchor="middle" font-size="44" id="kid">🧒</text></svg></div>
  <div class="sub" id="tmsg">Answer the question to move forward!</div><div id="tq" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px"></div>`;
  const kid=b.querySelector('#kid');function moveKid(i){const [x,y]=i>=STEPS?[830,100]:TPT(i);kid.setAttribute('x',x);kid.setAttribute('y',y+(i>=STEPS?2:-30))}moveKid(0);
  function ask(){const q=b.querySelector('#tq');q.innerHTML='';const type=TQ[Math.floor(Math.random()*TQ.length)];const pool=CONTENT[grade][type];let it,tries=0;do{it=pool[Math.floor(Math.random()*pool.length)];tries++}while(used.has(it)&&tries<20);used.add(it);R[type](q,it);const g=POOL.find(x=>x.id===type);b.querySelector('#tmsg').textContent=`Station ${pos+1} of ${STEPS} · ${g.ic} ${g.nm}`}
  cur.hook=(ok)=>{beep(ok);if(ok){pos++;b.querySelector('#st'+(pos-1)).setAttribute('fill','var(--ok)');moveKid(pos);if(pos>=STEPS){finish(true);return}toast('Correct! Move forward 🏃');}else{toast('Wrong — try another question');b.classList.add('flash-bad');setTimeout(()=>b.classList.remove('flash-bad'),600)}setTimeout(ask,ok?700:900)};
- stopTimer();tInt=setInterval(()=>{left--;const c=b.querySelector('#tclock');if(!c){stopTimer();return}c.textContent='⏳ '+fmt(left);if(left<=10){c.classList.add('low');if(S.sfx&&AC)tone(1200,AC.currentTime,.08,'square',.5)}if(left<=0){stopTimer();finish(false)}},1000);
+ stopTimer();const TMODE=timerFor('treasure');
+ if(TMODE==='off'){const c0=b.querySelector('#tclock');if(c0)c0.style.display='none'}
+ else if(TMODE==='up'){let up=0;const c1=b.querySelector('#tclock');if(c1)c1.textContent='⏱ 0:00';tInt=setInterval(()=>{up++;const c=b.querySelector('#tclock');if(!c){stopTimer();return}c.textContent='⏱ '+fmt(up)},1000)}
+ else{tInt=setInterval(()=>{left--;const c=b.querySelector('#tclock');if(!c){stopTimer();return}c.textContent='⏳ '+fmt(left);if(left<=10){c.classList.add('low');if(S.sfx&&AC)tone(1200,AC.currentTime,.08,'square',.5)}if(left<=0){stopTimer();finish(false)}},1000)}
  function finish(win){stopTimer();cur.hook=null;const pts=pos+(win?2:0);if(pts)addScore(team,pts);if(win){confetti();fanfare()}else beep(false);
   const f=document.createElement('div');f.className='fb show '+(win?'good':'badfb');f.innerHTML=`<div class="big">${win?'💰':'⏰'}</div><h3>${win?`${sideName(team)} found the treasure!`:'Time is up!'}</h3><p>${pos} of ${STEPS} stations reached · +${pts} points</p><div class="actions"><button class="btn" id="nxt">${cur.i<cur.items.length-1?`Next → ${sideName(nextT())}'s turn`:'Finish'}</button></div>`;b.appendChild(f);
   f.querySelector('#nxt').onclick=()=>{cur.results[cur.i]=win;cur.i++;nextTurn();renderRound()}}
@@ -822,30 +999,530 @@ function importData(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
 function resetContent(){if(confirm('Restore the original content? Your changes will be lost.')){CONTENT=JSON.parse(JSON.stringify(DEFAULT));saveData();renderPanel()}}
 
 applyS();
+/* ===================== FUN ZONE ===================== */
+const FUNGAMES=[
+ {id:'ttt',ic:'\u2b55',nm:'Tic-Tac-Toe',ds:'Two students head to head - knockout tournament'},
+ {id:'numbers',ic:'\ud83d\udd22',nm:'Number Hunt 1-12',ds:'Flip the hidden numbers in order - the layout never moves'},
+ {id:'wordbuild',ic:'\ud83d\udd24',nm:'Word Builder',ds:'Fill four words from the same letters - first to finish wins'},
+ {id:'spotdiff',ic:'\ud83d\udd0d',nm:'Spot the Difference',ds:'Tap the changes in the picture - everyone gets a different set'},
+ {id:'codebreak',ic:'\ud83c\udfaf',nm:'Code Breaker',ds:'Work out the hidden 3-colour code in six tries'},
+ {id:'pattern',ic:'\ud83e\udde9',nm:'Pattern Finder',ds:'Solve three sequences - fewest mistakes and fastest wins'},
+ {id:'sudoku',ic:'\ud83d\udd21',nm:'Mini Sudoku 6x6',ds:'Every row, column and box needs 1 to 6'},
+ {id:'crown',ic:'\u265b',nm:'Crown Puzzle',ds:'One crown per row, column and colour - none may touch'}
+];
+function funClassNow(){const CL=allClasses();if(!CL.includes(S.funClass))S.funClass=CL[0]||'';return S.funClass}
+function funStudents(cls){return cStudents(cls||funClassNow()).slice()}
+function renderFun(){$('#funTrail').innerHTML=FUNGAMES.map(g=>`<button class="station" onclick="startFun('${g.id}')"><div class="ic">${g.ic}</div><div class="nm">${g.nm}</div><div class="ds">${g.ds}</div></button>`).join('')}
+function startFun(id){const g=FUNGAMES.find(x=>x.id===id);$('#fIcon').textContent=g.ic;$('#fName').textContent=g.nm;go('funplay');F[id]($('#funBoard'))}
+function classPicker(onChange){const list=allClasses();
+ return `<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
+ <span style="font-weight:800">Class:</span>
+ <select class="sel" onchange="S.funClass=this.value;saveS();${onChange}">${list.map(c=>`<option ${funClassNow()===c?'selected':''}>${c}</option>`).join('')}</select>
+ <span style="font-weight:800;opacity:.7">${funStudents().length} students</span></div>`}
+function noStudents(b,retry){b.innerHTML=`<div class="q">No student names for ${funClassNow()} yet</div>${classPicker(retry)}
+ <div class="sub">Add them once in Settings &rarr; Teams &amp; students in a class, then come back.</div>
+ <div class="actions"><button class="btn" onclick="go('fun')">Back</button></div>`}
+const F={};
+
+/* ---- student photos ---- */
+function photoOf(name,cls){const k=(cls||funClassNow())+'|'+name;return (S.photos||{})[k]||''}
+function avatar(name,size,cls){const p=photoOf(name,cls);const s=size||44;
+ return p?`<img class="avatar" src="${p}" style="width:${s}px;height:${s}px">`
+ :`<span class="avatar ph" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.42)}px">${(name||'?').trim().charAt(0).toUpperCase()}</span>`}
+function nameTag(name,size,cls){return `<span class="ntag">${avatar(name,size,cls)}<span>${name}</span></span>`}
+
+/* ---- difficulty + game mode ---- */
+const DIFFS=[['easy','Easy'],['medium','Medium'],['hard','Hard']];
+function diffOf(id){S.funDiff=S.funDiff||{};return S.funDiff[id]||'medium'}
+function modeOf(id){S.funMode=S.funMode||{};return S.funMode[id]||'cup'}
+function diffPicker(id,retry,withMode){return `<div style="display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:6px">
+ <span style="font-weight:800">Level:</span>
+ <select class="sel" onchange="S.funDiff=S.funDiff||{};S.funDiff['${id}']=this.value;saveS();${retry}">${DIFFS.map(([v,t])=>`<option value="${v}" ${diffOf(id)===v?'selected':''}>${t}</option>`).join('')}</select>
+ ${withMode?`<span style="font-weight:800">Format:</span>
+ <select class="sel" onchange="S.funMode=S.funMode||{};S.funMode['${id}']=this.value;saveS();${retry}">
+  <option value="cup" ${modeOf(id)==='cup'?'selected':''}>Knockout cup</option>
+  <option value="speed" ${modeOf(id)==='speed'?'selected':''}>Speed &amp; fewest tries</option></select>`:''}</div>`}
+function funSetup(b,id,title,rules,startFn,withMode){
+ const names=funStudents();
+ if(!names.length){noStudents(b,`startFun('${id}')`);return false}
+ b.innerHTML=`<div class="q">${title}</div>${classPicker(`startFun('${id}')`)}${diffPicker(id,`startFun('${id}')`,withMode)}
+ <div class="sub">${rules}</div>
+ <div class="sub" style="margin-top:6px">Untick anyone who is absent</div>
+ <div class="pickgrid" id="whoBox">${names.map(n=>`<label class="pcard on"><input type="checkbox" checked data-n="${n.replace(/"/g,'&quot;')}">${avatar(n,54)}<span>${n}</span></label>`).join('')}</div>
+ <div style="display:flex;gap:10px;align-items:center;justify-content:center;margin-top:8px"><label style="font-weight:800"><input type="checkbox" id="funRnd" checked> shuffle the draw</label></div>
+ <div class="actions"><button class="btn" id="funGo">Continue</button></div>`;
+ b.querySelectorAll('#whoBox input').forEach(i=>i.onchange=()=>i.closest('.pcard').classList.toggle('on',i.checked));
+ b.querySelector('#funGo').onclick=()=>{
+  let q=[...b.querySelectorAll('#whoBox input:checked')].map(x=>x.dataset.n);
+  if(q.length<2){alert('Tick at least two students.');return}
+  if(b.querySelector('#funRnd').checked)q=shuffle(q);
+  startFn(q)};
+ return true}
+
+/* ---- knockout bracket ---- */
+let TR=null;
+function trStart(players,gameId,playFn){
+ const cur=[];for(let i=0;i<players.length;i+=2)cur.push({a:players[i],b:players[i+1]||null,w:null});
+ TR={gameId,playFn,rounds:[cur],r:0,m:0,champion:null};
+ trAdvanceByes();trNext()}
+function trAdvanceByes(){TR.rounds[TR.r].forEach(m=>{if(!m.b)m.w=m.a})}
+function trCurrent(){const rd=TR.rounds[TR.r];while(TR.m<rd.length&&rd[TR.m].w)TR.m++;return TR.m<rd.length?rd[TR.m]:null}
+function trReport(winner){TR.rounds[TR.r][TR.m].w=winner;TR.m++;trNext()}
+function trNext(){const m=trCurrent();
+ if(m){trReady($('#funBoard'),m);return}
+ const winners=TR.rounds[TR.r].map(x=>x.w).filter(Boolean);
+ if(winners.length<=1){TR.champion=winners[0];trChampion($('#funBoard'));return}
+ const nxt=[];for(let i=0;i<winners.length;i+=2)nxt.push({a:winners[i],b:winners[i+1]||null,w:null});
+ TR.rounds.push(nxt);TR.r++;TR.m=0;trAdvanceByes();trNext()}
+function roundName(ri){const left=TR.rounds[ri].length;
+ if(left===1)return 'Final';if(left===2)return 'Semi-final';if(left===4)return 'Quarter-final';return 'Round '+(ri+1)}
+function trBracketSVG(){
+ const R=TR.rounds,colW=160,h=Math.max(130,R[0].length*90+40);
+ let out=`<svg width="100%" viewBox="0 0 ${R.length*colW+30} ${h}" style="max-height:210px">`;
+ R.forEach((rd,ri)=>{const gap=h/(rd.length+1);
+  out+=`<text x="${ri*colW+75}" y="15" text-anchor="middle" style="font:700 11px Nunito;fill:#1B2A49;opacity:.55">${roundName(ri)}</text>`;
+  rd.forEach((m,mi)=>{const y=gap*(mi+1);const live=(ri===TR.r&&mi===TR.m&&!m.w);
+   [[m.a,y-15],[m.b,y+15]].forEach(([nm,yy])=>{const won=m.w&&m.w===nm;
+    out+=`<rect x="${ri*colW+8}" y="${yy-12}" width="140" height="24" rx="7" fill="${won?'#7BD389':(live?'#FFC93C':'#fff')}" stroke="${live?'#D9A518':'#D9D2C2'}" stroke-width="${live?2:1}"/>`;
+    out+=`<circle cx="${ri*colW+22}" cy="${yy}" r="8" fill="#1B2A49" opacity=".12"/>`;
+    out+=`<text x="${ri*colW+22}" y="${yy+4}" text-anchor="middle" style="font:700 9px Nunito;fill:#1B2A49">${(nm||'?').trim().charAt(0).toUpperCase()}</text>`;
+    out+=`<text x="${ri*colW+36}" y="${yy+4}" style="font:700 11px Nunito;fill:#1B2A49">${(nm||'-').slice(0,14)}</text>`});
+   if(ri<R.length-1)out+=`<path d="M${ri*colW+150} ${y} H${ri*colW+colW+2}" stroke="#B9B0A0" stroke-width="1.5" fill="none"/>`})});
+ return out+'</svg>'}
+/* ready gate - nothing is revealed until both players press start */
+function trReady(b,m){
+ b.innerHTML=`<div class="trwrap"><div class="trbracket">${trBracketSVG()}</div>
+ <div class="readybox">
+  <div class="ts" style="font-weight:800;opacity:.7">${roundName(TR.r)} - match ${TR.m+1}</div>
+  <div class="vsrow">
+   <div class="vsp">${avatar(m.a,86)}<div class="vsn">${m.a}</div></div>
+   <div class="vsx">VS</div>
+   <div class="vsp">${avatar(m.b,86)}<div class="vsn">${m.b}</div></div></div>
+  <div class="sub">The puzzle stays hidden until you press start</div>
+  <button class="btn" id="trGo">Both ready - start</button></div></div>`;
+ b.querySelector('#trGo').onclick=()=>{
+  b.innerHTML=`<div class="trwrap"><div class="trbracket">${trBracketSVG()}</div><div class="trmatch" id="trMatch"></div></div>`;
+  TR.playFn($('#trMatch'),m.a,m.b,trReport)}}
+function trChampion(b){confetti();fanfare();
+ b.innerHTML=`<div class="trwrap"><div class="trbracket">${trBracketSVG()}</div>
+  <div class="fb show" style="position:relative"><div class="big">\ud83c\udfc6</div>
+  ${avatar(TR.champion,96)}<h3>${TR.champion} is the champion!</h3>
+  <p>${TR.rounds.length} round(s) played</p>
+  <div class="actions"><button class="btn" onclick="startFun('${TR.gameId}')">Play again</button><button class="btn grey" onclick="go('fun')">Back</button></div></div></div>`}
+
+/* ---- speed format: one player at a time, ranked at the end ---- */
+let SP=null;
+function spStart(players,gameId,playFn){SP={gameId,playFn,queue:players,i:0,results:[]};spReady()}
+function spReady(){const b=$('#funBoard');
+ if(SP.i>=SP.queue.length){spBoard();return}
+ const who=SP.queue[SP.i];
+ b.innerHTML=`<div class="readybox">
+  <div class="ts" style="font-weight:800;opacity:.7">Player ${SP.i+1} of ${SP.queue.length}</div>
+  ${avatar(who,96)}<div class="vsn" style="font-size:24px">${who}</div>
+  <div class="sub">The puzzle stays hidden until you press start</div>
+  <button class="btn" id="spGo">Ready - start</button></div>`;
+ b.querySelector('#spGo').onclick=()=>{b.innerHTML='<div id="spMatch"></div>';SP.t0=Date.now();
+  SP.playFn($('#spMatch'),who,(tries)=>{SP.results.push({name:who,tries,secs:Math.round((Date.now()-SP.t0)/1000)});SP.i++;spReady()})}}
+function spBoard(){const b=$('#funBoard');confetti();fanfare();
+ const r=SP.results.slice().sort((x,y)=>x.tries-y.tries||x.secs-y.secs);
+ b.innerHTML=`<div class="fb show" style="position:relative"><div class="big">\ud83c\udfc6</div><h3>${r[0]?r[0].name:'-'} wins!</h3>
+  <table class="stable" style="max-width:420px">${r.map((x,i)=>`<tr><td>${['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][i]||(i+1)}</td><td>${nameTag(x.name,32)}</td><td>${x.tries} tries</td><td>${x.secs}s</td></tr>`).join('')}</table>
+  <div class="actions"><button class="btn" onclick="startFun('${SP.gameId}')">Play again</button><button class="btn grey" onclick="go('fun')">Back</button></div></div>`}
+
+/* ---------- Tic-Tac-Toe (knockout, student vs student) ---------- */
+F.ttt=(b)=>{funSetup(b,'ttt','Tic-Tac-Toe','Two students head to head. Win the match to move up the bracket.',q=>trStart(q,'ttt',tttMatch))};
+function tttMatch(box,A,B,report){
+ let bd=Array(9).fill(''),turn='X',over=false;
+ const win=g=>{const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for(const l of L)if(g[l[0]]&&g[l[0]]===g[l[1]]&&g[l[1]]===g[l[2]])return g[l[0]];
+  return g.every(Boolean)?'draw':null};
+ const draw=()=>{box.innerHTML=`<div style="display:flex;justify-content:space-around;align-items:center;margin-bottom:8px">
+   <div style="text-align:center;${turn==='X'&&!over?'transform:scale(1.08)':''}">${avatar(A,56)}<div style="font-weight:800">${A}</div><div style="font-size:22px">\u274c</div></div>
+   <div style="font-family:Fredoka;font-size:20px">vs</div>
+   <div style="text-align:center;${turn==='O'&&!over?'transform:scale(1.08)':''}">${avatar(B,56)}<div style="font-weight:800">${B}</div><div style="font-size:22px">\u2b55</div></div></div>
+  <div class="sub" id="tMsg">${over?'':(turn==='X'?A:B)+"'s turn"}</div>
+  <div class="tttgrid">${bd.map((c,i)=>`<button class="tttcell" data-i="${i}" ${c||over?'disabled':''}>${c==='X'?'\u274c':c==='O'?'\u2b55':''}</button>`).join('')}</div>`;
+  box.querySelectorAll('.tttcell').forEach(c=>c.onclick=()=>play(+c.dataset.i))};
+ const play=i=>{if(over||bd[i])return;bd[i]=turn;const r=win(bd);
+  if(r){over=true;
+   if(r==='draw'){beep(false);bd=Array(9).fill('');turn='X';over=false;draw();box.querySelector('#tMsg').innerHTML='<b>Draw - play again</b>';return}
+   beep(true);confetti();draw();
+   const winner=r==='X'?A:B;
+   box.querySelector('#tMsg').innerHTML=`<b>${winner} wins the match!</b>`;
+   const bar=document.createElement('div');bar.className='actions';bar.innerHTML='<button class="btn" id="tNext">Next match</button>';
+   box.appendChild(bar);bar.querySelector('#tNext').onclick=()=>report(winner);return}
+  turn=turn==='X'?'O':'X';draw()};
+ draw()}
+
+/* ---------- Number Hunt 1-12 (sequential, no bracket) ---------- */
+let nhState=null;
+F.numbers=(b)=>{
+ const names=funStudents();
+ if(!names.length){noStudents(b,"startFun('numbers')");return}
+ b.innerHTML=`<div class="q">Number Hunt 1-12</div>${classPicker("startFun('numbers')")}
+ <div class="sub">Flip the cards in order 1 to 12. One wrong card and they turn back - but they stay in the same places, so the class can remember them. The next student then tries.</div>
+ <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:6px"><label style="font-weight:800"><input type="checkbox" id="nhRnd"> random order of students</label></div>
+ <div class="sub" style="margin-top:6px">Untick anyone who is absent</div>
+ <div class="pickgrid" id="nhWho">${names.map(n=>`<label class="pcard on"><input type="checkbox" checked data-n="${n.replace(/"/g,'&quot;')}">${avatar(n,54)}<span>${n}</span></label>`).join('')}</div>
+ <div class="actions"><button class="btn" id="nhGo">Continue</button></div>`;
+ b.querySelectorAll('#nhWho input').forEach(i=>i.onchange=()=>i.closest('.pcard').classList.toggle('on',i.checked));
+ b.querySelector('#nhGo').onclick=()=>{
+  let q=[...b.querySelectorAll('#nhWho input:checked')].map(x=>x.dataset.n);
+  if(!q.length){alert('Tick at least one student.');return}
+  if(b.querySelector('#nhRnd').checked)q=shuffle(q);
+  nhState={queue:q,idx:0,round:1,best:{name:'-',n:0},winner:null,cards:shuffle(Array.from({length:12},(_,i)=>i+1))};
+  nhReady(b)}};
+function nhReady(b){const st=nhState;const who=st.queue[st.idx%st.queue.length];
+ b.innerHTML=`<div class="readybox"><div class="ts" style="font-weight:800;opacity:.7">Round ${st.round}</div>
+  ${avatar(who,96)}<div class="vsn" style="font-size:24px">${who}</div>
+  <div class="sub">The cards stay hidden until you press start</div>
+  <button class="btn" id="nhStart">Ready - start</button></div>`;
+ b.querySelector('#nhStart').onclick=()=>{st.next=1;st.open=[];st.locked=false;nhDraw(b)}}
+function nhDraw(b){const st=nhState;const who=st.queue[st.idx%st.queue.length];
+ b.innerHTML=`<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;width:100%">
+  <div style="flex:1;min-width:280px">
+   <div style="display:flex;align-items:center;gap:10px;justify-content:center">${avatar(who,48)}<span class="q" style="font-size:22px">${who}</span></div>
+   <div class="sub" id="nhMsg">Find number <b style="font-size:22px">${st.next}</b></div>
+   <div class="nhgrid" id="nhGrid">${st.cards.map((v,i)=>`<button class="nhcard ${st.open.includes(i)?'found':''}" data-i="${i}">${st.open.includes(i)?v:'?'}</button>`).join('')}</div>
+  </div>
+  <div style="min-width:160px;text-align:left">
+   <div style="font-family:Fredoka;font-size:17px;margin-bottom:6px">Best so far</div>
+   <div style="font-weight:800;margin-bottom:10px">${st.best.name} - ${st.best.n}</div>
+   <div style="font-weight:800;font-size:13px;opacity:.7;margin-bottom:4px">NEXT UP</div>
+   ${st.queue.map((n,i)=>`<div style="padding:2px 0;${i===st.idx%st.queue.length?'font-weight:800;color:#C64848':''}">${nameTag(n,24)}</div>`).join('')}</div></div>`;
+ b.querySelectorAll('.nhcard').forEach(c=>c.onclick=()=>nhFlip(b,+c.dataset.i))}
+function nhFlip(b,i){const st=nhState;if(st.locked||st.open.includes(i))return;
+ const val=st.cards[i],el=b.querySelector('.nhcard[data-i="'+i+'"]');el.textContent=val;el.classList.add('show');
+ if(val===st.next){beep(true);st.open.push(i);el.classList.add('found');const got=st.next;st.next++;
+  if(got>st.best.n)st.best={name:st.queue[st.idx%st.queue.length],n:got};
+  if(st.next>12){st.winner=st.queue[st.idx%st.queue.length];nhWin(b);return}
+  const m=b.querySelector('#nhMsg');if(m)m.innerHTML='Find number <b style="font-size:22px">'+st.next+'</b>'}
+ else{beep(false);st.locked=true;el.classList.add('wrong');
+  const m=b.querySelector('#nhMsg');if(m)m.innerHTML='<b>That was '+val+', not '+st.next+'.</b> Next student!';
+  setTimeout(()=>{st.idx++;if(st.idx%st.queue.length===0)st.round++;st.next=1;st.open=[];st.locked=false;nhDraw(b)},1200)}}
+function nhWin(b){const st=nhState;confetti();fanfare();
+ b.innerHTML=`<div class="fb show" style="position:relative"><div class="big">\ud83c\udfc6</div>${avatar(st.winner,96)}
+  <h3>${st.winner} found all 12!</h3><p>Finished on round ${st.round}</p>
+  <div class="actions"><button class="btn" onclick="startFun('numbers')">Play again</button><button class="btn grey" onclick="go('fun')">Back</button></div></div>`}
+
+/* ---------- Word Builder: 4 slots, tap letters ---------- */
+const WB_BANK={
+ easy:[['tea','eat','ate','tan'],['rat','tar','art','ran'],['pot','top','opt','pit'],['bat','tab','cab','cat']],
+ medium:[['star','rats','arts','tars'],['meal','lame','male','mead'],['tone','note','vote','vent'],['read','dear','dare','bead']],
+ hard:[['listen','silent','enlist','tinsel'],['master','stream','tamers','armest'],['danger','garden','ranged','gander']]};
+function wbPool(words){
+ /* one shared bag of letters that can build every word */
+ const need={};
+ words.forEach(w=>{const c={};w.split('').forEach(ch=>c[ch]=(c[ch]||0)+1);
+  Object.entries(c).forEach(([ch,n])=>{need[ch]=Math.max(need[ch]||0,n)})});
+ const bag=[];Object.entries(need).forEach(([ch,n])=>{for(let i=0;i<n;i++)bag.push(ch)});
+ return bag}
+F.wordbuild=(b)=>{funSetup(b,'wordbuild','Word Builder','Four words to complete. Tap a letter, then tap the slot. First to finish all four wins.',q=>trStart(q,'wordbuild',wbMatch))};
+function wbMatch(box,A,B,report){
+ const d=diffOf('wordbuild');const sets=WB_BANK[d];const words=sets[Math.floor(Math.random()*sets.length)];
+ const bag=wbPool(words);
+ const mk=()=>words.map(w=>{
+   const hints=w.length>4?2:1;                       /* 3-4 letters: one hint, longer: two */
+   const keep=shuffle(w.split('').map((_,i)=>i)).slice(0,hints);
+   return {w,cells:w.split('').map((ch,i)=>({ch:keep.includes(i)?ch:'',fixed:keep.includes(i)})),done:false}});
+ const st={A:{p:mk(),sel:null,used:{}},B:{p:mk(),sel:null,used:{}}};
+ const pane=side=>{const S1=st[side];const nm=side==='A'?A:B;
+  return `<div class="duelcol ${side==='A'?'a':'b'}"><h4>${avatar(nm,40)} ${nm}</h4>
+  ${S1.p.map((wd,wi)=>`<div class="wbrow ${wd.done?'done':''}">${wd.cells.map((c,ci)=>`<button class="wbcell ${c.fixed?'fixed':''} ${wd.done?'lock':''}" data-s="${side}" data-w="${wi}" data-c="${ci}">${c.ch.toUpperCase()}</button>`).join('')}</div>`).join('')}
+  <div class="wbbank">${bag.map((c,i)=>`<button class="wbl ${S1.sel===i?'sel':''}" data-s="${side}" data-i="${i}" ${S1.used[i]?'disabled':''}>${c.toUpperCase()}</button>`).join('')}</div>
+  <div style="font-weight:800;margin-top:6px">Done: ${S1.p.filter(x=>x.done).length} / ${words.length}</div></div>`};
+ const render=()=>{box.innerHTML=`<div class="q" style="font-size:20px">Build ${words.length} words from the same letters</div>
+   <div class="sub">Tap a letter, then tap an empty box. Tap a placed letter to take it back. Correct words lock.</div>
+   <div class="duel">${pane('A')}${pane('B')}</div>`;
+  box.querySelectorAll('.wbl').forEach(btn=>btn.onclick=()=>{const s=btn.dataset.s;
+   if(st[s].used[+btn.dataset.i])return;st[s].sel=+btn.dataset.i;render()});
+  box.querySelectorAll('.wbcell').forEach(cell=>cell.onclick=()=>{
+   const s=cell.dataset.s,wi=+cell.dataset.w,ci=+cell.dataset.c,S1=st[s],wd=S1.p[wi];
+   if(wd.done||wd.cells[ci].fixed)return;
+   if(wd.cells[ci].ch){const from=wd.cells[ci].from;wd.cells[ci].ch='';delete wd.cells[ci].from;
+    if(from!=null)delete S1.used[from];render();return}
+   if(S1.sel==null)return;
+   wd.cells[ci].ch=bag[S1.sel];wd.cells[ci].from=S1.sel;S1.used[S1.sel]=true;S1.sel=null;
+   /* a full word that is right locks and gives its letters back to the bag */
+   if(wd.cells.every(c=>c.ch)&&wd.cells.map(c=>c.ch).join('')===wd.w){wd.done=true;beep(true);
+    wd.cells.forEach(c=>{if(c.from!=null){delete S1.used[c.from];delete c.from}})}
+   render();
+   if(S1.p.every(x=>x.done)){confetti();report(s==='A'?A:B)}})};
+ render()}
+
+/* ---------- Spot the Difference: tap the picture ---------- */
+const SD_SPOTS=[
+ {k:'sun',   x:40, y:40, r:30},{k:'cloud', x:150,y:35, r:34},{k:'bird',  x:86, y:50, r:26},
+ {k:'roof',  x:145,y:66, r:38},{k:'door',  x:145,y:150,r:24},{k:'window',x:114,y:116,r:22},
+ {k:'tree',  x:243,y:110,r:32},{k:'ball',  x:60, y:185,r:18},{k:'flower',x:200,y:190,r:20},
+ {k:'grass', x:270,y:195,r:28}];
+function sdScene(seed,on){
+ let r=seed;const rnd=n=>{r=(r*9301+49297)%233280;return Math.floor(r/233280*n)};
+ const sky=['#BFE3F5','#CDE8FA','#D8EFFB'][rnd(3)];
+ let g=`<rect width="300" height="220" fill="${sky}"/><rect y="160" width="300" height="60" fill="${on.grass?'#A5D96B':'#7BD389'}"/>`;
+ g+=`<circle cx="40" cy="40" r="${on.sun?26:19}" fill="#FFC93C"/>`;
+ g+=`<ellipse cx="150" cy="35" rx="26" ry="12" fill="${on.cloud?'#E0E0E0':'#ffffff'}"/>`;
+ if(!on.bird)g+=`<path d="M74 50 q7 -7 14 0 q7 -7 14 0" stroke="#1B2A49" stroke-width="2" fill="none"/>`;
+ g+=`<rect x="95" y="90" width="100" height="75" fill="#FF6B6B"/>`;
+ g+=`<polygon points="85,90 205,90 145,${on.roof?52:64}" fill="#8B5E3C"/>`;
+ g+=`<rect x="133" y="130" width="26" height="35" fill="${on.door?'#3D2B1F':'#6B4423'}"/>`;
+ if(!on.window)g+=`<rect x="103" y="105" width="22" height="22" fill="#BFE3F5" stroke="#6B4423" stroke-width="2"/>`;
+ g+=`<rect x="165" y="105" width="22" height="22" fill="#BFE3F5" stroke="#6B4423" stroke-width="2"/>`;
+ g+=`<rect x="238" y="120" width="10" height="45" fill="#6B4423"/><circle cx="243" cy="110" r="${on.tree?30:23}" fill="#4E9C4E"/>`;
+ g+=`<circle cx="60" cy="185" r="10" fill="${on.ball?'#A78BFA':'#FF6B6B'}"/>`;
+ if(!on.flower){g+=`<circle cx="200" cy="190" r="6" fill="#F472B6"/><rect x="199" y="192" width="2" height="14" fill="#4E9C4E"/>`}
+ return g}
+F.spotdiff=(b)=>{funSetup(b,'spotdiff','Spot the Difference','Tap the differences directly on the right-hand picture. First to find them all wins.',q=>trStart(q,'spotdiff',sdMatch))};
+function sdMatch(box,A,B,report){
+ const d=diffOf('spotdiff');const target=d==='easy'?3:(d==='medium'?5:7);const MAXMISS=3;
+ const mk=()=>{const on={};shuffle(SD_SPOTS.map(s=>s.k)).slice(0,target).forEach(k=>on[k]=true);
+  return {seed:1+Math.floor(Math.random()*9000),on,found:{},miss:0,out:false}};
+ const pA=mk(),pB=mk();
+ const pane=(side,p)=>{const nm=side==='A'?A:B;
+  return `<div class="duelcol ${side==='A'?'a':'b'}"><h4>${avatar(nm,40)} ${nm}</h4>
+  <div class="sdpair">
+   <svg viewBox="0 0 300 220" class="sdimg">${sdScene(p.seed,{})}</svg>
+   <svg viewBox="0 0 300 220" class="sdimg nocur" id="sd${side}">${sdScene(p.seed,p.on)}
+     <rect class="sdmiss" data-s="${side}" x="0" y="0" width="300" height="220" fill="transparent"/>
+     ${Object.keys(p.on).map(k=>{const t=SD_SPOTS.find(x=>x.k===k);return `<circle class="sdhot" data-s="${side}" data-k="${k}" cx="${t.x}" cy="${t.y}" r="${t.r}" fill="transparent"/>`}).join('')}
+   </svg></div>
+  <div style="font-weight:800;margin-top:6px">Found: <span id="g${side}">${Object.keys(p.found).length}</span> / ${target}
+   &nbsp;&middot;&nbsp; Wrong taps: <span id="m${side}" style="color:#C64848">${p.miss}</span> / ${MAXMISS}</div></div>`};
+ box.innerHTML=`<div class="q" style="font-size:20px">Find ${target} differences</div>
+  <div class="sub">Tap the change on the right-hand picture. ${MAXMISS} wrong taps and you lose the match.</div>
+  <div class="duel">${pane('A',pA)}${pane('B',pB)}</div>`;
+ const wire=(side,p,me,other)=>{
+  box.querySelector(`.sdmiss[data-s="${side}"]`).addEventListener('click',()=>{
+   if(p.out)return;p.miss++;beep(false);
+   const el=box.querySelector('#m'+side);if(el)el.textContent=p.miss;
+   const img=box.querySelector('#sd'+side);img.classList.add('flash-bad');setTimeout(()=>img.classList.remove('flash-bad'),400);
+   if(p.miss>=MAXMISS){p.out=true;img.style.opacity='.45';report(other)}});
+  box.querySelectorAll(`.sdhot[data-s="${side}"]`).forEach(h=>h.addEventListener('click',ev=>{
+   ev.stopPropagation();
+   if(p.out)return;const k=h.dataset.k;if(p.found[k])return;
+   p.found[k]=true;beep(true);
+   h.setAttribute('fill','rgba(123,211,137,.45)');h.setAttribute('stroke','#3F9E55');h.setAttribute('stroke-width','3');
+   const n=Object.keys(p.found).length;box.querySelector('#g'+side).textContent=n;
+   if(n>=target){confetti();report(me)}}))};
+ wire('A',pA,A,B);wire('B',pB,B,A)}
+
+/* ---------- Code Breaker: 3 colours, 6 tries, cup or speed ---------- */
+const CB_PAL=[['#FF6B6B','red'],['#4ECDC4','teal'],['#FFC93C','yellow']];
+function cbFeedback(secret,g){let e=0,pt=0;const s=secret.slice(),h=g.slice();
+ for(let i=0;i<s.length;i++)if(h[i]===s[i]){e++;s[i]=-1;h[i]=-2}
+ for(let i=0;i<h.length;i++){if(h[i]<0)continue;const j=s.indexOf(h[i]);if(j>=0){pt++;s[j]=-1}}
+ return {e,p:pt}}
+function cbText(f){const a=[];if(f.e)a.push(f.e+' in place');if(f.p)a.push(f.p+' wrong place');return a.length?a.join(', '):'none right'}
+F.codebreak=(b)=>{funSetup(b,'codebreak','Code Breaker','A hidden code of 3 colours. You get six tries and a clue after each one.',
+  q=>{modeOf('codebreak')==='speed'?spStart(q,'codebreak',cbSolo):trStart(q,'codebreak',cbDuel)},true)};
+function cbPanel(side,nm,len,rows,cur,tries,max){
+ return `<div class="duelcol ${side==='A'?'a':'b'}"><h4>${avatar(nm,40)} ${nm}</h4>
+  <div class="cbrows">${rows.map(r=>`<div class="cbrow"><span class="cbg">${r.g.map(i=>`<i style="background:${CB_PAL[i][0]}"></i>`).join('')}</span><span class="cbfb">${cbText(r.f)}</span></div>`).join('')}</div>
+  <div class="cbslots">${Array.from({length:len},(_,i)=>`<div class="cbslot" style="background:${cur[i]!=null?CB_PAL[cur[i]][0]:'#fff'}"></div>`).join('')}</div>
+  <div class="cbpick">${CB_PAL.map((c,i)=>`<button class="cbdot" data-s="${side}" data-i="${i}" style="background:${c[0]}"></button>`).join('')}
+   <button class="sm alt" data-act="clear" data-s="${side}">Clear</button><button class="sm" data-act="go" data-s="${side}">Check</button></div>
+  <div style="font-weight:800;margin-top:4px">Try ${tries+1} of ${max}</div></div>`}
+function cbDuel(box,A,B,report){
+ const len=3;const max=6;
+ const st={A:{secret:Array.from({length:len},()=>Math.floor(Math.random()*3)),rows:[],cur:[],done:false},
+           B:{secret:Array.from({length:len},()=>Math.floor(Math.random()*3)),rows:[],cur:[],done:false}};
+ const render=()=>{box.innerHTML=`<div class="q" style="font-size:20px">Break the hidden colour code</div>
+  <div class="sub">Both play at the same time - six tries each</div>
+  <div class="duel">${cbPanel('A',A,len,st.A.rows,st.A.cur,st.A.rows.length,max)}${cbPanel('B',B,len,st.B.rows,st.B.cur,st.B.rows.length,max)}</div>`;
+  box.querySelectorAll('.cbdot').forEach(dt=>dt.onclick=()=>{const s=dt.dataset.s;if(st[s].done)return;if(st[s].cur.length<len){st[s].cur.push(+dt.dataset.i);render()}});
+  box.querySelectorAll('[data-act="clear"]').forEach(x=>x.onclick=()=>{st[x.dataset.s].cur=[];render()});
+  box.querySelectorAll('[data-act="go"]').forEach(x=>x.onclick=()=>{const s=x.dataset.s,S1=st[s];
+   if(S1.cur.length<len||S1.done)return;
+   const f=cbFeedback(S1.secret,S1.cur);S1.rows.unshift({g:S1.cur.slice(),f});S1.cur=[];
+   if(f.e===len){S1.done=true;beep(true);confetti();render();report(s==='A'?A:B);return}
+   beep(false);
+   if(S1.rows.length>=max){S1.done=true;
+    const other=s==='A'?'B':'A';
+    if(st[other].done){render();alert('Both ran out of tries - play the match again.');return}}
+   render()})};
+ render()}
+function cbSolo(box,who,done){
+ const len=3;const max=6;
+ const secret=Array.from({length:len},()=>Math.floor(Math.random()*3));let rows=[],cur=[];
+ const render=()=>{box.innerHTML=`<div class="q" style="font-size:20px">${who}: break the code</div>
+  <div style="max-width:340px;margin:0 auto">${cbPanel('A',who,len,rows,cur,rows.length,max)}</div>`;
+  box.querySelectorAll('.cbdot').forEach(dt=>dt.onclick=()=>{if(cur.length<len){cur.push(+dt.dataset.i);render()}});
+  box.querySelector('[data-act="clear"]').onclick=()=>{cur=[];render()};
+  box.querySelector('[data-act="go"]').onclick=()=>{if(cur.length<len)return;
+   const f=cbFeedback(secret,cur);rows.unshift({g:cur.slice(),f});cur=[];
+   if(f.e===len){beep(true);confetti();done(rows.length);return}
+   beep(false);if(rows.length>=max){done(max+1);return}render()}};
+ render()}
+
+/* ---------- Pattern Finder: 3 sequences at once ---------- */
+function patGen(d){const t=Math.floor(Math.random()*(d==='easy'?2:(d==='medium'?4:5)));
+ const a=2+Math.floor(Math.random()*6),k=2+Math.floor(Math.random()*4);const s=[];
+ if(t===0){for(let i=0;i<6;i++)s.push(a+k*i)}
+ else if(t===1){for(let i=0;i<6;i++)s.push(a*Math.pow(2,i))}
+ else if(t===2){for(let i=0;i<6;i++)s.push(a*k+i*i)}
+ else if(t===3){for(let i=0;i<6;i++)s.push((i+1)*(i+1)+a)}
+ else{s.push(a,k);for(let i=2;i<6;i++)s.push(s[i-1]+s[i-2])}
+ const hide=3+Math.floor(Math.random()*2);
+ return {seq:s,hide,ans:s[hide],opts:shuffle([s[hide],s[hide]+1+Math.floor(Math.random()*3),Math.max(0,s[hide]-1-Math.floor(Math.random()*3)),s[hide]+5])}}
+F.pattern=(b)=>{funSetup(b,'pattern','Pattern Finder','Three sequences each. Solve all three - wrong taps count against you.',
+  q=>{modeOf('pattern')==='speed'?spStart(q,'pattern',patSolo):trStart(q,'pattern',patDuel)},true)};
+function patBlock(side,p,pi,solved,badSet){
+ return `<div class="patblk ${solved?'ok':''}">
+  <div class="patseq">${p.seq.map((v,i)=>`<span class="tile" style="min-width:40px;height:40px;font-size:17px;${i===p.hide?'background:#FFC93C;border-color:#D9A518':''}">${i===p.hide?(solved?p.ans:'?'):v}</span>`).join('')}</div>
+  <div class="patopts">${p.opts.map(o=>{const bad=badSet&&badSet.has(pi+':'+o);
+   return `<button class="sm alt ${bad?'wrongopt':''}" data-s="${side}" data-p="${pi}" data-v="${o}" ${solved||bad?'disabled':''}>${o}${bad?' \u2717':''}</button>`}).join('')}</div></div>`}
+function patDuel(box,A,B,report){
+ const d=diffOf('pattern');
+ const st={A:{ps:[patGen(d),patGen(d),patGen(d)],ok:[false,false,false],wrong:0,bad:new Set()},
+           B:{ps:[patGen(d),patGen(d),patGen(d)],ok:[false,false,false],wrong:0,bad:new Set()}};
+ const pane=(side,nm)=>`<div class="duelcol ${side==='A'?'a':'b'}"><h4>${avatar(nm,40)} ${nm}</h4>
+  ${st[side].ps.map((p,i)=>patBlock(side,p,i,st[side].ok[i],st[side].bad)).join('')}
+  <div style="font-weight:800;margin-top:4px">Solved ${st[side].ok.filter(Boolean).length}/3 &middot; mistakes ${st[side].wrong}</div></div>`;
+ const render=()=>{box.innerHTML=`<div class="q" style="font-size:20px">Find the missing numbers</div>
+  <div class="sub">Three sequences each - first to solve all three wins</div>
+  <div class="duel">${pane('A',A)}${pane('B',B)}</div>`;
+  box.querySelectorAll('.patopts button').forEach(btn=>btn.onclick=()=>{
+   const s=btn.dataset.s,pi=+btn.dataset.p,S1=st[s];
+   if(S1.ok[pi])return;
+   if(+btn.dataset.v===S1.ps[pi].ans){S1.ok[pi]=true;beep(true)}else{S1.wrong++;S1.bad.add(pi+':'+btn.dataset.v);beep(false)}
+   render();
+   if(S1.ok.every(Boolean)){confetti();report(s==='A'?A:B)}})};
+ render()}
+function patSolo(box,who,done){
+ const d=diffOf('pattern');const ps=[patGen(d),patGen(d),patGen(d)];const ok=[false,false,false];let wrong=0;const bad=new Set();
+ const render=()=>{box.innerHTML=`<div class="q" style="font-size:20px">${who}: find the missing numbers</div>
+  <div style="max-width:420px;margin:0 auto">${ps.map((p,i)=>patBlock('A',p,i,ok[i],bad)).join('')}
+  <div style="font-weight:800;margin-top:6px;text-align:center">Solved ${ok.filter(Boolean).length}/3 &middot; mistakes ${wrong}</div></div>`;
+  box.querySelectorAll('.patopts button').forEach(btn=>btn.onclick=()=>{const pi=+btn.dataset.p;if(ok[pi])return;
+   if(+btn.dataset.v===ps[pi].ans){ok[pi]=true;beep(true)}else{wrong++;bad.add(pi+':'+btn.dataset.v);beep(false)}
+   render();if(ok.every(Boolean)){confetti();done(wrong)}})};
+ render()}
+
+/* ---------- Mini Sudoku 6x6 ---------- */
+function sud6(){
+ /* 6x6 latin square with 3-wide, 2-tall boxes: rows are cyclic shifts that keep boxes valid */
+ const base=[[0,1,2,3,4,5],[3,4,5,0,1,2],[1,2,0,4,5,3],[4,5,3,1,2,0],[2,0,1,5,3,4],[5,3,4,2,0,1]];
+ const nums=shuffle([1,2,3,4,5,6]);
+ let g=base.map(r=>r.map(v=>nums[v]));
+ /* shuffle the two rows inside each band, and the three bands */
+ const bands=shuffle([0,1,2]);
+ let out=[];
+ bands.forEach(b=>{const two=shuffle([0,1]);two.forEach(k=>out.push(g[b*2+k]))});
+ /* shuffle the three columns inside each stack, and the two stacks */
+ const stacks=shuffle([0,1]);
+ const colOrder=[];
+ stacks.forEach(st=>{shuffle([0,1,2]).forEach(k=>colOrder.push(st*3+k))});
+ out=out.map(r=>colOrder.map(c=>r[c]));
+ return out}
+F.sudoku=(b)=>{funSetup(b,'sudoku','Mini Sudoku 6x6','Every row, column and 3x2 box needs 1 to 6. First to finish correctly wins.',q=>trStart(q,'sudoku',sudMatch))};
+function sudMatch(box,A,B,report){
+ const d=diffOf('sudoku');const blanks=d==='easy'?8:(d==='medium'?12:16);
+ const sol=sud6();
+ const mk=()=>{const cells=[];for(let r=0;r<6;r++)for(let c=0;c<6;c++)cells.push([r,c]);
+  const hide=shuffle(cells).slice(0,blanks);
+  return sol.map((row,r)=>row.map((v,c)=>hide.some(h=>h[0]===r&&h[1]===c)?0:v))};
+ const gA=mk(),gB=mk();
+ const sel={A:null,B:null};
+ const grid=(side,g,nm)=>`<div class="duelcol ${side==='A'?'a':'b'}"><h4>${avatar(nm,40)} ${nm}</h4>
+  <div class="sud6" id="sud${side}">${g.map((row,r)=>row.map((v,c)=>v?`<div class="sudcell fixed">${v}</div>`:`<button class="sudcell" data-s="${side}" data-r="${r}" data-c="${c}" data-v="0">&middot;</button>`).join('')).join('')}</div>
+  <div class="sudpad" id="pad${side}">${[1,2,3,4,5,6].map(n=>`<button class="sudnum" data-s="${side}" data-n="${n}">${n}</button>`).join('')}
+   <button class="sudnum era" data-s="${side}" data-n="0">&#9003;</button></div>
+  <div class="sub" style="margin-top:4px">Pick a number, then tap a cell</div></div>`;
+ box.innerHTML=`<div class="q" style="font-size:20px">Fill every row, column and box with 1 to 6</div>
+  <div class="duel">${grid('A',gA,A)}${grid('B',gB,B)}</div>`;
+ const paint=side=>{box.querySelectorAll(`#pad${side} .sudnum`).forEach(x=>x.classList.toggle('on',+x.dataset.n===sel[side]))};
+ const check=(side,g)=>{const el=box.querySelector('#sud'+side);
+  if([...el.querySelectorAll('.sudcell')].some(x=>!x.classList.contains('fixed')&&+x.dataset.v===0))return;
+  const cur=g.map(r=>r.slice());
+  el.querySelectorAll('button.sudcell').forEach(x=>{cur[+x.dataset.r][+x.dataset.c]=+x.dataset.v});
+  const N=[1,2,3,4,5,6];
+  const rowsOK=cur.every(r=>N.every(n=>r.includes(n)));
+  const colsOK=[0,1,2,3,4,5].every(ci=>N.every(n=>cur.some(r=>r[ci]===n)));
+  let boxOK=true;for(let br=0;br<3;br++)for(let bc=0;bc<2;bc++){const v=[];
+   for(let r=0;r<2;r++)for(let c=0;c<3;c++)v.push(cur[br*2+r][bc*3+c]);
+   if(!N.every(n=>v.includes(n)))boxOK=false}
+  if(rowsOK&&colsOK&&boxOK){beep(true);confetti();report(side==='A'?A:B)}
+  else{beep(false);el.classList.add('flash-bad');setTimeout(()=>el.classList.remove('flash-bad'),600)}};
+ box.querySelectorAll('.sudnum').forEach(btn=>btn.onclick=()=>{const s=btn.dataset.s;
+  sel[s]=sel[s]===+btn.dataset.n?null:+btn.dataset.n;paint(s)});
+ box.querySelectorAll('button.sudcell').forEach(c=>c.onclick=()=>{const s=c.dataset.s;
+  if(sel[s]==null)return;
+  c.dataset.v=sel[s];c.textContent=sel[s]||'\u00b7';
+  check(s,s==='A'?gA:gB)})}
+
+/* ---------- 6. Crown Puzzle ---------- */
+F.crown=(b)=>{funSetup(b,'crown','Crown Puzzle','Place one crown in every row, column and colour. Crowns must never touch, even diagonally.',q=>trStart(q,'crown',crMatch))};
+function crRegions(n,sol){
+ const reg=Array.from({length:n},()=>Array(n).fill(-1));
+ sol.forEach((c,r)=>{reg[r][c]=r});
+ let free=[];for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(reg[r][c]<0)free.push([r,c]);
+ free=shuffle(free);let guard=0;
+ while(free.length&&guard++<9999){const [r,c]=free.shift();
+  const nb=[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([a,d])=>a>=0&&d>=0&&a<n&&d<n&&reg[a][d]>=0);
+  if(nb.length){const pick=nb[Math.floor(Math.random()*nb.length)];reg[r][c]=reg[pick[0]][pick[1]]}
+  else free.push([r,c])}
+ return reg}
+function crGen(n){
+ for(let t=0;t<400;t++){
+  const cols=shuffle(Array.from({length:n},(_,i)=>i));let ok=true;
+  for(let r=1;r<n;r++)if(Math.abs(cols[r]-cols[r-1])<=1){ok=false;break}
+  if(ok)return {sol:cols,reg:crRegions(n,cols)}}
+ const cols=Array.from({length:n},(_,i)=>i);return {sol:cols,reg:crRegions(n,cols)}}
+function crMatch(box,A,B,report){
+ const d=diffOf('crown');const n=d==='easy'?5:(d==='medium'?6:7);
+ const PAL=['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389','#FB923C','#60A5FA'];
+ const pz=crGen(n);
+ const pane=(side)=>`<div class="duelcol ${side==='A'?'a':'b'}"><h4>${avatar(side==='A'?A:B,40)} ${side==='A'?A:B}</h4>
+  <div class="crgrid" id="cr${side}" style="grid-template-columns:repeat(${n},1fr)">
+   ${pz.reg.map((row,r)=>row.map((g,c)=>`<button class="crcell" data-r="${r}" data-c="${c}" style="background:${PAL[g%PAL.length]}"></button>`).join('')).join('')}</div>
+  <div class="sub" id="msg${side}" style="margin-top:6px">${n} crowns to place</div></div>`;
+ box.innerHTML=`<div class="q" style="font-size:20px">Place ${n} crowns</div>
+  <div class="sub">One per row, column and colour &middot; crowns must never touch, even diagonally</div>
+  <div class="duel">${pane('A')}${pane('B')}</div>`;
+ const wire=(side)=>{const el=box.querySelector('#cr'+side);const put=new Set();
+  el.querySelectorAll('.crcell').forEach(c=>c.onclick=()=>{
+   const k=c.dataset.r+','+c.dataset.c;
+   if(put.has(k)){put.delete(k);c.textContent='';c.classList.remove('has')}
+   else{put.add(k);c.textContent='♛';c.classList.add('has')}
+   box.querySelector('#msg'+side).textContent=put.size+' / '+n+' placed';
+   if(put.size!==n)return;
+   const pts=[...put].map(s=>s.split(',').map(Number));
+   const rows=new Set(pts.map(p=>p[0])),cols=new Set(pts.map(p=>p[1])),regs=new Set(pts.map(p=>pz.reg[p[0]][p[1]]));
+   let touch=false;
+   for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)
+    if(Math.abs(pts[i][0]-pts[j][0])<=1&&Math.abs(pts[i][1]-pts[j][1])<=1)touch=true;
+   if(rows.size===n&&cols.size===n&&regs.size===n&&!touch){beep(true);confetti();report(side==='A'?A:B)}
+   else{beep(false);el.classList.add('flash-bad');box.querySelector('#msg'+side).textContent='Not correct yet — check the rules';setTimeout(()=>el.classList.remove('flash-bad'),600)}})};
+ wire('A');wire('B')}
+
 /* ===================== TEAMS QUICK MODAL ===================== */
 function openTeams(){$('#tmodal').classList.add('open');renderTeams()}
 function closeTeams(){$('#tmodal').classList.remove('open')}
 function renderTeams(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);
- const t=S.compType||'teams';const max=t==='teams'?5:4;
+ normalizeSides();
+ const t=S.compType||'teams';const max=(t==='teams'||t==='students')?5:4;
  if(S.teamCount>max){S.teamCount=max;saveS()}
- const lbl=t==='grade'?'Grade':(t==='classes'?'Class':'Team');
+ const CL=allClasses();
+ if(!CL.includes(S.classes[0]))for(let i=0;i<5;i++)S.classes[i]=CL[0]||'4A';
+ const theClass=S.classes[0];
+ const lbl=t==='grade'?'Grade':(t==='classes'?'Class':(t==='students'?'Student':'Team'));
+ const pool=t==='students'?cStudents(theClass):cTeams(theClass);
  let rows='';
  for(let i=0;i<S.teamCount;i++){
   let fields='';
-  if(t==='grade'){fields=`<select class="sel" onchange="S.grades[${i}]=this.value;saveS();renderTeams()">${['4','5','6'].map(g=>`<option ${TG(i)===g?'selected':''}>${g}</option>`).join('')}</select>`}
-  else if(t==='classes'){const CL=(S.classList&&S.classList.length?S.classList:['4A','4B']);if(!CL.includes(TCL(i))){S.classes[i]=CL[Math.min(i,CL.length-1)]}
-   fields=`<select class="sel" onchange="S.classes[${i}]=this.value;saveS();renderTeams()">${CL.map(c=>`<option ${TCL(i)===c?'selected':''}>${c}</option>`).join('')}</select>
-   <select class="sel" onchange="S.grades[${i}]=this.value;saveS()">${['4','5','6'].map(g=>`<option ${TG(i)===g?'selected':''}>Gr ${g}</option>`).join('')}</select>`}
-  else{const R=(S.roster&&S.roster.length?S.roster:['Team A','Team B','Team C','Team D','Team E']);if(!R.includes(S.names[i])){S.names[i]=R[Math.min(i,R.length-1)]}
-   fields=`<select class="sel" onchange="S.names[${i}]=this.value;saveS();renderTeams()">${R.map(n=>`<option ${S.names[i]===n?'selected':''}>${n}</option>`).join('')}</select>`}
+  if(t==='grade'){fields=`<select class="sel" onchange="S.grades[${i}]=this.value;saveS();renderTeams()">${['4','5','6'].map(x=>`<option ${TG(i)===x?'selected':''}>${x}</option>`).join('')}</select>`}
+  else if(t==='classes'){if(!CL.includes(TCL(i)))S.classes[i]=CL[Math.min(i,CL.length-1)]||'';
+   fields=`<select class="sel" onchange="S.classes[${i}]=this.value;saveS();renderTeams()">${CL.map(x=>`<option ${TCL(i)===x?'selected':''}>${x}</option>`).join('')}</select>`}
+  else{if(!pool.includes(S.names[i]))S.names[i]=pool[Math.min(i,pool.length-1)]||'';
+   fields=pool.length?`<select class="sel" onchange="S.names[${i}]=this.value;saveS();renderTeams()">${pool.map(x=>`<option ${S.names[i]===x?'selected':''}>${x}</option>`).join('')}</select>`:'<small style="color:#C64848;font-weight:800">add them in ⚙️ Settings</small>'}
   rows+=`<div class="srow"><div class="l">${lbl} ${i+1}</div><div class="c">${fields}<input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`}
- const shared=(S.compType==='teams')?`<div class="srow"><div class="l">Which class is playing?<small>All the teams below belong to this class</small></div><div class="c"><select class="sel" onchange="for(let i=0;i<5;i++)S.classes[i]=this.value;saveS();renderTeams()">${(S.classList&&S.classList.length?S.classList:['4A']).map(c=>`<option ${TCL(0)===c?'selected':''}>${c}</option>`).join('')}</select><select class="sel" onchange="for(let i=0;i<5;i++)S.grades[i]=this.value;saveS()">${['4','5','6'].map(g=>`<option ${TG(0)===g?'selected':''}>Gr ${g}</option>`).join('')}</select></div></div>`:'';
+ const shared=(t==='teams'||t==='students')?`<div class="srow"><div class="l">Which class?<small>The ${t==='students'?'students':'teams'} below come from this class</small></div><div class="c"><select class="sel" onchange="for(let i=0;i<5;i++){S.classes[i]=this.value;S.grades[i]=classOfGrade(this.value)}saveS();renderTeams()">${CL.map(x=>`<option ${theClass===x?'selected':''}>${x}</option>`).join('')}</select></div></div>`:'';
  $('#tgrid').innerHTML=`
- <div class="srow"><div class="l">What is the contest?<small>This decides how the sides are named and where the record is kept</small></div><div class="c"><select class="sel" onchange="S.compType=this.value;saveS();renderTeams()">${Object.entries(COMPTYPES).map(([k,v])=>`<option value="${k}" ${t===k?'selected':''}>${v}</option>`).join('')}</select></div></div>
- <div class="srow"><div class="l">How many sides?<small>${t==='teams'?'1 to 5 teams':'2 to 4'}</small></div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;saveS();renderTeams()">${Array.from({length:max},(_,n)=>n+1).filter(n=>t==='teams'||n>=2).map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">What is the contest?<small>This decides how the sides are named and where the record is kept</small></div><div class="c"><select class="sel" onchange="S.compType=this.value;normalizeSides();saveS();renderTeams()">${Object.entries(COMPTYPES).map(([k,v])=>`<option value="${k}" ${t===k?'selected':''}>${v}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">How many sides?</div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;normalizeSides();saveS();renderTeams()">${Array.from({length:max},(_,n)=>n+1).filter(n=>t==='grade'||t==='classes'?n>=2:true).map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
  ${shared}${rows}
  <div class="srow" style="background:#F1EAD8"><div class="l">This match will be recorded as<small style="opacity:1;font-weight:800;color:#1B2A49">${compLabel()}</small></div></div>
- <div class="pnote">Names come from the fixed lists in ⚙️ Settings, so they are always spelled the same.<br>Each different line-up keeps its own separate record, so Grade 4 vs Grade 5 never mixes with 4A vs 4B.</div>`}
+ <div class="pnote">All names come from ⚙️ Settings, so they are always spelled the same.</div>`}
 
 /* ===================== SEASON LOG ===================== */
 const SEASONKEY='wordquest-season-v1';
@@ -878,7 +1555,8 @@ function closeYear(){if(!SEASON.length){alert('There are no sessions to archive 
  const tot=seasonTotals();const champ=prompt('🏆 Who is the champion of this year?\n(Edit the name if you want.)',tot.length?tot[0][0]:'');if(champ===null)return;
  const y=new Date().getFullYear();const label=prompt('Name this school year:',(y-1)+'–'+y);if(label===null)return;
  if(!confirm('Lock and archive this year?\n\n\u2022 The year is saved as a read-only record.\n\u2022 All its scores are REMOVED from the season screen.\n\u2022 From then on they are visible only in \ud83d\udcda Archives.\n\nContinue?'))return;
- const arc={id:sessId(),label:label,champion:champ,closed:new Date().toISOString(),sessions:JSON.parse(JSON.stringify(SEASON))};
+ const arc={id:sessId(),label:label,champion:champ,closed:new Date().toISOString(),sessions:JSON.parse(JSON.stringify(SEASON)),
+  roster:{gradeClasses:JSON.parse(JSON.stringify(S.gradeClasses||{})),classTeams:JSON.parse(JSON.stringify(S.classTeams||{})),classStudents:JSON.parse(JSON.stringify(S.classStudents||{})),teamStudents:JSON.parse(JSON.stringify(S.teamStudents||{}))}};
  ARCHIVES.push(arc);saveArchives();markDeleted(SEASON.map(x=>x.id));SEASON=[];saveSeason();if(cloudCfg())syncNow();confetti();fanfare();alert('\u2705 '+arc.label+' is archived.\n\nIts scores are cleared from the season screen and can now be seen only in \ud83d\udcda Archives.');renderSeason()}
 function openArchives(){$('#amodal').classList.add('open');renderArchiveList()}
 function closeArchives(){$('#amodal').classList.remove('open')}
@@ -891,6 +1569,9 @@ function viewArchive(i){const a=ARCHIVES[i];const rank=totalsOf(a.sessions);cons
  <table class="stable"><tr><th>Date</th><th>Class</th><th>Grade</th><th>Results</th></tr>${a.sessions.map(ss=>`<tr><td>${new Date(ss.date).toLocaleDateString('en-GB')}</td><td style="font-size:12px">${compLabel(ss.comp||('teams|'+(ss.cls||'')+'|'+ss.teams.map(t=>t.name).sort().join(' vs ')))}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td></tr>`).join('')}</table>`}
 function exportArchive(i){const a=ARCHIVES[i];const rows=[['Year',a.label],['Champion',a.champion||''],[],['Date','Class','Grade','Team','Score']];a.sessions.forEach(ss=>ss.teams.forEach(t=>rows.push([new Date(ss.date).toLocaleDateString('en-GB'),ss.cls||'',ss.grade,t.name,t.score])));const csv=rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');const el=document.createElement('a');el.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);el.download='word-quest-'+a.label.replace(/[^0-9A-Za-z]+/g,'-')+'.csv';el.click()}
 function restoreYear(id){const a=ARCHIVES.find(x=>x.id===id);if(!a)return;
+ if(a.roster&&confirm('Also bring back the class, team and student lists saved with “'+a.label+'”?')){
+  S.gradeClasses=a.roster.gradeClasses||S.gradeClasses;S.classTeams=a.roster.classTeams||S.classTeams;
+  S.classStudents=a.roster.classStudents||S.classStudents;S.teamStudents=a.roster.teamStudents||S.teamStudents;saveS()}
  if(!confirm('Bring “'+a.label+'” back into the live season?\n\nIts '+a.sessions.length+' sessions will appear on the season screen again.'))return;
  const have=new Set(SEASON.map(x=>x.id));a.sessions.forEach(ss=>{DELETED=DELETED.filter(d=>d!==ss.id);if(!have.has(ss.id))SEASON.push(ss)});
  saveDeleted();SEASON.sort((x,y)=>new Date(x.date)-new Date(y.date));saveSeason();
@@ -930,7 +1611,7 @@ function renderSeason(){const body=$('#seasonBody');
   yp.innerHTML=`<option value="current" ${viewYear==='current'?'selected':''}>This season (live)</option>`+ARCHIVES.map(a=>`<option value="${a.id}" ${viewYear===a.id?'selected':''}>🏁 ${a.label}</option>`).join('')}
  const LIST=yearSessions();
  if(yearIsArchived()){const a=ARCHIVES.find(x=>x.id===viewYear);const rank=totalsOf(LIST);
-  body.innerHTML=`<div class="cmpbox" style="text-align:center"><div style="font-family:'Fredoka';font-size:26px;color:#1B2A49">🏁 ${a.label}</div><div style="font-weight:800">🏆 Champion: ${a.champion||'—'}</div><small style="opacity:.7">Locked record · ${LIST.length} sessions</small><div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sm" onclick="restoreYear('${a.id}')">↩️ Bring back to the live season</button><button class="sm alt" onclick="exportArchiveById('${a.id}')">📤 CSV</button></div></div>
+  body.innerHTML=`<div class="cmpbox" style="text-align:center"><div style="font-family:'Fredoka';font-size:26px;color:#1B2A49">🏁 ${a.label}</div><div style="font-weight:800">🏆 Champion: ${a.champion||'—'}</div><small style="opacity:.7">Locked record · ${LIST.length} sessions${a.roster?' · student lists saved':''}</small><div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="sm" onclick="restoreYear('${a.id}')">↩️ Bring back to the live season</button><button class="sm alt" onclick="exportArchiveById('${a.id}')">📤 CSV</button></div></div>
   <div class="totals">${rank.map(([n,t],i)=>`<div class="tot" style="--c:${t.c}"><div class="rank">${['🥇','🥈','🥉','4th','5th'][i]||''}</div><div class="lbl">${n}</div><div class="n">${t.s}</div><small>${t.w} win${t.w!==1?'s':''}</small></div>`).join('')}</div>
   <table class="stable"><tr><th>Date</th><th>Contest</th><th>Results</th></tr>${LIST.map(ss=>`<tr><td>${new Date(ss.date).toLocaleDateString('en-GB')}</td><td style="font-size:12px">${compLabel(ss.comp||'')}</td><td>${ss.teams.map(t=>`<span style="display:inline-block;background:${t.color};color:#1B2A49;padding:3px 10px;border-radius:999px;margin:2px">${t.name}: ${t.score}</span>`).join(' ')}</td></tr>`).join('')}</table>`;
   return}
@@ -1002,6 +1683,8 @@ function oskBack(el){try{el.focus({preventScroll:true})}catch(_){}
  const[s,e]=oskPos(el),t=el.value;if(s===e){if(s>0){el.value=t.slice(0,s-1)+t.slice(e);const p=s-1;try{el.setSelectionRange(p,p)}catch(_){}}}else{el.value=t.slice(0,s)+t.slice(e);try{el.setSelectionRange(s,s)}catch(_){}}
  el.dispatchEvent(new Event('input',{bubbles:true}))}
 /* focus tracking: mark editable fields so the device keyboard stays hidden, and show ours */
+document.addEventListener('pointerdown',e=>{if(!S.osk)return;if(e.target.closest('.osk')||e.target.closest('.oskToggle')||e.target.closest('.osklaunch'))return;
+ if(!oskEditable(e.target)){oskOpen=false;drawOsk()}},true);
 document.addEventListener('focusin',e=>{const el=e.target;if(!oskEditable(el))return;oskField=el;buildOsk();attachToggle(el);if(S.osk){el.setAttribute('inputmode','none');oskOpen=true;drawOsk()}});
 /* a small keyboard button sits beside every text box, so it can be turned on or off right there */
 function attachToggle(el){if(!el||el.dataset.oskBtn)return;el.dataset.oskBtn='1';
