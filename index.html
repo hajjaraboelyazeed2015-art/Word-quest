@@ -314,6 +314,10 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
 .cmptable{width:100%;border-collapse:collapse}
 .cmptable th,.cmptable td{padding:8px 10px;border-bottom:1px solid #E5DECF;text-align:center;font-weight:700}
 .cmptable td:first-child,.cmptable th:first-child{text-align:left;opacity:.7}
+/* tabs inside the Teams panel */
+.tabbar{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.tabbtn{flex:1;min-width:150px;padding:11px 14px;border-radius:12px;background:#fff;border:2px solid #D9D2C2;font-weight:800;font-size:14px;color:var(--ink);cursor:pointer}
+.tabbtn.on{background:var(--sky);border-color:var(--sky);color:var(--sun)}
 /* teacher panel */
 .modal{position:fixed;inset:0;background:rgba(10,18,40,.7);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
 .modal.open{display:flex}
@@ -363,7 +367,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v29</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v30</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -479,7 +483,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
 
 <!-- TEAMS MODAL -->
 <div class="modal" id="tmodal">
-  <div class="panel" style="width:min(560px,100%)">
+  <div class="panel" style="width:min(760px,100%)">
     <div class="phead"><h3>👥 Teams</h3><button class="ghost" onclick="closeTeams()">✔ Done</button></div>
     <div class="sgrid" id="tgrid"></div>
   </div>
@@ -648,7 +652,7 @@ const SKEY='wordquest-settings-v2';
 const SDEF={music:false,musicVol:.35,sfx:true,sfxVol:.6,clicks:true,okColor:'#7BD389',badColor:'#FF6B6B',teamCount:2,compType:'teams',names:['Team A','Team B','Team C','Team D','Team E'],grades:['4','4','4','4','4'],classes:['4A','4A','4A','4A','4A'],roster:['Team A','Team B','Team C','Team D','Team E'],classList:['4A','4B','5A','5B','6A','6B'],students:{},funClass:'',aiLevel:'medium',
  gradeClasses:{'4':['4A','4B'],'5':['5A','5B'],'6':['6A','6B']},
  classTeams:{},classStudents:{},teamStudents:{},photos:{},
- timerModes:{},setGrade:'4',setClass:'',setTeam:'',cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
+ timerModes:{},setGrade:'4',setClass:'',setTeam:'',teamTab:'match',cols:['#FF6B6B','#4ECDC4','#FFC93C','#A78BFA','#7BD389'],penalty:true,timerMode:'off',timerSec:30,treasureSec:120,className:'Class A',cloudOn:false,cloudBin:'',cloudKey:'',keyMode:'access',osk:false,track:'jungle',okSfx:'chime',badSfx:'buzz',clickSfx:'tick'};
 let S={...SDEF};try{S={...SDEF,...JSON.parse(localStorage.getItem(SKEY)||'{}')}}catch(e){}
 if(CF_BIN&&CF_KEY){S.cloudBin=CF_BIN;S.cloudKey=CF_KEY;if(CF_MODE)S.keyMode=CF_MODE;if(S.cloudOn!==false||!localStorage.getItem(SKEY))S.cloudOn=true;try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}}
 function saveS(){localStorage.setItem(SKEY,JSON.stringify(S));applyS()}
@@ -799,22 +803,6 @@ function renderSettings(){if(typeof attachAllToggles==='function')setTimeout(att
    <option value="down" ${timerFor(x.id)==='down'?'selected':''}>Countdown</option>
    <option value="up" ${timerFor(x.id)==='up'?'selected':''}>Stopwatch</option></select>
    ${timerFor(x.id)==='down'?`<input type="number" min="5" max="300" step="5" value="${S.timerSec}" style="width:70px;padding:7px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800" onchange="S.timerSec=+this.value||30;saveS()"><span style="font-weight:800;font-size:12px">sec</span>`:''}</div></div>`).join('')}
-
- <div class="shead">🏫 Classes in each grade</div>
- <div class="srow"><div class="l">Grade</div><div class="c"><select class="sel" onchange="S.setGrade=this.value;S.setClass='';saveS();renderSettings()">${['4','5','6'].map(x=>`<option ${g===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
- <div class="srow"><div class="l">Add a class to Grade ${g}</div><div class="c"><input type="text" id="newClass" maxlength="14" placeholder="e.g. ${g}A" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:130px"><button class="sm" onclick="addClass()">＋ Add</button></div></div>
- <div class="srow"><div class="l">Classes in Grade ${g}<small>${gClasses(g).length} class(es)</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end">${gClasses(g).map(x=>`<span class="chiplet">${x}<button onclick="delClass('${x}')">✕</button></span>`).join('')||'<small>none yet</small>'}</div></div>
-
- <div class="shead">👥 Teams &amp; students in a class</div>
- <div class="srow"><div class="l">Class</div><div class="c"><select class="sel" onchange="S.setClass=this.value;S.setTeam='';saveS();renderSettings()">${CL.map(x=>`<option ${c===x?'selected':''}>${x}</option>`).join('')||'<option>—</option>'}</select></div></div>
- <div class="srow"><div class="l">Add a student to ${c||'—'}</div><div class="c"><input type="text" id="newStu" maxlength="20" placeholder="Student name" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:150px"><button class="sm" onclick="addStudent()">＋ Add</button></div></div>
- <div class="srow"><div class="l">Students in ${c||'—'}<small>${cStudents(c).length} student(s) · tap a photo box to add a picture</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:230px;overflow:auto">${cStudents(c).map(x=>`<span class="stucard"><button class="phbtn" onclick="pickPhoto('${x.replace(/'/g,"\\'")}')">${avatar(x,52,c)}</button><span class="stuname">${x}</span><button class="del" onclick="delStudent('${x.replace(/'/g,"\\'")}')">✕</button></span>`).join('')||'<small>none yet</small>'}</div></div>
- <div class="srow"><div class="l">Add a team to ${c||'—'}</div><div class="c"><input type="text" id="newTeam" maxlength="16" placeholder="Team name" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:150px"><button class="sm" onclick="addTeam()">＋ Add</button></div></div>
- <div class="srow"><div class="l">Teams in ${c||'—'}<small>${teamsOfC.length} team(s)</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end">${teamsOfC.map(x=>`<span class="chiplet">${x}<button onclick="delTeam('${x.replace(/'/g,"\\'")}')">✕</button></span>`).join('')||'<small>none yet</small>'}</div></div>
- ${teamsOfC.length?`
- <div class="srow"><div class="l">Put students into a team</div><div class="c"><select class="sel" onchange="S.setTeam=this.value;saveS();renderSettings()">${teamsOfC.map(x=>`<option ${t===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
- <div class="srow"><div class="l">Members of ${t||'—'}<small>${tStudents(c,t).length} member(s) · tap a name to add or remove</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:170px;overflow:auto">${cStudents(c).map(n=>{const inT=tStudents(c,t).includes(n);return `<span class="chiplet ${inT?'on':''}" style="cursor:pointer" onclick="toggleMember('${n.replace(/'/g,"\\'")}')">${inT?'✓ ':''}${n}</span>`}).join('')||'<small>add students first</small>'}</div></div>`:''}
-
  <div class="shead">🎮 Rules</div>
  <div class="srow"><div class="l">Lose 1 point on "Try again"</div><div class="c">${sw('penalty')}</div></div>
  <div class="srow" style="background:#F1EAD8"><div class="l">Save settings<small>Everything saves as you type — press this to confirm and close</small></div><div class="c"><button class="sm" onclick="confirmSaveSettings()">💾 Save &amp; close</button></div></div>`}
@@ -1555,10 +1543,20 @@ function openTeams(){$('#tmodal').classList.add('open');renderTeams()}
 function closeTeams(){$('#tmodal').classList.remove('open')}
 function renderTeams(){if(typeof attachAllToggles==='function')setTimeout(attachAllToggles,0);
  normalizeSides();
+ const tab=S.teamTab||'match';
+ $('#tgrid').innerHTML=`
+ <div class="tabbar">
+  <button class="tabbtn ${tab==='match'?'on':''}" onclick="S.teamTab='match';saveS();renderTeams()">\u2694\ufe0f Match set-up</button>
+  <button class="tabbtn ${tab==='roster'?'on':''}" onclick="S.teamTab='roster';saveS();renderTeams()">\ud83d\udcd8 Classes, teams &amp; students</button>
+ </div>
+ <div id="tabBody">${tab==='match'?tabMatch():tabRoster()}</div>`}
+
+/* ---------- tab 1: who is competing right now ---------- */
+function tabMatch(){
  const t=S.compType||'teams';const max=(t==='teams'||t==='students')?5:4;
  if(S.teamCount>max){S.teamCount=max;saveS()}
  const CL=allClasses();
- if(!CL.includes(S.classes[0]))for(let i=0;i<5;i++)S.classes[i]=CL[0]||'4A';
+ if(!CL.length)return `<div class="pnote">No classes yet. Open the <b>Classes, teams &amp; students</b> tab and add one first.</div>`;
  const theClass=S.classes[0];
  const lbl=t==='grade'?'Grade':(t==='classes'?'Class':(t==='students'?'Student':'Team'));
  const pool=t==='students'?cStudents(theClass):cTeams(theClass);
@@ -1566,18 +1564,41 @@ function renderTeams(){if(typeof attachAllToggles==='function')setTimeout(attach
  for(let i=0;i<S.teamCount;i++){
   let fields='';
   if(t==='grade'){fields=`<select class="sel" onchange="S.grades[${i}]=this.value;saveS();renderTeams()">${['4','5','6'].map(x=>`<option ${TG(i)===x?'selected':''}>${x}</option>`).join('')}</select>`}
-  else if(t==='classes'){if(!CL.includes(TCL(i)))S.classes[i]=CL[Math.min(i,CL.length-1)]||'';
-   fields=`<select class="sel" onchange="S.classes[${i}]=this.value;saveS();renderTeams()">${CL.map(x=>`<option ${TCL(i)===x?'selected':''}>${x}</option>`).join('')}</select>`}
-  else{if(!pool.includes(S.names[i]))S.names[i]=pool[Math.min(i,pool.length-1)]||'';
-   fields=pool.length?`<select class="sel" onchange="S.names[${i}]=this.value;saveS();renderTeams()">${pool.map(x=>`<option ${S.names[i]===x?'selected':''}>${x}</option>`).join('')}</select>`:'<small style="color:#C64848;font-weight:800">add them in ⚙️ Settings</small>'}
-  rows+=`<div class="srow"><div class="l">${lbl} ${i+1}</div><div class="c">${fields}<input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`}
- const shared=(t==='teams'||t==='students')?`<div class="srow"><div class="l">Which class?<small>The ${t==='students'?'students':'teams'} below come from this class</small></div><div class="c"><select class="sel" onchange="for(let i=0;i<5;i++){S.classes[i]=this.value;S.grades[i]=classOfGrade(this.value)}saveS();renderTeams()">${CL.map(x=>`<option ${theClass===x?'selected':''}>${x}</option>`).join('')}</select></div></div>`:'';
- $('#tgrid').innerHTML=`
- <div class="srow"><div class="l">What is the contest?<small>This decides how the sides are named and where the record is kept</small></div><div class="c"><select class="sel" onchange="S.compType=this.value;normalizeSides();saveS();renderTeams()">${Object.entries(COMPTYPES).map(([k,v])=>`<option value="${k}" ${t===k?'selected':''}>${v}</option>`).join('')}</select></div></div>
- <div class="srow"><div class="l">How many sides?</div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;normalizeSides();saveS();renderTeams()">${Array.from({length:max},(_,n)=>n+1).filter(n=>t==='grade'||t==='classes'?n>=2:true).map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
+  else if(t==='classes'){fields=`<select class="sel" onchange="S.classes[${i}]=this.value;saveS();renderTeams()">${CL.map(x=>`<option ${TCL(i)===x?'selected':''}>${x}</option>`).join('')}</select>`}
+  else{fields=pool.length?`<select class="sel" onchange="S.names[${i}]=this.value;saveS();renderTeams()">${pool.map(x=>`<option ${S.names[i]===x?'selected':''}>${x}</option>`).join('')}</select>`
+   :`<small style="color:#C64848;font-weight:800">add ${t==='students'?'students':'teams'} in the next tab</small>`}
+  rows+=`<div class="srow"><div class="l">${lbl} ${i+1}</div><div class="c">${t==='students'?avatar(S.names[i],34,theClass):''}${fields}<input type="color" value="${S.cols[i]}" oninput="S.cols[${i}]=this.value;saveS()"></div></div>`}
+ const shared=(t==='teams'||t==='students')?`<div class="srow"><div class="l">Which class?<small>The ${t==='students'?'students':'teams'} below come from this class</small></div><div class="c"><select class="sel" onchange="for(let i=0;i<5;i++){S.classes[i]=this.value;S.grades[i]=classOfGrade(this.value)}normalizeSides();saveS();renderTeams()">${CL.map(x=>`<option ${theClass===x?'selected':''}>${x}</option>`).join('')}</select></div></div>`:'';
+ return `<div class="srow"><div class="l">What is the contest?<small>This decides how the sides are named and where the record is kept</small></div><div class="c"><select class="sel" onchange="S.compType=this.value;normalizeSides();saveS();renderTeams()">${Object.entries(COMPTYPES).map(([k,v])=>`<option value="${k}" ${t===k?'selected':''}>${v}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">How many sides?</div><div class="c"><select class="sel" onchange="S.teamCount=+this.value;normalizeSides();saveS();renderTeams()">${Array.from({length:max},(_,n)=>n+1).filter(n=>(t==='grade'||t==='classes')?n>=2:true).map(n=>`<option value="${n}" ${S.teamCount===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
  ${shared}${rows}
- <div class="srow" style="background:#F1EAD8"><div class="l">This match will be recorded as<small style="opacity:1;font-weight:800;color:#1B2A49">${compLabel()}</small></div></div>
- <div class="pnote">All names come from ⚙️ Settings, so they are always spelled the same.</div>`}
+ <div class="srow" style="background:#F1EAD8"><div class="l">This match will be recorded as<small style="opacity:1;font-weight:800;color:#1B2A49">${compLabel()}</small></div></div>`}
+
+/* ---------- tab 2: the register ---------- */
+function tabRoster(){
+ const CL=allClasses();
+ const g=S.setGrade||'4';
+ const c=S.setClass&&CL.includes(S.setClass)?S.setClass:(gClasses(g)[0]||'');
+ S.setClass=c;
+ const teamsOfC=cTeams(c);
+ const t=S.setTeam&&teamsOfC.includes(S.setTeam)?S.setTeam:(teamsOfC[0]||'');
+ S.setTeam=t;
+ return `
+ <div class="shead">\ud83c\udfeb Classes in each grade</div>
+ <div class="srow"><div class="l">Grade</div><div class="c"><select class="sel" onchange="S.setGrade=this.value;S.setClass='';saveS();renderTeams()">${['4','5','6'].map(x=>`<option ${g===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">Add a class to Grade ${g}</div><div class="c"><input type="text" id="newClass" maxlength="14" placeholder="e.g. ${g}A" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:130px"><button class="sm" onclick="addClass()">\uff0b Add</button></div></div>
+ <div class="srow"><div class="l">Classes in Grade ${g}<small>${gClasses(g).length} class(es)</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end">${gClasses(g).map(x=>`<span class="chiplet">${x}<button onclick="delClass('${x}')">\u2715</button></span>`).join('')||'<small>none yet</small>'}</div></div>
+
+ <div class="shead">\ud83d\udc65 Students &amp; teams in a class</div>
+ <div class="srow"><div class="l">Class</div><div class="c"><select class="sel" onchange="S.setClass=this.value;S.setTeam='';saveS();renderTeams()">${CL.map(x=>`<option ${c===x?'selected':''}>${x}</option>`).join('')||'<option>-</option>'}</select></div></div>
+ <div class="srow"><div class="l">Add a student to ${c||'-'}</div><div class="c"><input type="text" id="newStu" maxlength="20" placeholder="Student name" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:150px"><button class="sm" onclick="addStudent()">\uff0b Add</button></div></div>
+ <div class="srow"><div class="l">Students in ${c||'-'}<small>${cStudents(c).length} student(s) &middot; tap a photo box to add a picture</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:250px;overflow:auto">${cStudents(c).map(x=>`<span class="stucard"><button class="phbtn" onclick="pickPhoto('${x.replace(/'/g,"\\'")}')">${avatar(x,52,c)}</button><span class="stuname">${x}</span><button class="del" onclick="delStudent('${x.replace(/'/g,"\\'")}')">\u2715</button></span>`).join('')||'<small>none yet</small>'}</div></div>
+ <div class="srow"><div class="l">Add a team to ${c||'-'}</div><div class="c"><input type="text" id="newTeam" maxlength="16" placeholder="Team name" style="padding:8px;border:2px solid #D9D2C2;border-radius:8px;font-weight:800;width:150px"><button class="sm" onclick="addTeam()">\uff0b Add</button></div></div>
+ <div class="srow"><div class="l">Teams in ${c||'-'}<small>${teamsOfC.length} team(s)</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end">${teamsOfC.map(x=>`<span class="chiplet">${x}<button onclick="delTeam('${x.replace(/'/g,"\\'")}')">\u2715</button></span>`).join('')||'<small>none yet</small>'}</div></div>
+ ${teamsOfC.length?`
+ <div class="srow"><div class="l">Put students into a team</div><div class="c"><select class="sel" onchange="S.setTeam=this.value;saveS();renderTeams()">${teamsOfC.map(x=>`<option ${t===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+ <div class="srow"><div class="l">Members of ${t||'-'}<small>${tStudents(c,t).length} member(s) &middot; tap a name to add or remove</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:190px;overflow:auto">${cStudents(c).map(n=>{const inT=tStudents(c,t).includes(n);return `<span class="chiplet ${inT?'on':''}" style="cursor:pointer" onclick="toggleMember('${n.replace(/'/g,"\\'")}')">${avatar(n,26,c)}${inT?' \u2713':''} ${n}</span>`}).join('')||'<small>add students first</small>'}</div></div>`:''}
+ <div class="srow" style="background:#F1EAD8"><div class="l">All changes save as you type</div><div class="c"><button class="sm" onclick="if(cloudCfg())pushCloud(true);toast('Saved \u2714')">\ud83d\udcbe Save</button></div></div>`}
 
 /* ===================== SEASON LOG ===================== */
 const SEASONKEY='wordquest-season-v1';
