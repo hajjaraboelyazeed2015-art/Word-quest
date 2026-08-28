@@ -367,7 +367,7 @@ input[type=color]{width:46px;height:34px;border:2px solid #D9D2C2;border-radius:
   <div id="gateTools" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px"></div>
   <div id="cloudBadge" style="margin-top:14px;font-weight:800;font-size:13px;opacity:.9"></div>
   <div class="cred wm-credit">Prepared by Miss Hagar Shaaban</div>
-  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v30</div>
+  <div style="position:absolute;top:12px;right:16px;font-weight:800;opacity:.5;font-size:12px">v31</div>
 </div>
 <div class="wm wm-credit">Prepared by Miss Hagar Shaaban</div>
 <div class="stars" id="stars"></div>
@@ -806,32 +806,36 @@ function renderSettings(){if(typeof attachAllToggles==='function')setTimeout(att
  <div class="shead">🎮 Rules</div>
  <div class="srow"><div class="l">Lose 1 point on "Try again"</div><div class="c">${sw('penalty')}</div></div>
  <div class="srow" style="background:#F1EAD8"><div class="l">Save settings<small>Everything saves as you type — press this to confirm and close</small></div><div class="c"><button class="sm" onclick="confirmSaveSettings()">💾 Save &amp; close</button></div></div>`}
+function refreshRoster(){
+ if($('#tmodal')&&$('#tmodal').classList.contains('open'))renderTeams();
+ if($('#smodal')&&$('#smodal').classList.contains('open'))renderSettings();
+ rosterSync()}
 function addClass(){const v=($('#newClass')||{}).value||'';const g=S.setGrade||'4';S.gradeClasses=S.gradeClasses||{};S.gradeClasses[g]=S.gradeClasses[g]||[];
- if(addTo(S.gradeClasses[g],v)){S.setClass=v.trim();saveS();toast('Class added');renderSettings()}else if(v.trim())alert('That class is already in the list.')}
+ if(addTo(S.gradeClasses[g],v)){S.setClass=v.trim();saveS();toast('Class added');refreshRoster()}else if(v.trim())alert('That class is already in the list.')}
 function delClass(x){if(!confirm('Remove class '+x+'?\n\nIts teams and students will also be removed.'))return;const g=S.setGrade||'4';
  S.gradeClasses[g]=gClasses(g).filter(y=>y!==x);delete (S.classStudents||{})[x];delete (S.classTeams||{})[x];
  Object.keys(S.teamStudents||{}).forEach(k=>{if(k.indexOf(x+'|')===0)delete S.teamStudents[k]});
- if(S.setClass===x)S.setClass='';saveS();renderSettings()}
+ if(S.setClass===x)S.setClass='';saveS();refreshRoster()}
 function addStudent(){const c=S.setClass;if(!c){alert('Add a class first.');return}const v=($('#newStu')||{}).value||'';
  S.classStudents=S.classStudents||{};S.classStudents[c]=S.classStudents[c]||[];
- if(addTo(S.classStudents[c],v)){saveS();toast('Student added');renderSettings()}else if(v.trim())alert('That name is already in the class.')}
+ if(addTo(S.classStudents[c],v)){saveS();toast('Student added');refreshRoster()}else if(v.trim())alert('That name is already in the class.')}
 function delStudent(n){const c=S.setClass;if(!confirm('Remove '+n+' from '+c+'?'))return;
  S.classStudents[c]=cStudents(c).filter(x=>x!==n);if(S.photos)delete S.photos[c+'|'+n];
  Object.keys(S.teamStudents||{}).forEach(k=>{if(k.indexOf(c+'|')===0)S.teamStudents[k]=S.teamStudents[k].filter(x=>x!==n)});
- saveS();renderSettings()}
+ saveS();refreshRoster()}
 function addTeam(){const c=S.setClass;if(!c){alert('Add a class first.');return}const v=($('#newTeam')||{}).value||'';
  S.classTeams=S.classTeams||{};S.classTeams[c]=S.classTeams[c]||[];
- if(addTo(S.classTeams[c],v)){S.setTeam=v.trim();saveS();toast('Team added');renderSettings()}else if(v.trim())alert('That team is already in the class.')}
+ if(addTo(S.classTeams[c],v)){S.setTeam=v.trim();saveS();toast('Team added');refreshRoster()}else if(v.trim())alert('That team is already in the class.')}
 function delTeam(x){const c=S.setClass;if(!confirm('Remove team '+x+' from '+c+'?'))return;
- S.classTeams[c]=cTeams(c).filter(y=>y!==x);delete (S.teamStudents||{})[c+'|'+x];if(S.setTeam===x)S.setTeam='';saveS();renderSettings()}
+ S.classTeams[c]=cTeams(c).filter(y=>y!==x);delete (S.teamStudents||{})[c+'|'+x];if(S.setTeam===x)S.setTeam='';saveS();refreshRoster()}
 function toggleMember(n){const c=S.setClass,t=S.setTeam;if(!t)return;const k=c+'|'+t;S.teamStudents=S.teamStudents||{};S.teamStudents[k]=S.teamStudents[k]||[];
- const i=S.teamStudents[k].indexOf(n);if(i>=0)S.teamStudents[k].splice(i,1);else S.teamStudents[k].push(n);saveS();renderSettings()}
+ const i=S.teamStudents[k].indexOf(n);if(i>=0)S.teamStudents[k].splice(i,1);else S.teamStudents[k].push(n);saveS();refreshRoster()}
 function pickPhoto(name){const c=S.setClass;const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
  inp.onchange=()=>{const f=inp.files[0];if(!f)return;const rd=new FileReader();
   rd.onload=()=>{const img=new Image();img.onload=()=>{const cv=document.createElement('canvas'),m=160;
     const side=Math.min(img.width,img.height);cv.width=cv.height=m;
     cv.getContext('2d').drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,m,m);
-    S.photos=S.photos||{};S.photos[c+'|'+name]=cv.toDataURL('image/jpeg',.8);saveS();renderSettings()};img.src=rd.result};
+    S.photos=S.photos||{};S.photos[c+'|'+name]=cv.toDataURL('image/jpeg',.8);saveS();refreshRoster()};img.src=rd.result};
   rd.readAsDataURL(f)};inp.click()}
 function confirmSaveSettings(){saveS();if(cloudCfg())pushCloud(true);toast('Settings saved ✔');closeSettings()}
 function resetSettings(){if(!confirm('Restore default settings?'))return;musicOff();S={...SDEF};saveS();renderSettings()}
@@ -1598,7 +1602,7 @@ function tabRoster(){
  ${teamsOfC.length?`
  <div class="srow"><div class="l">Put students into a team</div><div class="c"><select class="sel" onchange="S.setTeam=this.value;saveS();renderTeams()">${teamsOfC.map(x=>`<option ${t===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
  <div class="srow"><div class="l">Members of ${t||'-'}<small>${tStudents(c,t).length} member(s) &middot; tap a name to add or remove</small></div><div class="c" style="flex-wrap:wrap;justify-content:flex-end;max-height:190px;overflow:auto">${cStudents(c).map(n=>{const inT=tStudents(c,t).includes(n);return `<span class="chiplet ${inT?'on':''}" style="cursor:pointer" onclick="toggleMember('${n.replace(/'/g,"\\'")}')">${avatar(n,26,c)}${inT?' \u2713':''} ${n}</span>`}).join('')||'<small>add students first</small>'}</div></div>`:''}
- <div class="srow" style="background:#F1EAD8"><div class="l">All changes save as you type</div><div class="c"><button class="sm" onclick="if(cloudCfg())pushCloud(true);toast('Saved \u2714')">\ud83d\udcbe Save</button></div></div>`}
+ <div class="srow" style="background:#F1EAD8"><div class="l">All changes save as you type</div><div class="c"><button class="sm" onclick="rosterSync();toast('Saved \u2714')">\ud83d\udcbe Save</button></div></div>`}
 
 /* ===================== SEASON LOG ===================== */
 const SEASONKEY='wordquest-season-v1';
@@ -1776,6 +1780,17 @@ function attachAllToggles(){document.querySelectorAll('input,textarea').forEach(
 function applyOsk(){if(!oskBuilt&&S.osk)buildOsk();if(oskBuilt)drawOsk();setTimeout(attachAllToggles,0);setTimeout(markToggles,0);document.querySelectorAll('input,textarea').forEach(el=>{if(oskEditable(el)){if(S.osk)el.setAttribute('inputmode','none');else el.removeAttribute('inputmode')}})}
 
 /* ===================== CLOUD SYNC (JSONBin.io) ===================== */
+/* the class register travels with the scores */
+function rosterOut(){return {gradeClasses:S.gradeClasses||{},classTeams:S.classTeams||{},classStudents:S.classStudents||{},teamStudents:S.teamStudents||{},photos:S.photos||{}}}
+function rosterSync(){S.rosterAt=Date.now();saveS();if(cloudCfg())pushCloud(true)}
+function rosterIn(r,stamp){
+ if(!r)return false;
+ if((stamp||0)<=(S.rosterAt||0))return false;   /* ours is newer - keep it */
+ S.gradeClasses=r.gradeClasses||S.gradeClasses;S.classTeams=r.classTeams||S.classTeams;
+ S.classStudents=r.classStudents||S.classStudents;S.teamStudents=r.teamStudents||S.teamStudents;
+ S.photos=r.photos||S.photos;S.rosterAt=stamp;
+ try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}
+ return true}
 function cloudCfg(){return S.cloudOn&&S.cloudBin&&S.cloudKey}
 function cloudHead(extra,mode){const h={};h[(mode||S.keyMode||'access')==='master'?'X-Master-Key':'X-Access-Key']=S.cloudKey;if(extra)Object.assign(h,extra);return h}
 /* send ONE key header only; if it is rejected, retry with the other kind and remember which works */
@@ -1788,15 +1803,16 @@ async function cloudFetch(url,opts,extraHead){opts=opts||{};const first=S.keyMod
  return r}
 function sessId(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
 function ensureIds(){let ch=false;SEASON.forEach(s=>{if(!s.id){s.id=sessId();ch=true}});if(ch)saveSeason()}
-function mergeRemote(payload){let sess=[],arch=[],rdel=[];if(Array.isArray(payload))sess=payload;else if(payload&&typeof payload==='object'){sess=payload.sessions||[];arch=payload.archives||[];rdel=payload.deleted||[]}
+function mergeRemote(payload){let sess=[],arch=[],rdel=[];
+ if(payload&&payload.roster&&rosterIn(payload.roster,payload.rosterAt)){if($('#tmodal')&&$('#tmodal').classList.contains('open'))renderTeams();normalizeSides()}if(Array.isArray(payload))sess=payload;else if(payload&&typeof payload==='object'){sess=payload.sessions||[];arch=payload.archives||[];rdel=payload.deleted||[]}
  if(rdel.length){rdel.forEach(id=>{if(!DELETED.includes(id))DELETED.push(id)});saveDeleted();
   SEASON=SEASON.filter(x=>!DELETED.includes(x.id));ARCHIVES=ARCHIVES.filter(a=>!DELETED.includes(a.id));saveSeason();saveArchives()}
  sess=sess.filter(r=>r&&!DELETED.includes(r.id));arch=arch.filter(a=>a&&!DELETED.includes(a.id));
  const seen=new Set(SEASON.map(s=>s.id));sess.forEach(r=>{if(r&&r.id&&!seen.has(r.id)){SEASON.push(r);seen.add(r.id)}});SEASON.sort((a,b)=>new Date(a.date)-new Date(b.date));saveSeason();
  const aseen=new Set(ARCHIVES.map(a=>a.id));arch.forEach(a=>{if(a&&a.id&&!aseen.has(a.id)){ARCHIVES.push(a);aseen.add(a.id)}});saveArchives()}
 function cloudStat(msg,cls){const e=$('#cloudStat');if(e){e.textContent=msg;e.className='cstat '+(cls||'')}}
-async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}throw new Error('HTTP '+r.status+(d?' - '+d:''))}const data=await r.json();const arr=Array.isArray(data)?data:(data.record||data.sessions||[]);const before=SEASON.length+ARCHIVES.length;mergeRemote(arr);const after=SEASON.length+ARCHIVES.length;if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(after>before){toast('Updated from another device \u2601');if(typeof cloudBadge==='function')cloudBadge()}if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
-async function pushCloud(silent,unloading){if(!cloudCfg())return false;try{const opts={method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES,deleted:DELETED})};if(unloading)opts.keepalive=true;
+async function pullCloud(silent){if(!cloudCfg())return;try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin+'/latest',{},{'X-Bin-Meta':'false'});if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}throw new Error('HTTP '+r.status+(d?' - '+d:''))}const data=await r.json();const payload=(data&&!Array.isArray(data)&&data.record&&typeof data.record==='object'&&!Array.isArray(data.record))?data.record:data;const arr=Array.isArray(payload)?payload:payload;const before=SEASON.length+ARCHIVES.length;mergeRemote(payload);const after=SEASON.length+ARCHIVES.length;if($('#scr-season').classList.contains('active'))renderSeason();if($('#scr-result').classList.contains('active'))renderAllTime();if(after>before){toast('Updated from another device \u2601');if(typeof cloudBadge==='function')cloudBadge()}if(!silent)cloudStat('Pulled from the cloud \u2714','ok')}catch(e){if(!silent)cloudStat('Could not read cloud: '+e.message,'bad')}}
+async function pushCloud(silent,unloading){if(!cloudCfg())return false;try{const opts={method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES,deleted:DELETED,roster:rosterOut(),rosterAt:S.rosterAt||0})};if(unloading)opts.keepalive=true;
  const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,opts,{'Content-Type':'application/json'});
  if(!r.ok){let detail='';try{const j=await r.clone().json();detail=j.message||JSON.stringify(j)}catch(_){}
   throw new Error('HTTP '+r.status+(detail?' - '+detail:''))}
@@ -1810,7 +1826,7 @@ async function testCloud(){if(!S.cloudBin||!S.cloudKey){cloudStat('Enter Bin ID 
   readOK=r.ok;if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}readMsg='HTTP '+r.status+(d?' - '+d:'')}}
  catch(e){readMsg=e.message}
  cloudStat('Testing write\u2026');
- try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES,deleted:DELETED})},{'Content-Type':'application/json'});
+ try{const r=await cloudFetch('https://api.jsonbin.io/v3/b/'+S.cloudBin,{method:'PUT',body:JSON.stringify({sessions:SEASON,archives:ARCHIVES,deleted:DELETED,roster:rosterOut(),rosterAt:S.rosterAt||0})},{'Content-Type':'application/json'});
   writeOK=r.ok;if(!r.ok){let d='';try{const j=await r.clone().json();d=j.message||''}catch(_){}writeMsg='HTTP '+r.status+(d?' - '+d:'')}}
  catch(e){writeMsg=e.message}
  const mode=S.keyMode||'access';
